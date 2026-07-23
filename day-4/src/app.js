@@ -36,6 +36,7 @@ app.delete('/notes/:id' , (req , res) => {
 app.patch('/notes/:id' , (req , res) => {
     
     notes[req.params.id].description = req.body.description
+    notes[req.params.id].title = req.body.title
     res.send('note updated')
 
     
