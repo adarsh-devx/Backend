@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 const App = () => {
@@ -21,11 +21,13 @@ const App = () => {
     },
   ]);
 
-  axios.get('http://localhost:3000/api/notes')
-  .then((res) => {
-    setNotes(res.data.note);
-    
-  })
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/notes`)
+      .then((res) => {
+        setNotes(res.data.note);
+      });
+  }, []);
+
 
   return (
     <>
