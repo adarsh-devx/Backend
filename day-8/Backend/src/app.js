@@ -4,23 +4,25 @@
 
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
 const noteModel = require("./models/note.model");
+const cors = require("cors");
+const path = require('path');
 
 const app = express();
 
 app.use(cors());
+app.use(express.static('./public'));
 app.use(express.json());
+
 
 
 //create
 app.post("/api/notes", async (req, res) => {
-  const { title, description, age } = req.body;
+  const { title, description} = req.body;
 
   const note = await noteModel.create({
     title,
-    description,
-    age,
+    description
   });
 
   res.status(201).json({
@@ -40,6 +42,19 @@ app.get("/api/notes", async (req, res) => {
   });
 });
 
+//update
+app.patch("/api/notes/:id", async (req, res) => {
+  const id = req.params.id;
+  const { title, description } = req.body;
+  const note = await noteModel.findByIdAndUpdate(id, req.body);
+
+  res.status(200).json({
+    message: "note updated successfully",
+    note,
+  });
+});
+
+
 //delete
 app.delete("/api/notes/:id", async (req, res) => {
   const id = req.params.id;
@@ -52,17 +67,8 @@ app.delete("/api/notes/:id", async (req, res) => {
   });
 });
 
-
-//update
-app.patch("/api/notes/:id", async (req, res) => {
-  const id = req.params.id;
-  const { title, description, age } = req.body;
-  const note = await noteModel.findByIdAndUpdate(id, req.body);
-
-  res.status(200).json({
-    message: "note updated successfully",
-    note,
-  });
+app.use('*name' , (req , res) => {
+  res.sendFile(path.join(__dirname , '../public/index.html'))
 });
 
 module.exports = app;
