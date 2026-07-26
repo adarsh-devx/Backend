@@ -15,7 +15,7 @@ const App = () => {
   // Nayi note database me insert karne ke liye POST request
   function createNotes(title, description) {
     axios
-      .post(`${import.meta.env.VITE_API_URL}/api/notes`, {
+      .post("/api/notes", {
         title,
         description,
       })
@@ -38,7 +38,7 @@ const App = () => {
   // ==========================================
   // Database se saari notes read karke state me set karta hai
   function fetchNotes() {
-    axios.get(`${import.meta.env.VITE_API_URL}/api/notes`).then((res) => {
+    axios.get("/api/notes").then((res) => {
       setNotes(res.data.note || []);
     });
   }
@@ -54,7 +54,7 @@ const App = () => {
   // Database me target note ko PATCH request se update karta hai
   function updateNote(id, title, description) {
     axios
-      .patch(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
+      .patch(`/api/notes/${id}`, {
         title,
         description,
       })
@@ -79,7 +79,7 @@ const App = () => {
   // ==========================================
   // Selected note ko delete karne ke liye DELETE request
   function handleDeleteNote(id) {
-    axios.delete(`${import.meta.env.VITE_API_URL}/api/notes/${id}`).then(() => {
+    axios.delete(`/api/notes/${id}`).then(() => {
       fetchNotes(); // List refresh karo
     });
   }
