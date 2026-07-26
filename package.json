@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "postinstall": "cd day-8/Backend && npm install",
-    "start": "cd day-8/Backend && node server.js"
+    "start": "cd day-8/Backend && node server.js",
+    "dev": "cd day-8/Backend && node server.js"
   }
 }
