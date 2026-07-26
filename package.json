@@ -1,0 +1,9 @@
+{
+  "name": "root-day-2",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "cd day-8/Backend && npm install",
+    "start": "cd day-8/Backend && node server.js"
+  }
+}
