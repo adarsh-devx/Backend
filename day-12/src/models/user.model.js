@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'https://ik.imagekit.io/adarshh/default-image.avif'
     },
-})
+}, { timestamps: true });
 
 const userModel = mongoose.model("users", userSchema);
 module.exports = userModel;
