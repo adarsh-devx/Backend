@@ -7,7 +7,9 @@ async function registerController(req, res) {
     const { username, email, password, bio, profileImage } = req.body;
 
     if (!username || !email || !password) {
-      return res.status(400).json({ message: "Username, email, and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Username, email, and password are required" });
     }
 
     const isUserAlreadyExist = await userModel.findOne({
@@ -15,8 +17,11 @@ async function registerController(req, res) {
     });
 
     if (isUserAlreadyExist) {
-      const conflictField = isUserAlreadyExist.email === email ? "Email" : "Username";
-      return res.status(409).json({ message: `${conflictField} already exists` });
+      const conflictField =
+        isUserAlreadyExist.email === email ? "Email" : "Username";
+      return res
+        .status(409)
+        .json({ message: `${conflictField} already exists` });
     }
 
     const hash = await bcrypt.hash(password, 10);
@@ -29,9 +34,13 @@ async function registerController(req, res) {
       password: hash,
     });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      { id: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      },
+    );
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -60,7 +69,9 @@ async function loginController(req, res) {
     const { username, email, password } = req.body;
 
     if ((!username && !email) || !password) {
-      return res.status(400).json({ message: "Username or email, and password are required" });
+      return res
+        .status(400)
+        .json({ message: "Username or email, and password are required" });
     }
 
     const queryConditions = [];
@@ -79,9 +90,13 @@ async function loginController(req, res) {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      { id: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      },
+    );
 
     res.cookie("token", token, {
       httpOnly: true,
