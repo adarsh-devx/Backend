@@ -2,20 +2,20 @@ const express = require("express");
 const postRouter = express.Router();
 const {
   createPostController,
-  getPostController, getPostDetailsController ,
+  getPostController,
+  getPostDetailsController,
 } = require("../controllers/post.controller");
+const authMiddleware = require("../middlewares/auth.middleware");
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 
 //POST /api/posts/
-postRouter.post("/", upload.single("image"), createPostController);
-
+postRouter.post("/", authMiddleware, upload.single("image"), createPostController);
 
 //GET /api/posts/ [protected]
-postRouter.get("/", getPostController);
+postRouter.get("/", authMiddleware, getPostController);
 
 //GET /api/posts/details/:postId
-// return an detail about specific post with the id . also check wheather the post belongs to the user that is request come from .
-postRouter.get('/details/:postId' , getPostDetailsController)
+postRouter.get("/details/:postId", authMiddleware, getPostDetailsController);
 
 module.exports = postRouter;
