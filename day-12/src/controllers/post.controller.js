@@ -3,6 +3,7 @@ const userModel = require("../models/user.model");
 const mongoose = require("mongoose");
 const Imagekit = require("@imagekit/nodejs");
 const { toFile } = require("@imagekit/nodejs");
+const likeModel = require("../models/like.model");
 
 const imagekit = new Imagekit({
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
@@ -87,8 +88,38 @@ async function getPostDetailsController(req, res) {
   }
 }
 
+async function likePostController(req, res) {
+  try {
+    const username = req.username;
+    const postId = req.params.postId;
+
+    const post = await postModel.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        message: "Post not found",
+      });
+    }
+
+    const like = await likeModel.create({
+      post: postId,
+      user: username,
+    });
+
+    return res.status(200).json({
+      message: "Post liked successfully",
+      like,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      message: "Invalid post ID",
+    });
+  }
+}
+
 module.exports = {
   createPostController,
   getPostController,
   getPostDetailsController,
+  likePostController,
 };

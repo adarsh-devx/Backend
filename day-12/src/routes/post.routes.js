@@ -4,6 +4,7 @@ const {
   createPostController,
   getPostController,
   getPostDetailsController,
+  likePostController,
 } = require("../controllers/post.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 const multer = require("multer");
@@ -22,6 +23,8 @@ postRouter.get("/", authMiddleware, getPostController);
 postRouter.get("/details/:postId", authMiddleware, getPostDetailsController);
 
 
-
+// @route POST /api/posts/like/:id
+// @desc Like a post with the id provided in the request parameters
+postRouter.post("/like/:postId", authMiddleware, likePostController);
 
 module.exports = postRouter;
