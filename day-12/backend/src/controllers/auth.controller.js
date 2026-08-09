@@ -120,7 +120,30 @@ async function loginController(req, res) {
   }
 }
 
+async function getMeController(req, res) {
+  try {
+    const userId = req.userId;
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({
+      message: "User found successfully",
+      user: {
+        username: user.username,
+        email: user.email,
+        bio: user.bio,
+        profileImage: user.profileImage,
+      },
+    });
+  } catch (err) {
+    console.error("Get Me Controller Error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   registerController,
   loginController,
-};
+  getMeController,
+};  

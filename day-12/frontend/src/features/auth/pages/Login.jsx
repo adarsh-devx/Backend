@@ -2,32 +2,21 @@ import { Link } from "react-router";
 import "../styles/form.scss";
 import { useState } from "react";
 import axios from "axios";
+import { useAuth } from "../hooks/useAuth";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const{handleLogin} = useAuth()
 
-  const handleSubmit = async (e) => {
+  const handleSubmit =  (e) => {
     e.preventDefault();
-
-    const data = { username, password };
-    console.log(data);
-
-    try {
-      const res = await axios.post(
-        "http://localhost:3000/api/auth/login",
-        data,
-        {
-          withCredentials: true,
-        },
-      );
-      console.log(res.data);
-      setError("");
-    } catch (err) {
-      console.log(err);
-      setError(err.response?.data?.message || "An error occurred");
-    }
+     handleLogin(username, password).then(res => {
+      console.log(res);
+      
+    })
+    
 
     setUsername("");
     setPassword("");
