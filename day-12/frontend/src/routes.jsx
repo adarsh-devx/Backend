@@ -4,6 +4,10 @@ import Login from "./features/auth/pages/Login";
 
 export const routes = createBrowserRouter([
   {
+    path: "/",
+    element: <h1>Home Page (Logged In)</h1>,
+  },
+  {
     path: "/login",
     element: <Login />,
   },

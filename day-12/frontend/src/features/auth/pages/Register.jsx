@@ -17,7 +17,7 @@ const Register = () => {
       await handleRegister(username, email, password);
       setError("");
     } catch (err) {
-      setError(err);
+      setError(err.response?.data?.message || err.message || "An error occurred");
     }
     
     setUsername('')

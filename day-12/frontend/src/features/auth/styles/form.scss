@@ -1,25 +1,38 @@
+@mixin flex-column($gap: 0rem){
+    display: flex;
+    flex-direction: column;
+    gap: $gap;
+}
 
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+@mixin glass-effect($bg-opacity: 0.015, $border-opacity: 0.12, $blur: 24px) {
+    background: rgba(255, 255, 255, $bg-opacity);
+    border: 1px solid rgba(255, 255, 255, $border-opacity);
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+}
+
+@mixin smooth-transition($time: 0.25s) {
+    transition: all $time cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 main {
     min-height: 100vh;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include flex-center;
     padding: 2rem;
 }
 
 .form-container {
+    @include flex-column(1.5rem);
     height: fit-content;
     min-width: 25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    background: rgba(255, 255, 255, 0.015);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    @include glass-effect(0.015, 0.12, 24px);
     border-radius: 1.5rem;
     padding: 2.5rem;
 
@@ -44,9 +57,7 @@ main {
     }
 
     form {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
+        @include flex-column(1rem);
 
         input, button {
             border: none;
@@ -56,7 +67,7 @@ main {
             border-radius: 1rem;
             font-family: inherit;
             font-size: 1rem;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            @include smooth-transition(0.25s);
         }
 
         input {
@@ -100,18 +111,18 @@ main {
         }
     }
 
-     p{
-    color: white;
-    text-align: center;
-    
-    a{
-      font-weight: 600;
-    }
+    p {
+        color: white;
+        text-align: center;
+        
+        a {
+            font-weight: 600;
+        }
 
-    .toggleAuthForm{
-        color: rgb(14, 150, 249);
-        text-decoration: none;
-        cursor: pointer;
+        .toggleAuthForm {
+            color: rgb(14, 150, 249);
+            text-decoration: none;
+            cursor: pointer;
+        }
     }
-  }
 }

@@ -1,23 +1,29 @@
-import { Link } from "react-router";
-import "../styles/form.scss";
-import { useState } from "react";
-import axios from "axios";
 import { useAuth } from "../hooks/useAuth";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import "../styles/form.scss";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const{handleLogin} = useAuth()
+  const { handleLogin, loading } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit =  (e) => {
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-     handleLogin(username, password).then(res => {
-      console.log(res);
-      
-    })
-    
-
+    try {
+      await handleLogin(username, password);
+      navigate("/");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || err.message || "An error occurred",
+      );
+    }
     setUsername("");
     setPassword("");
   };
