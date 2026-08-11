@@ -1,9 +1,10 @@
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useState } from 'react';
 import '../styles/form.scss';
 import { useAuth } from '../hooks/useAuth';
 
 const Register = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -16,6 +17,7 @@ const Register = () => {
     try {
       await handleRegister(username, email, password);
       setError("");
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || err.message || "An error occurred");
     }
