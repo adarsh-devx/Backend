@@ -1,21 +1,37 @@
 import { createContext, useEffect, useState } from "react";
-import { loginApi, registerApi } from "./services/auth.api";
+import { loginApi, registerApi, getMeApi } from "./services/auth.api";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false); // kya check ho chuka?
+
+  // App load hote hi check karo: user logged in hai ya nahi?
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await getMeApi();
+        setUser(res.user);
+      } catch (err) {
+        setUser(null); // not logged in
+      } finally {
+        setAuthChecked(true); // check complete
+      }
+    };
+    checkAuth();
+  }, []);
 
   const handleLogin = async (username, password) => {
     setLoading(true);
     try {
       const res = await loginApi(username, password);
       setUser(res.user);
-      return res; // ✅ Return response
+      return res;
     } catch (err) {
       console.error(err);
-      throw err;  // ✅ Throw error so component catch can capture it
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -26,10 +42,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await registerApi(username, email, password);
       setUser(res.user);
-      return res; // ✅ Return response
+      return res;
     } catch (err) {
       console.error(err);
-      throw err;  // ✅ Throw error
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -37,7 +53,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user,  loading, handleLogin, handleRegister }}
+      value={{ user, loading, authChecked, handleLogin, handleRegister }}
     >
       {children}
     </AuthContext.Provider>

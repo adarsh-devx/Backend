@@ -118,11 +118,23 @@ async function likePostController(req, res) {
 }
 
 async function getFeedController(req, res) {
-  const posts = await postModel.find().populate(
-    {
-      path: "user",
-      select: "-password",
-    }
+  const allPosts = await postModel.find().populate({
+    path: "user",
+    select: "-password",
+  });
+
+  const posts = await Promise.all(
+    allPosts.map(async (post) => {
+      const isLiked = await likeModel.findOne({
+        user: req.username,
+        post: post._id,
+      });
+
+      return {
+        ...post.toObject(),
+        isLiked: !!isLiked,
+      };
+    })
   );
 
   res.status(200).json({
