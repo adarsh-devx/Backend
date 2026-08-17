@@ -33,9 +33,9 @@ const Register = () => {
             <h1>Register</h1>
             {error && <p className="error-message">{error}</p>}
             <form onSubmit={(e) => formSubmitHandler(e)}>
-                <input value={username} onChange={(e) => setUsername(e.target.value)} type="text" name='username' placeholder='Choose username' required />
-                <input value={email} onChange={(e) => setEmail(e.target.value)} type="text" name='email' placeholder='Email' required />
-                <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" name='password' placeholder='Password' required /> 
+                <input value={username} onChange={(e) => setUsername(e.target.value)} type="text" name='username' placeholder='Choose username' aria-label="Username" required />
+                <input value={email} onChange={(e) => setEmail(e.target.value)} type="text" name='email' placeholder='Email' aria-label="Email" required />
+                <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" name='password' placeholder='Password' aria-label="Password" required /> 
                 <button type='submit'>Register</button> 
             </form>
 

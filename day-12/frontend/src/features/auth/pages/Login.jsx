@@ -40,6 +40,7 @@ const Login = () => {
             type="text"
             name="username"
             placeholder="Enter username"
+            aria-label="Username"
           />
           <input
             value={password}
@@ -47,6 +48,7 @@ const Login = () => {
             type="password"
             name="password"
             placeholder="Enter password"
+            aria-label="Password"
           />
           <button type="submit">Login</button>
         </form>

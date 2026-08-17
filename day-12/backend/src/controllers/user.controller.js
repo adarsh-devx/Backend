@@ -186,4 +186,85 @@ module.exports = {
   acceptFollowController,
   rejectFollowController,
   getFollowRequestsController,
+  getAllUsersController,
+  getFollowingController,
+  getFollowersController,
 };
+
+// --- NEW CONTROLLERS ---
+
+// Get all users (with isFollowing status)
+async function getAllUsersController(req, res) {
+  try {
+    const myUsername = req.username;
+
+    const allUsers = await userModel.find({ username: { $ne: myUsername } }).select("-password");
+
+    const users = await Promise.all(
+      allUsers.map(async (user) => {
+        const followRecord = await followModel.findOne({
+          follower: myUsername,
+          following: user.username,
+          status: "accepted",
+        });
+        return {
+          ...user.toObject(),
+          isFollowing: !!followRecord,
+        };
+      })
+    );
+
+    res.status(200).json({ message: "Users fetched successfully", users });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Get users that I follow (accepted)
+async function getFollowingController(req, res) {
+  try {
+    const myUsername = req.username;
+
+    const followingRecords = await followModel.find({
+      follower: myUsername,
+      status: "accepted",
+    });
+
+    const followingUsers = await Promise.all(
+      followingRecords.map(async (record) => {
+        const user = await userModel.findOne({ username: record.following }).select("-password");
+        return user;
+      })
+    );
+
+    res.status(200).json({ message: "Following fetched successfully", users: followingUsers });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+// Get users that follow me (accepted)
+async function getFollowersController(req, res) {
+  try {
+    const myUsername = req.username;
+
+    const followerRecords = await followModel.find({
+      following: myUsername,
+      status: "accepted",
+    });
+
+    const followerUsers = await Promise.all(
+      followerRecords.map(async (record) => {
+        const user = await userModel.findOne({ username: record.follower }).select("-password");
+        return user;
+      })
+    );
+
+    res.status(200).json({ message: "Followers fetched successfully", users: followerUsers });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}

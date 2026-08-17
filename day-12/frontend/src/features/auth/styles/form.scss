@@ -86,22 +86,22 @@ main {
             }
 
             &:focus {
-                border-color: rgb(3, 111, 214);
+                border-color: #f60052;
                 background: rgba(255, 255, 255, 0.06);
-                box-shadow: 0 0 0 3px rgba(3, 111, 214, 0.25);
+                box-shadow: 0 0 0 3px rgba(246, 0, 82, 0.25);
             }
         }
 
         button {
-            background-color: rgb(3, 111, 214);
+            background-color: #f60052;
             color: white;
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(3, 111, 214, 0.2);
+            box-shadow: 0 4px 15px rgba(246, 0, 82, 0.25);
 
             &:hover {
-                background-color: rgb(20, 130, 235);
-                box-shadow: 0 6px 20px rgba(3, 111, 214, 0.35);
+                background-color: #e0004a;
+                box-shadow: 0 6px 20px rgba(246, 0, 82, 0.4);
                 transform: translateY(-1px);
             }
 
@@ -124,7 +124,7 @@ main {
         }
 
         .toggleAuthForm {
-            color: rgb(14, 150, 249);
+            color: #f60052;
             text-decoration: none;
             cursor: pointer;
         }
