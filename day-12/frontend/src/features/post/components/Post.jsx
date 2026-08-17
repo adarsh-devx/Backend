@@ -1,26 +1,34 @@
 import React from "react";
+import { usePost } from "../hook/usePost";
 
 const Post = ({ user, post }) => {
+  const { handleLikePost, handleUnlikePost } = usePost();
+
+  const handleLike = () => {
+    handleLikePost(post._id);
+  };
+
+  const handleUnlike = () => {
+    handleUnlikePost(post._id);
+  };
+
   return (
     <div className="post">
       <div className="user">
         <div className="img-wrapper">
-          <img
-            src={user.profileImage}
-            alt={user.username}
-          />
+          <img src={user.profileImage} alt={user.username} />
         </div>
         <p>{user.username}</p>
       </div>
-      <img
-        src={post.imgURL}
-        alt={post.caption}
-      />
+      <img src={post.imgURL} alt={post.caption} />
       <div className="icons">
         <div className="left">
           <button>
             <svg
-            className={post.isLiked? "like" : ""}
+              className={post.isLiked ? "like" : ""}
+              onClick={() => {
+                post.isLiked ? handleUnlike(post._id) : handleLike(post._id);
+              }}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"

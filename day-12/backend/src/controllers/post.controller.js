@@ -117,8 +117,37 @@ async function likePostController(req, res) {
   }
 }
 
+async function unlikePostController(req, res) {
+  try {
+    const postId = req.params.postId;
+    const username = req.username;
+
+    const isLiked = await likeModel.findOne({
+      post: postId,
+      user: username,
+    });
+
+    if (!isLiked) {
+      return res.status(400).json({
+        message: "Post did't like",
+      });
+    }
+
+    await likeModel.findOneAndDelete({ _id: isLiked._id });
+
+    return res.status(200).json({
+      message: "Post unliked successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({
+      message: "Invalid post ID",
+    });
+  }
+}
+
 async function getFeedController(req, res) {
-  const allPosts = await postModel.find().populate({
+  const allPosts = await postModel.find().sort({ createdAt: -1 }).populate({
     path: "user",
     select: "-password",
   });
@@ -134,7 +163,7 @@ async function getFeedController(req, res) {
         ...post.toObject(),
         isLiked: !!isLiked,
       };
-    })
+    }),
   );
 
   res.status(200).json({
@@ -148,5 +177,6 @@ module.exports = {
   getPostController,
   getPostDetailsController,
   likePostController,
+  unlikePostController,
   getFeedController,
 };
