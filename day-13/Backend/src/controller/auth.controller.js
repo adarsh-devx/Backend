@@ -56,7 +56,7 @@ const loginUser = async (req, res) => {
     const { email, username, password } = req.body;
     const user = await userModel.findOne({
       $or: [{ email }, { username }],
-    });
+    }).select("+password");
 
     if (!user) {
       return res.status(400).json({
@@ -101,4 +101,33 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser , loginUser };
+const getMe = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    return res.status(200).json({
+      message: "user fetched successfully",
+      user
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "internal server error",
+    });
+  }
+};
+
+
+const logoutUser = (req ,res) => {
+  try {
+    return res.status(200).json({
+      message: "user logout successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "internal server error",
+    });
+  }
+}
+
+module.exports = { registerUser , loginUser , getMe };

@@ -14,15 +14,9 @@ const userSchema = new mongoose.Schema({
   password:{
     type: String,
     required: true,
+    select : false
   }
 });
 
 const userModel = mongoose.model("User",userSchema);
 module.exports = userModel;
-
-
-//TASK 
-
-
-// learn -> userSchema.pre("save" , function (next) {}) -> middleware
-// learn -> userSchema.post("save" , function (next) {}) -> middleware
