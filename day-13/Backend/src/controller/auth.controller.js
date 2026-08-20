@@ -1,6 +1,7 @@
 const userModel = require("../models/user.model.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const blacklistModel = require("../models/blacklist.model.js");
 
 const registerUser = async (req, res) => {
   try {
@@ -54,9 +55,11 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, username, password } = req.body;
-    const user = await userModel.findOne({
-      $or: [{ email }, { username }],
-    }).select("+password");
+    const user = await userModel
+      .findOne({
+        $or: [{ email }, { username }],
+      })
+      .select("+password");
 
     if (!user) {
       return res.status(400).json({
@@ -83,7 +86,7 @@ const loginUser = async (req, res) => {
       },
     );
 
-    res.cookie("token" , token);
+    res.cookie("token", token);
 
     return res.status(200).json({
       message: "user login successfully",
@@ -106,7 +109,7 @@ const getMe = async (req, res) => {
     const user = await userModel.findById(req.user.id);
     return res.status(200).json({
       message: "user fetched successfully",
-      user
+      user,
     });
   } catch (error) {
     console.log(error);
@@ -116,9 +119,19 @@ const getMe = async (req, res) => {
   }
 };
 
-
-const logoutUser = (req ,res) => {
+const logoutUser = async (req, res) => {
   try {
+    const { token } = req.cookies;
+    res.clearCookie("token");
+
+    if (!token) {
+      return res.status(400).json({
+        message: "Invalid token",
+      });
+    }
+
+    await blacklistModel.create({ token });
+
     return res.status(200).json({
       message: "user logout successfully",
     });
@@ -128,6 +141,6 @@ const logoutUser = (req ,res) => {
       message: "internal server error",
     });
   }
-}
+};
 
-module.exports = { registerUser , loginUser , getMe };
+module.exports = { registerUser, loginUser, getMe, logoutUser };
