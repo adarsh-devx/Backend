@@ -50,6 +50,35 @@
     }
   }
 
+  // Alerts
+  .alert-message {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    &.error-alert {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+
+    &.success-alert {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #a7f3d0;
+    }
+  }
+
   .register-form {
     display: flex;
     flex-direction: column;

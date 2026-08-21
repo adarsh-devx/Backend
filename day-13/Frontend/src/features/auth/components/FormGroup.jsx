@@ -1,5 +1,6 @@
 import React from 'react'
 
+
 const FormGroup = ({name, label, type = "text", value, onChange, placeholder = " "}) => {
   return (
     <div className="form-group">
