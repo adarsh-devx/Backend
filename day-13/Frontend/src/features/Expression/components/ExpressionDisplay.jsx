@@ -4,10 +4,6 @@ function ExpressionDisplay({ expression }) {
       <h2>
         {expression.emoji} {expression.name}
       </h2>
-
-      <p>
-        Confidence: {expression.confidence}%
-      </p>
     </div>
   );
 }

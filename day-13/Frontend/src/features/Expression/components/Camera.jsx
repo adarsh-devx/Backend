@@ -42,8 +42,7 @@ function Camera({ onReady }) {
       autoPlay
       muted
       playsInline
-      width="640"
-      height="480"
+      style={{ width: "100%", height: "100%", objectFit: "cover" }}
     />
   );
 }

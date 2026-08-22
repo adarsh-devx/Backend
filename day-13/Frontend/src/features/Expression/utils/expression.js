@@ -11,12 +11,10 @@ export function detectExpression(result) {
     return {
       name: "No Face",
       emoji: "❌",
-      confidence: 0,
     };
   }
 
-  const bs =
-    result.faceBlendshapes[0].categories;
+  const bs = result.faceBlendshapes[0].categories;
 
   // -------------------------
   // Facial signals
@@ -101,8 +99,7 @@ export function detectExpression(result) {
   // Strong-expression rules
   // -------------------------
 
-  const surpriseScore =
-    scores.Surprise;
+  const surpriseScore = scores.Surprise;
 
   /*
     If the face strongly looks surprised,
@@ -118,9 +115,6 @@ export function detectExpression(result) {
     return {
       name: "Surprised",
       emoji: "😮",
-      confidence: Math.round(
-        surpriseScore * 100
-      ),
     };
   }
 
@@ -142,9 +136,6 @@ export function detectExpression(result) {
     return {
       name: "Kiss",
       emoji: "😘",
-      confidence: Math.round(
-        pucker * 100
-      ),
     };
   }
 
@@ -156,9 +147,6 @@ export function detectExpression(result) {
     return {
       name: "Happy",
       emoji: "😊",
-      confidence: Math.round(
-        smile * 100
-      ),
     };
   }
 
@@ -170,9 +158,6 @@ export function detectExpression(result) {
     return {
       name: "Angry",
       emoji: "😠",
-      confidence: Math.round(
-        scores.Angry * 100
-      ),
     };
   }
 
@@ -184,9 +169,6 @@ export function detectExpression(result) {
     return {
       name: "Disgust",
       emoji: "🤢",
-      confidence: Math.round(
-        scores.Disgust * 100
-      ),
     };
   }
 
@@ -201,9 +183,6 @@ export function detectExpression(result) {
     return {
       name: "Sad",
       emoji: "😢",
-      confidence: Math.round(
-        scores.Sad * 100
-      ),
     };
   }
 
@@ -218,9 +197,6 @@ export function detectExpression(result) {
     return {
       name: "Fear",
       emoji: "😨",
-      confidence: Math.round(
-        scores.Fear * 100
-      ),
     };
   }
 
@@ -231,6 +207,5 @@ export function detectExpression(result) {
   return {
     name: "Neutral",
     emoji: "😐",
-    confidence: 50,
   };
 }
