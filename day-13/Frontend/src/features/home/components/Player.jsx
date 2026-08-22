@@ -44,6 +44,16 @@ const Player = () => {
     }
   }, [volume, isMuted]);
 
+  if (loading) {
+    return (
+      <div className="player-card">
+        <div style={{ color: "#9ca3af", fontSize: "0.9rem", textAlign: "center", width: "100%" }}>
+          Loading song matching mood...
+        </div>
+      </div>
+    );
+  }
+
   if (!song) {
     return (
       <div className="player-card">

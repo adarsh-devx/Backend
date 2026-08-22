@@ -1,9 +1,10 @@
 import React from "react";
 
-const DetectExpressionBtn = ({ isDetecting, onClick }) => {
+const DetectExpressionBtn = ({ isDetecting, onClick, disabled, label }) => {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       className={`detect-btn ${isDetecting ? "active" : ""}`}
       style={{
         padding: "0.75rem 1.5rem",
@@ -11,7 +12,8 @@ const DetectExpressionBtn = ({ isDetecting, onClick }) => {
         fontWeight: "600",
         borderRadius: "0.5rem",
         border: "none",
-        cursor: "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
+        opacity: disabled ? 0.6 : 1,
         background: isDetecting
           ? "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)"
           : "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
@@ -23,7 +25,7 @@ const DetectExpressionBtn = ({ isDetecting, onClick }) => {
         margin: "1rem 0",
       }}
     >
-      {isDetecting ? "Scanning..." : "Detect Expression"}
+      {label}
     </button>
   );
 };
