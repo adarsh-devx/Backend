@@ -66,10 +66,10 @@ function ExpressionPage() {
       emoji: "🔍",
     });
 
-    // Run active detection for 1.7 seconds, then turn off the detector loop
+    // Run active detection for 1.3 seconds, then turn off the detector loop
     setTimeout(() => {
       setIsDetecting(false);
-    }, 1700);
+    }, 1300);
   };
 
   let buttonLabel = "Detect Expression";
