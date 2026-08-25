@@ -39,3 +39,16 @@ export const registerValidation = [
     }),
   validate,
 ];
+
+export const loginValidation = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Invalid email"),
+  body("password")
+    .notEmpty()
+    .withMessage("Password is required"),
+  validate,
+];
