@@ -318,6 +318,34 @@ export async function loginUser(req, res) {
   }
 }
 
+// @desc Get current user
+// @route GET /api/auth/get-me
+// @access Private
+
+export async function getMe(req, res) {
+  try {
+    const userId = req.user.id;
+    const user = await userModel.findById(userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+        err: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "User fetched successfully",
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error("Error in fetching user:", error.message);
+    res.status(500).json({ error: "Server error" });
+  }
+}
+
+
 // @desc Verify user email
 // @route GET /api/auth/verify-email
 // @access Public
