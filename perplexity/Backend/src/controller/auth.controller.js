@@ -31,7 +31,7 @@ export async function registerUser(req, res) {
       process.env.JWT_SECRET,
     );
 
-    const verificationUrl = `${process.env.CORS_ORIGIN}/verify-email?token=${emailVerificationToken}`;
+    const verificationUrl = `${req.protocol}://${req.get("host")}/api/auth/verify-email?token=${emailVerificationToken}`;
 
     await sendEmail({
       to: email,
@@ -173,7 +173,6 @@ export async function registerUser(req, res) {
                       margin: 10px 0 0;
                       font-size: 13px;
                       line-height: 1.5;
-                      word-break: break-all;
                     ">
                       <a
                         href="${verificationUrl}"
@@ -182,7 +181,7 @@ export async function registerUser(req, res) {
                           text-decoration: underline;
                         "
                       >
-                        ${verificationUrl}
+                        Verify & Login
                       </a>
                     </p>
 
@@ -345,7 +344,6 @@ export async function getMe(req, res) {
   }
 }
 
-
 // @desc Verify user email
 // @route GET /api/auth/verify-email
 // @access Public
@@ -384,122 +382,7 @@ export async function verifyEmail(req, res) {
 
     user.verified = true;
     await user.save();
-
-   res.send(`
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-      <title>Email Verified — Perplexity</title>
-
-      <style>
-        * {
-          box-sizing: border-box;
-        }
-
-        body {
-          margin: 0;
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-          background: #f5f5f5;
-          font-family: Arial, Helvetica, sans-serif;
-          color: #171717;
-        }
-
-        .card {
-          width: 100%;
-          max-width: 500px;
-          padding: 48px 40px;
-          text-align: center;
-          background: #ffffff;
-          border: 1px solid #e5e5e5;
-          border-radius: 16px;
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
-        }
-
-        .icon {
-          width: 64px;
-          height: 64px;
-          margin: 0 auto 24px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          background: #111111;
-          color: #ffffff;
-          font-size: 28px;
-        }
-
-        h1 {
-          margin: 0 0 14px;
-          font-size: 28px;
-          line-height: 1.3;
-        }
-
-        p {
-          margin: 0 0 28px;
-          color: #666666;
-          font-size: 16px;
-          line-height: 1.6;
-        }
-
-        .button {
-          display: inline-block;
-          padding: 13px 26px;
-          border-radius: 8px;
-          background: #111111;
-          color: #ffffff;
-          text-decoration: none;
-          font-size: 15px;
-          font-weight: 600;
-        }
-
-        .footer {
-          margin-top: 32px;
-          padding-top: 20px;
-          border-top: 1px solid #eeeeee;
-          color: #999999;
-          font-size: 12px;
-        }
-      </style>
-    </head>
-
-    <body>
-      <div class="card">
-
-        <div class="icon">
-          ✓
-        </div>
-
-        <h1>
-          Email verified successfully
-        </h1>
-
-        <p>
-          Your email address has been successfully verified.
-          Your account is now ready to use.
-        </p>
-
-        <a
-          href="http://localhost:3000/login"
-          class="button"
-        >
-          Continue to Login
-        </a>
-
-        <div class="footer">
-          © 2026 Perplexity. All rights reserved.
-        </div>
-
-      </div>
-    </body>
-  </html>
-`);
+    return res.redirect(`${process.env.CORS_ORIGIN}/verify-success`);
   } catch (error) {
     console.error("Error in email verification:", error.message);
     res.status(500).json({ error: "Server error" });
