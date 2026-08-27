@@ -1,10 +1,16 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { useSelector } from 'react-redux'
+import { useChat } from "../hooks/useChat";
 
 const Dashboard = () => {
     const { user } = useSelector((state) => state.auth);
+    const { initializeSocketConnection } = useChat();
 
     console.log(user);
+
+    useEffect(() => {
+        initializeSocketConnection();
+    }, []);
 
     return (
         <div className="min-h-screen bg-zinc-950 text-[#FFFFE3] p-8 font-sans">
