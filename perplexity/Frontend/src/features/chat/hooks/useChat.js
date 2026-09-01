@@ -35,7 +35,6 @@ export const useChat = () => {
     try {
       const data = await getChats();
       if (data && data.chats) {
-        // Convert array of chats to key-value object map if chats is {}
         const chatsMap = {};
         data.chats.forEach((c) => {
           chatsMap[c._id] = c;
@@ -79,10 +78,11 @@ export const useChat = () => {
   }, [activeChatId]);
 
   // Send message using Redux dispatch for chat updates
-  const handleSendMessage = async (inputMessage) => {
-    if (!inputMessage || !inputMessage.trim() || isSending) return;
+  const handleSendMessage = async (inputMessage, imageData = null) => {
+    if ((!inputMessage || !inputMessage.trim()) && !imageData) return;
+    if (isSending) return;
 
-    const userText = inputMessage.trim();
+    const userText = inputMessage ? inputMessage.trim() : "";
     setIsSending(true);
 
     // Optimistically add user message to feed
@@ -90,6 +90,7 @@ export const useChat = () => {
       _id: "temp-" + Date.now(),
       role: "user",
       content: userText,
+      image: imageData,
       createdAt: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, tempUserMsg]);
@@ -97,19 +98,17 @@ export const useChat = () => {
     try {
       const res = await apiSendMessage({
         message: userText,
+        image: imageData,
         chatId: activeChatId,
       });
 
       if (res) {
-        // If it's a new chat created
         if (!activeChatId && res.chat) {
           dispatch(setActiveChatId(res.chat._id));
         }
 
-        // Reload chats in Redux store
         loadChats();
 
-        // Update messages feed
         if (res.userMessage && res.aiMessage) {
           setMessages((prev) => {
             const filtered = prev.filter((m) => !m._id.startsWith("temp-"));
@@ -151,7 +150,6 @@ export const useChat = () => {
     }
   };
 
-  // Convert chats object map back to array for component rendering
   const chatsList = Array.isArray(chats)
     ? chats
     : Object.values(chats || {});

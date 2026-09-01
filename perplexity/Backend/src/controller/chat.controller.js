@@ -2,27 +2,27 @@ import { generateResponse, generateChatTitle } from "../services/ai.service.js";
 import chatModel from "../models/chat.model.js";
 import messageModel from "../models/message.model.js";
 
-
-
 // @desc send message
 // @route POST /api/chats/message
 // @access Private
 export async function sendMessage(req, res) {
   try {
-    const { message, chat: chatId } = req.body;
+    const { message, image, chat: chatId } = req.body;
 
     let title = null,
       chat = null;
 
+    const displayMsg = message || (image ? "Image uploaded" : "New message");
+
     if (!chatId) {
-      const initialTitle = message.length > 30 ? message.substring(0, 30) + "..." : message;
+      const initialTitle = displayMsg.length > 30 ? displayMsg.substring(0, 30) + "..." : displayMsg;
       chat = await chatModel.create({
         user: req.user.id,
         title: initialTitle,
       });
 
-      // Background Async Title Generation (Fire-and-forget) - Doesn't block HTTP response!
-      generateChatTitle(message).then(async (aiTitle) => {
+      // Background Async Title Generation (Fire-and-forget)
+      generateChatTitle(displayMsg).then(async (aiTitle) => {
         if (aiTitle) {
           await chatModel.findByIdAndUpdate(chat._id, { title: aiTitle });
         }
@@ -33,13 +33,14 @@ export async function sendMessage(req, res) {
 
     const userMessage = await messageModel.create({
       chat: activeChatId,
-      content: message,
+      content: message || "Describe this image",
+      image: image || null,
       role: "user",
     });
 
     const messages = await messageModel.find({ chat: activeChatId });
     
-    // Only await Gemini response directly
+    // Call Gemini with multimodal support
     const result = await generateResponse(messages);
 
     const aiMessage = await messageModel.create({
@@ -59,8 +60,6 @@ export async function sendMessage(req, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
-
-
 
 // @desc get all chats
 // @route GET /api/chats/
@@ -98,8 +97,6 @@ export async function getMessages(req, res) {
     res.status(500).json({ message: "Internal server error" });
   }
 }
-
-
 
 // @desc delete chat
 // @route DELETE /api/chats/delete/:chatId

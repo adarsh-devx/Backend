@@ -11,6 +11,10 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    image: {
+      type: String,
+      default: null,
+    },
     role: {
       type: String,
       enum: {
