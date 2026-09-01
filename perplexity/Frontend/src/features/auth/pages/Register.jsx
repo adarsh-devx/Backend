@@ -14,13 +14,14 @@ const Register = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const user = useSelector((state) => state.auth.user);
+  const loading = useSelector((state) => state.auth.loading);
+  const navigate = useNavigate();
+  const { handleRegister } = useAuth();
+
   if (loading) {
     return <Loader />;
   }
-
-  const user = useSelector((state) => state.auth.user);
-  const navigate = useNavigate();
-  const { handleRegister } = useAuth();
 
   if (user) {
     return <Navigate to="/" replace />;
@@ -70,7 +71,6 @@ const Register = () => {
     try {
       const res = await handleRegister(formData);
       if (res && res.success) {
-        alert(res.message || "Registration successful! Please check your email to verify your account.");
         navigate("/login");
       }
     } catch (err) {
@@ -101,8 +101,8 @@ const Register = () => {
       }
     >
       {/* Register Form */}
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Username field */}
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Username Field */}
         <div className="space-y-2">
           <label className="text-xs font-semibold uppercase tracking-wider text-[#CBCBCB] block">
             Username
@@ -213,40 +213,11 @@ const Register = () => {
           )}
         </div>
 
-        {/* Terms & Conditions */}
-        <div className="flex items-center">
-          <input
-            id="terms"
-            type="checkbox"
-            required
-            className="h-4 w-4 rounded border-zinc-800 bg-zinc-950 text-[#6D8196] focus:ring-[#6D8196]/30 accent-[#6D8196] cursor-pointer"
-          />
-          <label
-            htmlFor="terms"
-            className="ml-2 block text-xs text-[#CBCBCB] cursor-pointer select-none"
-          >
-            I agree to the{" "}
-            <a
-              href="#"
-              className="text-[#6D8196] hover:text-[#8397ac] hover:underline"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="#"
-              className="text-[#6D8196] hover:text-[#8397ac] hover:underline"
-            >
-              Privacy Policy
-            </a>
-          </label>
-        </div>
-
         {/* Submit Button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full relative group overflow-hidden bg-[#6D8196] hover:bg-[#5a6d80] text-[#FFFFE3] font-bold py-3 px-4 rounded-xl shadow-[0_0_20px_rgba(109,129,150,0.2)] hover:shadow-[0_0_25px_rgba(109,129,150,0.45)] transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none mt-2"
+          className="w-full relative group overflow-hidden bg-[#6D8196] hover:bg-[#5a6d80] text-[#FFFFE3] font-bold py-3 px-4 rounded-xl shadow-[0_0_20px_rgba(109,129,150,0.2)] hover:shadow-[0_0_25px_rgba(109,129,150,0.45)] transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
         >
           {isSubmitting ? (
             <>
@@ -284,7 +255,7 @@ const Register = () => {
           to="/login"
           className="text-[#6D8196] hover:text-[#8397ac] font-semibold transition-colors"
         >
-          Sign in
+          Sign in instead
         </Link>
       </div>
     </AuthLayout>

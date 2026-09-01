@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { useAuth } from "../hook/useAuth";
 import { useSelector } from "react-redux";
+import { setError } from "../auth.slice";
 import Loader from "../../../components/Loader";
 import AuthLayout from "../components/AuthLayout";
 
@@ -15,8 +16,14 @@ const Login = () => {
 
   const user = useSelector((state) => state.auth.user);
   const loading = useSelector((state) => state.auth.loading);
+  const authError = useSelector((state) => state.auth.error);
   const navigate = useNavigate();
-  const { handleLogin } = useAuth();
+  const { handleLogin, dispatch } = useAuth();
+
+  // Clear any previous Redux auth errors when Login page mounts
+  useEffect(() => {
+    dispatch(setError(null));
+  }, [dispatch]);
 
   if (loading) {
     return <Loader />;
@@ -32,9 +39,13 @@ const Login = () => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
+    // Clear field error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+    // Clear Redux global auth error when user starts typing
+    if (authError) {
+      dispatch(setError(null));
     }
   };
 
@@ -100,6 +111,26 @@ const Login = () => {
         </svg>
       }
     >
+      {/* Backend API Error Banner (Shown ONLY after submitting form with invalid credentials) */}
+      {authError && (
+        <div className="mb-5 p-3.5 bg-red-500/15 border border-red-500/30 rounded-xl text-rose-400 text-xs font-medium flex items-center gap-2.5 animate-fadeIn">
+          <svg
+            className="w-4.5 h-4.5 text-rose-400 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          <span>{authError}</span>
+        </div>
+      )}
+
       {/* Login Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Email field */}
