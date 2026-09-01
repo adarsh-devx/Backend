@@ -15,11 +15,18 @@ export async function sendMessage(req, res) {
       chat = null;
 
     if (!chatId) {
-      title = await generateChatTitle(message);
+      const initialTitle = message.length > 30 ? message.substring(0, 30) + "..." : message;
       chat = await chatModel.create({
         user: req.user.id,
-        title,
+        title: initialTitle,
       });
+
+      // Background Async Title Generation (Fire-and-forget) - Doesn't block HTTP response!
+      generateChatTitle(message).then(async (aiTitle) => {
+        if (aiTitle) {
+          await chatModel.findByIdAndUpdate(chat._id, { title: aiTitle });
+        }
+      }).catch((err) => console.error("Background title generation error:", err));
     }
 
     const activeChatId = chatId || chat._id;
@@ -31,6 +38,8 @@ export async function sendMessage(req, res) {
     });
 
     const messages = await messageModel.find({ chat: activeChatId });
+    
+    // Only await Gemini response directly
     const result = await generateResponse(messages);
 
     const aiMessage = await messageModel.create({
@@ -40,7 +49,7 @@ export async function sendMessage(req, res) {
     });
 
     res.status(201).json({
-      title,
+      title: chat ? chat.title : null,
       chat,
       aiMessage,
       userMessage,
