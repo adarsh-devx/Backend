@@ -44,6 +44,20 @@ const Dashboard = () => {
     scrollToBottom();
   }, [messages, isSending]);
 
+  // Handle window resize for smart responsive sidebar default
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -93,6 +107,11 @@ const Dashboard = () => {
 
     setInputText("");
     setAttachedFiles([]);
+
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+
     handleSendMessage(userText, imagePayload);
   };
 
@@ -134,17 +153,29 @@ const Dashboard = () => {
     <main
       className={`relative h-full w-full flex font-sans overflow-hidden transition-colors duration-300 ${
         isDarkMode
-          ? "bg-[#09090b] text-zinc-100"
+          ? "bg-[#000000] text-zinc-100"
           : "bg-[#f8fafc] text-zinc-900 light-theme"
       }`}
     >
+      {/* Mobile Semi-transparent Overlay Backdrop */}
+      {isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-30 md:hidden transition-opacity duration-300"
+        />
+      )}
+
       {/* 1. Left Sidebar */}
       <aside
-        className={`relative z-20 flex flex-col justify-between shrink-0 h-full overflow-hidden transition-all duration-300 ${
+        className={`fixed md:relative z-40 inset-y-0 left-0 flex flex-col justify-between shrink-0 h-full overflow-hidden transition-all duration-300 ease-in-out ${
           isDarkMode
-            ? "bg-[#121215] border-r border-zinc-800/70"
-            : "bg-[#ffffff] border-r border-zinc-200/80 shadow-sm"
-        } ${isSidebarOpen ? "w-64 md:w-72" : "w-16"}`}
+            ? "bg-[#000000] border-r border-zinc-800/80"
+            : "bg-[#ffffff] border-r border-zinc-200/80 shadow-lg md:shadow-sm"
+        } ${
+          isSidebarOpen
+            ? "translate-x-0 w-72 md:w-64 lg:w-72"
+            : "-translate-x-full md:translate-x-0 md:w-16"
+        }`}
       >
         {/* Sidebar Header / Top Controls */}
         <div
@@ -165,7 +196,7 @@ const Dashboard = () => {
                 </h1>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
-                  title="Collapse sidebar"
+                  title="Close sidebar"
                   className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                     isDarkMode
                       ? "text-zinc-400 hover:text-white hover:bg-zinc-800/60"
@@ -193,7 +224,10 @@ const Dashboard = () => {
 
               {/* Expanded New Chat Button */}
               <button
-                onClick={handleCreateNewChat}
+                onClick={() => {
+                  handleCreateNewChat();
+                  if (window.innerWidth < 768) setIsSidebarOpen(false);
+                }}
                 className={`w-full font-medium py-2.5 px-2.5 rounded-xl transition-all duration-200 flex items-center gap-2.5 text-xs cursor-pointer border-0 shadow-none ${
                   isDarkMode
                     ? "hover:bg-zinc-800/50 text-zinc-200"
@@ -402,7 +436,10 @@ const Dashboard = () => {
                 return (
                   <div
                     key={c._id}
-                    onClick={() => handleSelectChat(c._id)}
+                    onClick={() => {
+                      handleSelectChat(c._id);
+                      if (window.innerWidth < 768) setIsSidebarOpen(false);
+                    }}
                     className={`group relative w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-medium cursor-pointer transition-all duration-200 ${
                       isActive
                         ? isDarkMode
@@ -468,7 +505,7 @@ const Dashboard = () => {
         )}
 
         {/* Sidebar Footer: User Profile with Popover Menu */}
-        <div ref={profileMenuRef} className="relative p-3.5 shrink-0">
+        <div ref={profileMenuRef} className="relative p-3.5 shrink-0 flex justify-center">
           {/* Profile Dropdown Popover Menu */}
           {isProfileMenuOpen && (
             <div
@@ -549,53 +586,52 @@ const Dashboard = () => {
           )}
 
           {/* Profile Trigger Button */}
-          <div
-            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-            className={`flex items-center cursor-pointer p-1.5 rounded-xl transition-all ${
-              isDarkMode ? "hover:bg-zinc-800/50" : "hover:bg-zinc-100"
-            } ${isSidebarOpen ? "justify-start gap-2.5" : "justify-center"}`}
-          >
-            {isSidebarOpen ? (
-              <div className="flex items-center gap-2.5 truncate w-full">
-                <div className="w-8 h-8 rounded-full bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-500 text-xs font-bold shrink-0">
-                  {user?.username ? user.username[0].toUpperCase() : "U"}
-                </div>
-                <div className="truncate flex-1 flex items-center justify-between">
-                  <p
-                    className={`text-xs font-semibold truncate ${
-                      isDarkMode ? "text-white" : "text-zinc-800"
-                    }`}
-                  >
-                    {user?.username || "User"}
-                  </p>
-                  <svg
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                      isDarkMode ? "text-zinc-500" : "text-zinc-400"
-                    } ${isProfileMenuOpen ? "rotate-180" : ""}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div>
+          {isSidebarOpen ? (
+            <div
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              className={`w-full flex items-center gap-2.5 cursor-pointer p-1.5 rounded-xl transition-all ${
+                isDarkMode ? "hover:bg-zinc-800/50" : "hover:bg-zinc-100"
+              }`}
+            >
+              <div className="w-8 h-8 rounded-full bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-500 text-xs font-bold shrink-0">
+                {user?.username ? user.username[0].toUpperCase() : "U"}
               </div>
-            ) : (
-              <div
-                title={user?.username || "User"}
-                className="w-9 h-9 rounded-full bg-[#10b981] text-zinc-950 font-extrabold text-xs flex items-center justify-center cursor-pointer shadow-md"
-              >
-                {user?.username
-                  ? user.username.substring(0, 2).toUpperCase()
-                  : "US"}
+              <div className="truncate flex-1 flex items-center justify-between">
+                <p
+                  className={`text-xs font-semibold truncate ${
+                    isDarkMode ? "text-white" : "text-zinc-800"
+                  }`}
+                >
+                  {user?.username || "User"}
+                </p>
+                <svg
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    isDarkMode ? "text-zinc-500" : "text-zinc-400"
+                  } ${isProfileMenuOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              title={user?.username || "User"}
+              className="w-10 h-10 rounded-full bg-emerald-600/20 border border-emerald-500/40 text-emerald-500 font-extrabold text-xs flex items-center justify-center cursor-pointer transition-transform hover:scale-105 shrink-0"
+            >
+              {user?.username
+                ? user.username.substring(0, 2).toUpperCase()
+                : "US"}
+            </button>
+          )}
         </div>
       </aside>
 
@@ -605,8 +641,36 @@ const Dashboard = () => {
           isDarkMode ? "bg-[#09090b]" : "bg-[#f8fafc]"
         }`}
       >
+        {/* Mobile Header Bar (Only visible on screens < 768px) */}
+        <div className="md:hidden shrink-0 h-13 px-4 flex items-center justify-between border-b border-zinc-800/40">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                isDarkMode ? "text-zinc-300 hover:bg-zinc-800" : "text-zinc-700 hover:bg-zinc-200"
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <h1 className="text-base font-bold text-white tracking-tight">Perplexity</h1>
+          </div>
+
+          <button
+            onClick={handleCreateNewChat}
+            className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+              isDarkMode ? "text-zinc-300 hover:bg-zinc-800" : "text-zinc-700 hover:bg-zinc-200"
+            }`}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+
         {/* Main Message Feed */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 md:p-8 space-y-6">
           {isMessagesLoading ? (
             <div className="h-full flex items-center justify-center">
               <div className="flex flex-col items-center gap-3">
@@ -640,16 +704,16 @@ const Dashboard = () => {
             </div>
           ) : messages.length === 0 ? (
             /* Welcome / Empty State */
-            <div className="h-full flex flex-col items-center justify-center max-w-2xl mx-auto text-center p-6">
+            <div className="h-full flex flex-col items-center justify-center max-w-2xl mx-auto text-center p-4 sm:p-6">
               <h2
-                className={`text-3xl md:text-4xl font-bold tracking-tight mb-3 ${
+                className={`text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 ${
                   isDarkMode ? "text-white" : "text-zinc-900"
                 }`}
               >
                 What do you want to know?
               </h2>
               <p
-                className={`text-sm max-w-md mb-8 leading-relaxed ${
+                className={`text-xs sm:text-sm max-w-md mb-6 sm:mb-8 leading-relaxed ${
                   isDarkMode ? "text-zinc-400" : "text-zinc-600"
                 }`}
               >
@@ -658,7 +722,7 @@ const Dashboard = () => {
 
               {/* Suggestion Chips */}
               {!inputText.trim() && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-lg transition-all duration-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 w-full max-w-lg transition-all duration-300">
                   {[
                     "Mob ka sabse powerful scene kiss season me h?",
                     "Write a React custom hook for socket.io",
@@ -668,7 +732,7 @@ const Dashboard = () => {
                     <button
                       key={i}
                       onClick={() => setInputText(prompt)}
-                      className={`p-3.5 text-left text-xs rounded-2xl transition-all cursor-pointer shadow-sm ${
+                      className={`p-3 sm:p-3.5 text-left text-xs rounded-2xl transition-all cursor-pointer shadow-sm ${
                         isDarkMode
                           ? "bg-[#141417] hover:bg-[#1f1f24] text-zinc-300 hover:text-white border-0"
                           : "bg-white hover:bg-zinc-100 text-zinc-700 hover:text-zinc-900 border border-zinc-200"
@@ -682,7 +746,7 @@ const Dashboard = () => {
             </div>
           ) : (
             /* Message Feed Container */
-            <div className="max-w-3xl mx-auto space-y-8 w-full">
+            <div className="max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto space-y-6 sm:space-y-8 w-full">
               {messages.map((msg, idx) => {
                 const isUser = msg.role === "user";
                 return isUser ? (
@@ -697,7 +761,7 @@ const Dashboard = () => {
                         />
                       </div>
                     )}
-                    <div className="bg-[#1d4ed8] text-white text-sm py-2.5 px-5 rounded-3xl max-w-md md:max-w-lg shadow-md leading-relaxed font-normal">
+                    <div className="bg-[#1d4ed8] text-white text-xs sm:text-sm py-2.5 px-4 sm:px-5 rounded-3xl max-w-[85%] sm:max-w-md md:max-w-lg shadow-md leading-relaxed font-normal">
                       <p className="whitespace-pre-wrap">{msg.content}</p>
                     </div>
                   </div>
@@ -708,7 +772,7 @@ const Dashboard = () => {
                     className="flex flex-col justify-start my-6"
                   >
                     <div
-                      className={`text-sm leading-relaxed font-normal space-y-2 markdown-body overflow-hidden ${
+                      className={`text-xs sm:text-sm leading-relaxed font-normal space-y-2 markdown-body overflow-hidden ${
                         isDarkMode ? "text-zinc-200" : "text-zinc-800"
                       }`}
                     >
@@ -719,7 +783,7 @@ const Dashboard = () => {
 
                     {/* Action Bar (Copy, Thumbs, Share, Retry, More) */}
                     <div
-                      className={`flex items-center gap-3 mt-4 text-xs ${
+                      className={`flex items-center gap-2 sm:gap-3 mt-4 text-xs ${
                         isDarkMode ? "text-zinc-400" : "text-zinc-500"
                       }`}
                     >
@@ -915,13 +979,13 @@ const Dashboard = () => {
 
         {/* 3. Bottom Pill Input Bar */}
         <div
-          className={`shrink-0 p-4 pb-2 transition-colors duration-300 ${
-            isDarkMode ? "bg-[#09090b]" : "bg-[#f8fafc]"
+          className={`shrink-0 p-3 sm:p-4 pb-2 transition-colors duration-300 ${
+            isDarkMode ? "bg-[#000000]" : "bg-[#f8fafc]"
           }`}
         >
           <form
             onSubmit={onSubmit}
-            className={`max-w-3xl mx-auto relative flex flex-col rounded-3xl p-2.5 px-4 shadow-xl transition-all ${
+            className={`max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto relative flex flex-col rounded-3xl p-2 sm:p-2.5 px-3 sm:px-4 shadow-xl transition-all ${
               isDarkMode
                 ? "bg-[#18181b] border-0"
                 : "bg-white border border-zinc-200"
@@ -1078,7 +1142,7 @@ const Dashboard = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything..."
-                className={`flex-1 bg-transparent border-0 text-sm py-2 px-3 focus:outline-none ${
+                className={`flex-1 bg-transparent border-0 text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:outline-none ${
                   isDarkMode
                     ? "text-[#FFFFE3] placeholder-zinc-500"
                     : "text-zinc-900 placeholder-zinc-400"
@@ -1112,7 +1176,7 @@ const Dashboard = () => {
 
           {/* Footer Disclaimer */}
           <div
-            className={`text-center mt-2 text-[11px] ${
+            className={`text-center mt-2 text-[10px] sm:text-[11px] ${
               isDarkMode ? "text-zinc-500" : "text-zinc-400"
             }`}
           >
