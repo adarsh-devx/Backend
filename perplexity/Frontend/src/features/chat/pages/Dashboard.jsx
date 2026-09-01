@@ -82,10 +82,10 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {/* Expanded New Chat Button */}
+              {/* Expanded New Chat Button (No hover border) */}
               <button
                 onClick={handleCreateNewChat}
-                className="w-full bg-[#18181b] hover:bg-[#272730] text-zinc-200 font-medium py-3 px-4 rounded-2xl transition-all duration-200 flex items-center gap-3 text-sm cursor-pointer border-0 hover:border hover:border-zinc-700/60 shadow-none"
+                className="w-full hover:bg-[#272730] text-zinc-200 font-medium py-3 px-4 rounded-2xl transition-all duration-200 flex items-center gap-3 text-sm cursor-pointer border-0 shadow-none"
               >
                 <svg
                   className="w-4.5 h-4.5 text-zinc-300 shrink-0"
@@ -135,11 +135,11 @@ const Dashboard = () => {
                 </svg>
               </button>
 
-              {/* Collapsed New Chat Pencil Icon Button */}
+              {/* Collapsed New Chat Pencil Icon Button (No hover border) */}
               <button
                 onClick={handleCreateNewChat}
                 title="New chat"
-                className="w-10 h-10 bg-[#18181b] hover:bg-[#272730] border-0 hover:border hover:border-zinc-700/60 text-zinc-200 rounded-xl flex items-center justify-center transition-all cursor-pointer"
+                className="w-10 h-10 bg-[#18181b] hover:bg-[#272730] border-0 text-zinc-200 rounded-xl flex items-center justify-center transition-all cursor-pointer"
               >
                 <svg
                   className="w-5 h-5 text-zinc-300"
@@ -184,7 +184,7 @@ const Dashboard = () => {
                     className={`group relative w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-medium cursor-pointer transition-all duration-200 ${
                       isActive
                         ? "bg-blue-600/10 border border-blue-500/40 text-white"
-                        : "bg-transparent border-0 hover:border hover:border-zinc-800 text-zinc-400 hover:bg-zinc-800/40 hover:text-white"
+                        : "bg-transparent border-0 text-zinc-400 hover:bg-zinc-800/40 hover:text-white"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 truncate pr-6">
@@ -393,15 +393,23 @@ const Dashboard = () => {
                 );
               })}
 
-              {/* AI Generating Loading Indicator */}
+              {/* AI Thinking Animation */}
               {isSending && (
-                <div className="flex justify-start my-4">
-                  <div className="flex items-center gap-2 text-zinc-400 text-sm">
-                    <svg className="animate-spin h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span className="animate-pulse">Thinking...</span>
+                <div className="flex justify-start my-6">
+                  <div className="flex items-center gap-3 py-1">
+                    {/* AI Bot Icon */}
+                    <div className="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center text-blue-400 shrink-0">
+                      <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+
+                    {/* 3 Bouncing Dots Animation */}
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-zinc-300 animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                      <span className="w-2 h-2 rounded-full bg-zinc-300 animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                      <span className="w-2 h-2 rounded-full bg-zinc-300 animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -415,7 +423,7 @@ const Dashboard = () => {
         <div className="shrink-0 bg-[#09090b] p-4 pb-2">
           <form
             onSubmit={onSubmit}
-            className="max-w-3xl mx-auto relative flex items-center bg-[#18181b] border-0 hover:border hover:border-[#27272a] focus-within:border focus-within:border-[#3f3f46] rounded-full p-2 px-4 shadow-2xl transition-all"
+            className="max-w-3xl mx-auto relative flex items-center bg-[#18181b] border-0 rounded-full p-2 px-4 shadow-2xl transition-all"
           >
             {/* Left Plus Icon */}
             <button
