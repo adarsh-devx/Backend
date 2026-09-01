@@ -315,7 +315,7 @@ const Dashboard = () => {
               <button
                 onClick={() => setIsSidebarOpen(true)}
                 title="Expand sidebar"
-                className={`group relative p-2.5 mb-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
+                className={`group relative p-2.5 mb-1 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
                   isDarkMode ? "text-white hover:bg-zinc-800/60" : "text-zinc-900 hover:bg-zinc-100"
                 }`}
               >
@@ -350,14 +350,14 @@ const Dashboard = () => {
                 </svg>
               </button>
 
-              {/* Collapsed New Chat Pencil Icon Button */}
+              {/* Collapsed New Chat Pencil Icon Button (Borderless) */}
               <button
                 onClick={handleCreateNewChat}
                 title="New chat"
-                className={`w-10 h-10 border-0 rounded-xl flex items-center justify-center transition-all cursor-pointer mb-2 ${
+                className={`p-2.5 rounded-xl transition-all cursor-pointer mb-1 flex items-center justify-center ${
                   isDarkMode
-                    ? "bg-[#18181b] hover:bg-[#272730] text-zinc-200"
-                    : "bg-[#f1f5f9] hover:bg-[#e2e8f0] text-zinc-800"
+                    ? "text-zinc-300 hover:text-white hover:bg-zinc-800/60"
+                    : "text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100"
                 }`}
               >
                 <svg
@@ -375,14 +375,14 @@ const Dashboard = () => {
                 </svg>
               </button>
 
-              {/* Collapsed Search Magnifying Glass Icon Button */}
+              {/* Collapsed Search Icon Button (Borderless) */}
               <button
                 onClick={handleOpenSearch}
                 title="Search chats"
-                className={`w-10 h-10 border-0 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                className={`p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
                   isDarkMode
-                    ? "bg-[#18181b] hover:bg-[#272730] text-zinc-200"
-                    : "bg-[#f1f5f9] hover:bg-[#e2e8f0] text-zinc-800"
+                    ? "text-zinc-300 hover:text-white hover:bg-zinc-800/60"
+                    : "text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100"
                 }`}
               >
                 <svg
@@ -638,7 +638,7 @@ const Dashboard = () => {
       {/* 2. Main Right Area */}
       <section
         className={`relative z-10 flex-1 flex flex-col h-full overflow-hidden transition-colors duration-300 ${
-          isDarkMode ? "bg-[#09090b]" : "bg-[#f8fafc]"
+          isDarkMode ? "bg-[#000000]" : "bg-[#f8fafc]"
         }`}
       >
         {/* Mobile Header Bar (Only visible on screens < 768px) */}
@@ -713,36 +713,12 @@ const Dashboard = () => {
                 What do you want to know?
               </h2>
               <p
-                className={`text-xs sm:text-sm max-w-md mb-6 sm:mb-8 leading-relaxed ${
+                className={`text-xs sm:text-sm max-w-md leading-relaxed ${
                   isDarkMode ? "text-zinc-400" : "text-zinc-600"
                 }`}
               >
                 Ask a question or search for anything to start exploring.
               </p>
-
-              {/* Suggestion Chips */}
-              {!inputText.trim() && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 w-full max-w-lg transition-all duration-300">
-                  {[
-                    "Mob ka sabse powerful scene kiss season me h?",
-                    "Write a React custom hook for socket.io",
-                    "Explain quantum entanglement in simple Hindi",
-                    "Best practices for Mongoose schema design",
-                  ].map((prompt, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setInputText(prompt)}
-                      className={`p-3 sm:p-3.5 text-left text-xs rounded-2xl transition-all cursor-pointer shadow-sm ${
-                        isDarkMode
-                          ? "bg-[#141417] hover:bg-[#1f1f24] text-zinc-300 hover:text-white border-0"
-                          : "bg-white hover:bg-zinc-100 text-zinc-700 hover:text-zinc-900 border border-zinc-200"
-                      }`}
-                    >
-                      "{prompt}"
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           ) : (
             /* Message Feed Container */
