@@ -62,11 +62,11 @@ const Dashboard = () => {
         }`}
       >
         {/* Sidebar Header / Top Controls */}
-        <div className={`p-3.5 pb-2 shrink-0 flex flex-col ${isSidebarOpen ? "" : "items-center"}`}>
+        <div className={`p-3 pb-2 shrink-0 flex flex-col ${isSidebarOpen ? "" : "items-center"}`}>
           {isSidebarOpen ? (
             <>
               {/* Expanded Header Row */}
-              <div className="flex items-center justify-between mb-3 px-1">
+              <div className="flex items-center justify-between mb-3 px-2.5">
                 <h1 className="text-lg font-bold tracking-tight text-white">
                   Perplexity
                 </h1>
@@ -82,13 +82,13 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {/* Expanded New Chat Button (No hover border) */}
+              {/* Expanded New Chat Button (100% aligned with recent conversations) */}
               <button
                 onClick={handleCreateNewChat}
-                className="w-full hover:bg-[#272730] text-zinc-200 font-medium py-3 px-4 rounded-2xl transition-all duration-200 flex items-center gap-3 text-sm cursor-pointer border-0 shadow-none"
+                className="w-full hover:bg-zinc-800/50 text-zinc-200 font-medium py-2.5 px-2.5 rounded-xl transition-all duration-200 flex items-center gap-2.5 text-xs cursor-pointer border-0 shadow-none"
               >
                 <svg
-                  className="w-4.5 h-4.5 text-zinc-300 shrink-0"
+                  className="w-4 h-4 text-zinc-400 shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -135,7 +135,7 @@ const Dashboard = () => {
                 </svg>
               </button>
 
-              {/* Collapsed New Chat Pencil Icon Button (No hover border) */}
+              {/* Collapsed New Chat Pencil Icon Button */}
               <button
                 onClick={handleCreateNewChat}
                 title="New chat"
@@ -162,7 +162,7 @@ const Dashboard = () => {
         {/* Chat Titles List */}
         {isSidebarOpen ? (
           <div className="flex-1 overflow-y-auto p-3 space-y-1">
-            <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+            <div className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
               Recent Conversations
             </div>
 
