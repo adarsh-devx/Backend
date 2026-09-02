@@ -1,14 +1,8 @@
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatMistralAI } from "@langchain/mistralai";
 import { HumanMessage, SystemMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
 import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 import { searchIntenet } from "./internet.service.js";
-
-const geminiModel = new ChatGoogleGenerativeAI({
-  model: "gemini-3.6-flash",
-  apiKey: process.env.GEMINI_API_KEY,
-});
 
 const mistralModel = new ChatMistralAI({
   model: "mistral-small-latest",
@@ -28,7 +22,7 @@ const searchInternetTool = tool(
   }
 );
 
-const modelWithTools = geminiModel.bindTools([searchInternetTool]);
+const modelWithTools = mistralModel.bindTools([searchInternetTool]);
 
 export async function generateResponse(messages) {
   // Take last 10 messages to keep context fast and lightweight
@@ -40,7 +34,6 @@ export async function generateResponse(messages) {
       const isLatestUserMsg = index === recentMessages.length - 1;
       
       if (msg.role === "user") {
-        // Only include base64 image payload if it's the current latest message
         if (msg.image && isLatestUserMsg) {
           return new HumanMessage({
             content: [
@@ -64,7 +57,7 @@ export async function generateResponse(messages) {
 
   let response = await modelWithTools.invoke(formattedMessages);
 
-  // If Gemini decides to invoke the search_internet tool
+  // If Mistral decides to invoke the search_internet tool
   if (response.tool_calls && response.tool_calls.length > 0) {
     const toolCall = response.tool_calls[0];
     if (toolCall.name === "search_internet") {
@@ -79,7 +72,7 @@ export async function generateResponse(messages) {
       );
 
       // Call model again with the search results to get final answer
-      response = await geminiModel.invoke(formattedMessages);
+      response = await mistralModel.invoke(formattedMessages);
     }
   }
 
