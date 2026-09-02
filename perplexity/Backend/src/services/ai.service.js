@@ -1,6 +1,9 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { ChatMistralAI } from "@langchain/mistralai";
-import { HumanMessage, SystemMessage, AIMessage } from "langchain";
+import { HumanMessage, SystemMessage, AIMessage, ToolMessage } from "@langchain/core/messages";
+import { tool } from "@langchain/core/tools";
+import * as z from "zod";
+import { searchIntenet } from "./internet.service.js";
 
 const geminiModel = new ChatGoogleGenerativeAI({
   model: "gemini-3.6-flash",
@@ -12,12 +15,33 @@ const mistralModel = new ChatMistralAI({
   apiKey: process.env.MISTRAL_API_KEY,
 });
 
+const searchInternetTool = tool(
+  async ({ query }) => {
+    return await searchIntenet(query);
+  },
+  {
+    name: "search_internet",
+    description: "Search the internet for real-time information",
+    schema: z.object({
+      query: z.string().describe("The query to search for"),
+    }),
+  }
+);
+
+const modelWithTools = geminiModel.bindTools([searchInternetTool]);
+
 export async function generateResponse(messages) {
-  const formattedMessages = messages
+  // Take last 10 messages to keep context fast and lightweight
+  const recentMessages = messages.slice(-10);
+
+  const formattedMessages = recentMessages
     .filter((msg) => msg && (msg.content || msg.image))
-    .map((msg) => {
+    .map((msg, index) => {
+      const isLatestUserMsg = index === recentMessages.length - 1;
+      
       if (msg.role === "user") {
-        if (msg.image) {
+        // Only include base64 image payload if it's the current latest message
+        if (msg.image && isLatestUserMsg) {
           return new HumanMessage({
             content: [
               { type: "text", text: msg.content || "Describe or analyze this image." },
@@ -38,8 +62,28 @@ export async function generateResponse(messages) {
     })
     .filter(Boolean);
 
-  const response = await geminiModel.invoke(formattedMessages);
-  return response.text;
+  let response = await modelWithTools.invoke(formattedMessages);
+
+  // If Gemini decides to invoke the search_internet tool
+  if (response.tool_calls && response.tool_calls.length > 0) {
+    const toolCall = response.tool_calls[0];
+    if (toolCall.name === "search_internet") {
+      const searchResult = await searchInternetTool.invoke(toolCall.args);
+      
+      formattedMessages.push(response);
+      formattedMessages.push(
+        new ToolMessage({
+          content: typeof searchResult === "string" ? searchResult : JSON.stringify(searchResult),
+          tool_call_id: toolCall.id,
+        })
+      );
+
+      // Call model again with the search results to get final answer
+      response = await geminiModel.invoke(formattedMessages);
+    }
+  }
+
+  return response.content || response.text;
 }
 
 export async function generateChatTitle(message) {
