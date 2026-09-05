@@ -4,6 +4,7 @@ import { useChat } from "../hooks/useChat";
 import { setUser } from "../../auth/auth.slice";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -151,7 +152,7 @@ const Dashboard = () => {
 
   return (
     <main
-      className={`relative h-full w-full flex font-sans overflow-hidden transition-colors duration-300 ${
+      className={`relative h-full w-full flex font-handwritten overflow-hidden transition-colors duration-300 ${
         isDarkMode
           ? "bg-[#000000] text-zinc-100"
           : "bg-[#f8fafc] text-zinc-900 light-theme"
@@ -526,31 +527,41 @@ const Dashboard = () => {
               >
                 {isDarkMode ? (
                   <svg
-                    className="w-4 h-4 text-amber-400 shrink-0"
-                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
+                    fill="none"
                     stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-4 h-4 text-indigo-400 shrink-0 lucide lucide-moon"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                    />
+                    <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
                   </svg>
                 ) : (
                   <svg
-                    className="w-4 h-4 text-indigo-500 shrink-0"
-                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
                     viewBox="0 0 24 24"
+                    fill="none"
                     stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-4 h-4 text-amber-500 shrink-0 lucide lucide-sun"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                    />
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2" />
+                    <path d="M12 20v2" />
+                    <path d="m4.93 4.93 1.41 1.41" />
+                    <path d="m17.66 17.66 1.41 1.41" />
+                    <path d="M2 12h2" />
+                    <path d="M20 12h2" />
+                    <path d="m6.34 17.66-1.41 1.41" />
+                    <path d="m19.07 4.93-1.41 1.41" />
                   </svg>
                 )}
                 <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
@@ -585,7 +596,7 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Profile Trigger Button */}
+          {/* Profile Trigger Button using Neobrutalism Avatar */}
           {isSidebarOpen ? (
             <div
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
@@ -593,9 +604,12 @@ const Dashboard = () => {
                 isDarkMode ? "hover:bg-zinc-800/50" : "hover:bg-zinc-100"
               }`}
             >
-              <div className="w-8 h-8 rounded-full bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-500 text-xs font-bold shrink-0">
-                {user?.username ? user.username[0].toUpperCase() : "U"}
-              </div>
+              <Avatar className="w-8 h-8 shrink-0 border border-zinc-700">
+                <AvatarImage src="/profile.png" alt={user?.username || 'User'} className="object-cover" />
+                <AvatarFallback className="bg-emerald-600/20 text-emerald-500 font-bold text-xs">
+                  {user?.username ? user.username[0].toUpperCase() : "U"}
+                </AvatarFallback>
+              </Avatar>
               <div className="truncate flex-1 flex items-center justify-between">
                 <p
                   className={`text-xs font-semibold truncate ${
@@ -625,11 +639,14 @@ const Dashboard = () => {
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               title={user?.username || "User"}
-              className="w-10 h-10 rounded-full bg-emerald-600/20 border border-emerald-500/40 text-emerald-500 font-extrabold text-xs flex items-center justify-center cursor-pointer transition-transform hover:scale-105 shrink-0"
+              className="p-0 border-0 bg-transparent cursor-pointer transition-transform hover:scale-105 shrink-0"
             >
-              {user?.username
-                ? user.username.substring(0, 2).toUpperCase()
-                : "US"}
+              <Avatar className="w-10 h-10 border border-zinc-700">
+                <AvatarImage src="/profile.png" alt={user?.username || 'User'} className="object-cover" />
+                <AvatarFallback className="bg-emerald-600/20 text-emerald-500 font-extrabold text-xs">
+                  {user?.username ? user.username.substring(0, 2).toUpperCase() : "US"}
+                </AvatarFallback>
+              </Avatar>
             </button>
           )}
         </div>
@@ -961,20 +978,20 @@ const Dashboard = () => {
         >
           <form
             onSubmit={onSubmit}
-            className={`max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto relative flex flex-col rounded-3xl p-2 sm:p-2.5 px-3 sm:px-4 shadow-xl transition-all ${
+            className={`max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto relative flex flex-col rounded-2xl p-2 sm:p-2.5 px-3 sm:px-4 transition-all border-2 ${
               isDarkMode
-                ? "bg-[#18181b] border-0"
-                : "bg-white border border-zinc-200"
+                ? "bg-[#18181b] border-zinc-700 shadow-[2px_2px_0px_0px_#2563eb]"
+                : "bg-[#dbeafe] border-black shadow-[2px_2px_0px_0px_#000000]"
             }`}
           >
             {/* Attachment Popover Menu */}
             {isAttachMenuOpen && (
               <div
                 ref={attachMenuRef}
-                className={`absolute bottom-16 left-0 z-50 p-1.5 rounded-2xl border shadow-2xl animate-fadeIn ${
+                className={`absolute bottom-16 left-0 z-50 p-1.5 rounded-2xl border-2 animate-fadeIn ${
                   isDarkMode
-                    ? "bg-[#18181b] border-zinc-800 text-white"
-                    : "bg-white border-zinc-200 text-zinc-900 shadow-xl"
+                    ? "bg-[#18181b] border-zinc-700 text-white shadow-[2px_2px_0px_0px_#2563eb]"
+                    : "bg-white border-black text-black shadow-[2px_2px_0px_0px_#000000]"
                 }`}
               >
                 <button
@@ -983,15 +1000,15 @@ const Dashboard = () => {
                     setIsAttachMenuOpen(false);
                     fileInputRef.current?.click();
                   }}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs transition-all cursor-pointer ${
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs transition-all cursor-pointer font-bold ${
                     isDarkMode
-                      ? "hover:bg-zinc-800/70 text-zinc-200"
-                      : "hover:bg-zinc-100 text-zinc-800"
+                      ? "hover:bg-zinc-800 text-zinc-200"
+                      : "hover:bg-zinc-100 text-black"
                   }`}
                 >
                   <svg
                     className={`w-4 h-4 shrink-0 ${
-                      isDarkMode ? "text-zinc-400" : "text-zinc-500"
+                      isDarkMode ? "text-zinc-400" : "text-black"
                     }`}
                     fill="none"
                     viewBox="0 0 24 24"
@@ -1005,7 +1022,7 @@ const Dashboard = () => {
                     />
                   </svg>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-xs">
+                    <span className="font-bold text-xs">
                       Add photos & files
                     </span>
                   </div>
@@ -1025,14 +1042,14 @@ const Dashboard = () => {
 
             {/* Attached Files Preview Chips */}
             {attachedFiles.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2 pt-1 pb-1 border-b border-zinc-800/40">
+              <div className="flex flex-wrap gap-2 mb-2 pt-1 pb-1 border-b border-zinc-700/50">
                 {attachedFiles.map((item) => (
                   <div
                     key={item.id}
-                    className={`group relative flex items-center gap-2 py-1 px-2.5 rounded-xl text-xs border ${
+                    className={`group relative flex items-center gap-2 py-1 px-2.5 rounded-xl text-xs border-2 ${
                       isDarkMode
-                        ? "bg-zinc-800/80 border-zinc-700 text-zinc-200"
-                        : "bg-zinc-100 border-zinc-300 text-zinc-800"
+                        ? "bg-zinc-800 border-zinc-600 text-zinc-200 shadow-[2px_2px_0px_0px_#2563eb]"
+                        : "bg-white border-black text-black shadow-[2px_2px_0px_0px_#000000]"
                     }`}
                   >
                     {item.preview ? (
@@ -1043,7 +1060,7 @@ const Dashboard = () => {
                       />
                     ) : (
                       <svg
-                        className="w-4 h-4 text-blue-400 shrink-0"
+                        className="w-4 h-4 text-blue-500 shrink-0"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -1056,13 +1073,13 @@ const Dashboard = () => {
                         />
                       </svg>
                     )}
-                    <span className="truncate max-w-[140px] font-medium">
+                    <span className="truncate max-w-[140px] font-bold">
                       {item.name}
                     </span>
                     <button
                       type="button"
                       onClick={() => removeAttachedFile(item.id)}
-                      className="p-0.5 hover:text-rose-400 rounded-full transition-colors cursor-pointer"
+                      className="p-0.5 hover:text-rose-500 rounded-full transition-colors cursor-pointer"
                     >
                       <svg
                         className="w-3.5 h-3.5"
@@ -1073,7 +1090,7 @@ const Dashboard = () => {
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          strokeWidth={2}
+                          strokeWidth={2.5}
                           d="M6 18L18 6M6 6l12 12"
                         />
                       </svg>
@@ -1084,16 +1101,16 @@ const Dashboard = () => {
             )}
 
             {/* Input Row */}
-            <div className="flex items-center w-full">
+            <div className="flex items-center w-full gap-2">
               {/* Left Plus Attachment Trigger Button */}
               <button
                 type="button"
                 onClick={() => setIsAttachMenuOpen(!isAttachMenuOpen)}
                 title="Add photos & files"
-                className={`p-1.5 rounded-full cursor-pointer transition-colors shrink-0 ${
+                className={`p-1.5 rounded-xl cursor-pointer transition-all shrink-0 border-2 ${
                   isDarkMode
-                    ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
-                    : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
+                    ? "text-zinc-300 hover:text-white bg-zinc-800 border-zinc-600 shadow-[2px_2px_0px_0px_#ffffff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                    : "text-black hover:bg-zinc-100 bg-white border-black shadow-[2px_2px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
                 }`}
               >
                 <svg
@@ -1105,7 +1122,7 @@ const Dashboard = () => {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
@@ -1120,8 +1137,8 @@ const Dashboard = () => {
                 placeholder="Ask anything..."
                 className={`flex-1 bg-transparent border-0 text-xs sm:text-sm py-2 px-2.5 sm:px-3 focus:outline-none ${
                   isDarkMode
-                    ? "text-[#FFFFE3] placeholder-zinc-500"
-                    : "text-zinc-900 placeholder-zinc-400"
+                    ? "text-white placeholder-zinc-500 font-medium"
+                    : "text-black placeholder-zinc-700 font-bold"
                 }`}
               />
 
@@ -1130,7 +1147,11 @@ const Dashboard = () => {
                 <button
                   type="submit"
                   disabled={(!inputText.trim() && attachedFiles.length === 0) || isSending}
-                  className="bg-[#2563eb] hover:bg-[#1d4ed8] disabled:opacity-40 disabled:pointer-events-none text-white p-2 rounded-full transition-all cursor-pointer shadow-md"
+                  className={`bg-[#2563eb] hover:bg-[#1d4ed8] disabled:opacity-40 disabled:pointer-events-none text-white p-2 sm:p-2.5 rounded-xl border-2 transition-all cursor-pointer ${
+                    isDarkMode
+                      ? "border-white shadow-[3px_3px_0px_0px_#ffffff] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                      : "border-black shadow-[3px_3px_0px_0px_#000000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                  }`}
                 >
                   <svg
                     className="w-4 h-4"

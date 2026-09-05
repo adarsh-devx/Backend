@@ -1,4 +1,10 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@400..700&display=swap');
+
+.font-handwritten,
+.markdown-body {
+  font-family: 'Architects Daughter', 'Caveat', cursive, sans-serif !important;
+}
 
 html,
 body,

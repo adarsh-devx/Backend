@@ -3,7 +3,18 @@ import { Link, Navigate, useNavigate } from "react-router";
 import { useAuth } from "../hook/useAuth";
 import { useSelector } from "react-redux";
 import Loader from "../../../components/Loader";
-import AuthLayout from "../components/AuthLayout";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +44,6 @@ const Register = () => {
       ...prev,
       [name]: value,
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -81,184 +91,100 @@ const Register = () => {
   };
 
   return (
-    <AuthLayout
-      title="Create Account"
-      subtitle="Get started by entering your details"
-      icon={
-        <svg
-          className="w-6 h-6 text-[#FFFFE3]"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2.5}
-            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-          />
-        </svg>
-      }
-    >
-      {/* Register Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Username Field */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#CBCBCB] block">
-            Username
-          </label>
-          <div className="relative">
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="johndoe"
-              className={`w-full bg-zinc-950/60 border ${
-                errors.username
-                  ? "border-red-500/80 focus:ring-red-500/30"
-                  : "border-zinc-800/80 focus:ring-[#6D8196]/30 focus:border-[#6D8196]"
-              } rounded-xl py-3 px-4 text-[#FFFFE3] placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all duration-200`}
-            />
+    <div className="min-h-screen w-full bg-[#f8fafc] text-black flex items-center justify-center p-4 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:32px_32px]">
+      <Card className="w-full max-w-sm border-2 border-black shadow-[6px_6px_0px_0px_#000000] bg-[#dbeafe] text-black rounded-2xl p-2">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-2xl font-black tracking-tight text-black">
+            Create an account
+          </CardTitle>
+          <CardDescription className="text-zinc-800 text-sm font-medium">
+            Enter your details below to create your new account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-5">
+              <div className="grid gap-2">
+                <Label htmlFor="username" className="text-sm font-bold text-black">
+                  Username
+                </Label>
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="johndoe"
+                  className="border-2 border-black bg-white text-black placeholder-zinc-400 focus:ring-0 focus:outline-none rounded-xl h-11 px-3.5 shadow-[2px_2px_0px_0px_#000]"
+                  required
+                />
+                {errors.username && (
+                  <p className="text-xs text-rose-600 font-bold">{errors.username}</p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email" className="text-sm font-bold text-black">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="m@example.com"
+                  className="border-2 border-black bg-white text-black placeholder-zinc-400 focus:ring-0 focus:outline-none rounded-xl h-11 px-3.5 shadow-[2px_2px_0px_0px_#000]"
+                  required
+                />
+                {errors.email && (
+                  <p className="text-xs text-rose-600 font-bold">{errors.email}</p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="password" className="text-sm font-bold text-black">
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="border-2 border-black bg-white text-black focus:ring-0 focus:outline-none rounded-xl h-11 px-3.5 shadow-[2px_2px_0px_0px_#000]"
+                  required
+                />
+                {errors.password && (
+                  <p className="text-xs text-rose-600 font-bold">{errors.password}</p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full mt-2 h-11 bg-[#3b82f6] hover:bg-[#2563eb] text-black font-extrabold border-2 border-black shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all rounded-xl cursor-pointer"
+              >
+                {isSubmitting ? "Creating account..." : "Sign Up"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+
+        <CardFooter className="flex-col gap-2 pt-2">
+          <div className="mt-1 text-center text-xs font-semibold text-zinc-900">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-black underline underline-offset-4 font-black hover:text-blue-700"
+            >
+              Sign in instead
+            </Link>
           </div>
-          {errors.username && (
-            <p className="text-xs text-rose-500 mt-1 flex items-center gap-1 animate-pulse">
-              <svg
-                className="w-3.5 h-3.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {errors.username}
-            </p>
-          )}
-        </div>
-
-        {/* Email field */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#CBCBCB] block">
-            Email Address
-          </label>
-          <div className="relative">
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              className={`w-full bg-zinc-950/60 border ${
-                errors.email
-                  ? "border-red-500/80 focus:ring-red-500/30"
-                  : "border-zinc-800/80 focus:ring-[#6D8196]/30 focus:border-[#6D8196]"
-              } rounded-xl py-3 px-4 text-[#FFFFE3] placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all duration-200`}
-            />
-          </div>
-          {errors.email && (
-            <p className="text-xs text-rose-500 mt-1 flex items-center gap-1 animate-pulse">
-              <svg
-                className="w-3.5 h-3.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {errors.email}
-            </p>
-          )}
-        </div>
-
-        {/* Password field */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#CBCBCB] block">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className={`w-full bg-zinc-950/60 border ${
-                errors.password
-                  ? "border-red-500/80 focus:ring-red-500/30"
-                  : "border-zinc-800/80 focus:ring-[#6D8196]/30 focus:border-[#6D8196]"
-              } rounded-xl py-3 px-4 text-[#FFFFE3] placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all duration-200`}
-            />
-          </div>
-          {errors.password && (
-            <p className="text-xs text-rose-500 mt-1 flex items-center gap-1 animate-pulse">
-              <svg
-                className="w-3.5 h-3.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {errors.password}
-            </p>
-          )}
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full relative group overflow-hidden bg-[#6D8196] hover:bg-[#5a6d80] text-[#FFFFE3] font-bold py-3 px-4 rounded-xl shadow-[0_0_20px_rgba(109,129,150,0.2)] hover:shadow-[0_0_25px_rgba(109,129,150,0.45)] transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
-        >
-          {isSubmitting ? (
-            <>
-              <svg
-                className="animate-spin h-5 w-5 text-[#FFFFE3]"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              Creating Account...
-            </>
-          ) : (
-            "Create Account"
-          )}
-        </button>
-      </form>
-
-      {/* Footer Link */}
-      <div className="mt-8 text-center text-xs text-[#CBCBCB]/60">
-        Already have an account?{" "}
-        <Link
-          to="/login"
-          className="text-[#6D8196] hover:text-[#8397ac] font-semibold transition-colors"
-        >
-          Sign in instead
-        </Link>
-      </div>
-    </AuthLayout>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

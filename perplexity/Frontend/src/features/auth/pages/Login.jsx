@@ -4,7 +4,18 @@ import { useAuth } from "../hook/useAuth";
 import { useSelector } from "react-redux";
 import { setError } from "../auth.slice";
 import Loader from "../../../components/Loader";
-import AuthLayout from "../components/AuthLayout";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -39,11 +50,9 @@ const Login = () => {
       ...prev,
       [name]: value,
     }));
-    // Clear field error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    // Clear Redux global auth error when user starts typing
     if (authError) {
       dispatch(setError(null));
     }
@@ -74,13 +83,8 @@ const Login = () => {
     }
 
     setIsSubmitting(true);
-    const payload = {
-      email,
-      password,
-    };
-
     try {
-      const res = await handleLogin(payload);
+      const res = await handleLogin({ email, password });
       if (res && res.success) {
         navigate("/");
       }
@@ -92,190 +96,94 @@ const Login = () => {
   };
 
   return (
-    <AuthLayout
-      title="Welcome Back"
-      subtitle="Enter your credentials to access your account"
-      icon={
-        <svg
-          className="w-6 h-6 text-[#FFFFE3]"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2.5}
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-          />
-        </svg>
-      }
-    >
-      {/* Backend API Error Banner (Shown ONLY after submitting form with invalid credentials) */}
-      {authError && (
-        <div className="mb-5 p-3.5 bg-red-500/15 border border-red-500/30 rounded-xl text-rose-400 text-xs font-medium flex items-center gap-2.5 animate-fadeIn">
-          <svg
-            className="w-4.5 h-4.5 text-rose-400 shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
-          <span>{authError}</span>
-        </div>
-      )}
-
-      {/* Login Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Email field */}
-        <div className="space-y-2">
-          <label className="text-xs font-semibold uppercase tracking-wider text-[#CBCBCB] block">
-            Email Address
-          </label>
-          <div className="relative">
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="you@example.com"
-              className={`w-full bg-zinc-950/60 border ${
-                errors.email
-                  ? "border-red-500/80 focus:ring-red-500/30"
-                  : "border-zinc-800/80 focus:ring-[#6D8196]/30 focus:border-[#6D8196]"
-              } rounded-xl py-3 px-4 text-[#FFFFE3] placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all duration-200`}
-            />
-          </div>
-          {errors.email && (
-            <p className="text-xs text-rose-500 mt-1 flex items-center gap-1 animate-pulse">
-              <svg
-                className="w-3.5 h-3.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {errors.email}
-            </p>
+    <div className="min-h-screen w-full bg-[#f8fafc] text-black flex items-center justify-center p-4 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:32px_32px]">
+      <Card className="w-full max-w-sm border-2 border-black shadow-[6px_6px_0px_0px_#000000] bg-[#dbeafe] text-black rounded-2xl p-2">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-2xl font-black tracking-tight text-black">
+            Login to your account
+          </CardTitle>
+          <CardDescription className="text-zinc-800 text-sm font-medium">
+            Enter your email below to login to your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {authError && (
+            <div className="mb-4 p-3 bg-red-100 border-2 border-black rounded-xl text-rose-700 text-xs font-bold shadow-[2px_2px_0px_0px_#000]">
+              {authError}
+            </div>
           )}
-        </div>
 
-        {/* Password field */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="text-xs font-semibold uppercase tracking-wider text-[#CBCBCB] block">
-              Password
-            </label>
-            <a
-              href="#"
-              className="text-xs text-[#6D8196] hover:text-[#8397ac] transition-colors font-medium"
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-5">
+              <div className="grid gap-2">
+                <Label htmlFor="email" className="text-sm font-bold text-black">
+                  Email
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="m@example.com"
+                  className="border-2 border-black bg-white text-black placeholder-zinc-400 focus:ring-0 focus:outline-none rounded-xl h-11 px-3.5 shadow-[2px_2px_0px_0px_#000]"
+                  required
+                />
+                {errors.email && (
+                  <p className="text-xs text-rose-600 font-bold">{errors.email}</p>
+                )}
+              </div>
+
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password" className="text-sm font-bold text-black">
+                    Password
+                  </Label>
+                  <a
+                    href="#"
+                    className="ml-auto inline-block text-xs font-bold text-black underline-offset-4 hover:underline"
+                  >
+                    Forgot your password?
+                  </a>
+                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="border-2 border-black bg-white text-black focus:ring-0 focus:outline-none rounded-xl h-11 px-3.5 shadow-[2px_2px_0px_0px_#000]"
+                  required
+                />
+                {errors.password && (
+                  <p className="text-xs text-rose-600 font-bold">{errors.password}</p>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full mt-2 h-11 bg-[#3b82f6] hover:bg-[#2563eb] text-black font-extrabold border-2 border-black shadow-[3px_3px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all rounded-xl cursor-pointer"
+              >
+                {isSubmitting ? "Logging in..." : "Login"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+
+        <CardFooter className="flex-col gap-2 pt-2">
+          <div className="mt-1 text-center text-xs font-semibold text-zinc-900">
+            Don&apos;t have an account?{" "}
+            <Link
+              to="/register"
+              className="text-black underline underline-offset-4 font-black hover:text-blue-700"
             >
-              Forgot password?
-            </a>
+              Sign up
+            </Link>
           </div>
-          <div className="relative">
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              className={`w-full bg-zinc-950/60 border ${
-                errors.password
-                  ? "border-red-500/80 focus:ring-red-500/30"
-                  : "border-zinc-800/80 focus:ring-[#6D8196]/30 focus:border-[#6D8196]"
-              } rounded-xl py-3 px-4 text-[#FFFFE3] placeholder-zinc-600 focus:outline-none focus:ring-4 transition-all duration-200`}
-            />
-          </div>
-          {errors.password && (
-            <p className="text-xs text-rose-500 mt-1 flex items-center gap-1 animate-pulse">
-              <svg
-                className="w-3.5 h-3.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {errors.password}
-            </p>
-          )}
-        </div>
-
-        {/* Remember me and keep logged in */}
-        <div className="flex items-center">
-          <input
-            id="remember-me"
-            type="checkbox"
-            className="h-4 w-4 rounded border-zinc-800 bg-zinc-950 text-[#6D8196] focus:ring-[#6D8196]/30 accent-[#6D8196]"
-          />
-          <label
-            htmlFor="remember-me"
-            className="ml-2 block text-xs text-[#CBCBCB] cursor-pointer select-none"
-          >
-            Keep me logged in
-          </label>
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full relative group overflow-hidden bg-[#6D8196] hover:bg-[#5a6d80] text-[#FFFFE3] font-bold py-3 px-4 rounded-xl shadow-[0_0_20px_rgba(109,129,150,0.2)] hover:shadow-[0_0_25px_rgba(109,129,150,0.45)] transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
-        >
-          {isSubmitting ? (
-            <>
-              <svg
-                className="animate-spin h-5 w-5 text-[#FFFFE3]"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-              Verifying...
-            </>
-          ) : (
-            "Sign In"
-          )}
-        </button>
-      </form>
-
-      {/* Footer Link */}
-      <div className="mt-8 text-center text-xs text-[#CBCBCB]/60">
-        Don't have an account?{" "}
-        <Link
-          to="/register"
-          className="text-[#6D8196] hover:text-[#8397ac] font-semibold transition-colors"
-        >
-          Sign up now
-        </Link>
-      </div>
-    </AuthLayout>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 
