@@ -13,10 +13,10 @@ const pc = new Pinecone({
 const index = pc.index("cohort-2-rag")
 
 
-const loader = new PDFLoader('./story.pdf')
+// const loader = new PDFLoader('./story.pdf')
 
 
-const docs = await loader.load()
+// const docs = await loader.load()
 
 const embeddings = new MistralAIEmbeddings({
     apiKey: process.env.MISTRAL_API_KEY,
@@ -27,25 +27,38 @@ const embeddings = new MistralAIEmbeddings({
 
 
 
-const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 500,
-    chunkOverlap: 0
+// const splitter = new RecursiveCharacterTextSplitter({
+//     chunkSize: 500,
+//     chunkOverlap: 0
+// })
+
+// const chunks = await splitter.splitDocuments(docs)
+
+// const texts = chunks.map((chunk) => chunk.pageContent);
+// const vectors = await embeddings.embedDocuments(texts);
+
+// await index.deleteAll();
+
+// const results = await index.upsert({
+//     records:chunks.map((chunk , i) => ({
+//         id: `chunk-${i}`,
+//         values: vectors[i],
+//         metadata: { text: chunk.pageContent }
+//     }))
+// })
+
+// const stats = await index.describeIndexStats();
+// console.log(stats);
+
+
+
+const queryEmbedding = await embeddings.embedQuery("how was the internship");
+console.log(queryEmbedding);
+
+const results = await index.query({
+    topK: 2,
+    vector: queryEmbedding,
+    includeMetadata: true,
 })
 
-const chunks = await splitter.splitDocuments(docs)
-
-const texts = chunks.map((chunk) => chunk.pageContent);
-const vectors = await embeddings.embedDocuments(texts);
-
-await index.deleteAll();
-
-const results = await index.upsert({
-    records:chunks.map((chunk , i) => ({
-        id: `chunk-${i}`,
-        values: vectors[i],
-        metadata: { text: chunk.pageContent }
-    }))
-})
-
-const stats = await index.describeIndexStats();
-console.log(stats);
+console.log(JSON.stringify(results,null,2))
