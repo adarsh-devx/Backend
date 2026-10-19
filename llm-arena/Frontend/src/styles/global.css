@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ * Design tokens — restrained, neutral, no purple/neon identity.
+ * ------------------------------------------------------------------ */
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: #ffffff;
+  color: #171717;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Respect reduced-motion preferences globally. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Markdown surface.
+ *
+ * - react-markdown never receives rehype-raw, so raw HTML in content is
+ *   rendered as inert text (no dangerouslySetInnerHTML anywhere).
+ * - URL schemes are sanitised by react-markdown (javascript: blocked).
+ * - Long URLs and unbroken tokens wrap instead of widening containers.
+ * - Fenced code blocks and wide tables stay inside scrollable boxes.
+ * ------------------------------------------------------------------ */
+.markdown :is(h1, h2, h3, h4, p, li, a, strong, em, td, th, blockquote) {
+  overflow-wrap: anywhere;
+}
+
+/* Fenced code blocks render through the CodeBlock component (header + copy
+   + scroll area); only the inner `code` needs de-chipping here so inline
+   code utilities do not leak into blocks. Unlayered rules win over Tailwind
+   utilities at equal importance. */
+.markdown pre {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.markdown pre code {
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  font-size: inherit;
+  color: #262626;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+
+/* Inline code vs code inside a pre are distinguished structurally:
+   react-markdown does not flag inline code, so the pre rule above wins
+   over the inline-code utilities on specificity. */
+.markdown :not(pre) > code {
+  font-variant-ligatures: none;
+}
+
+/* Conversation scroller ---------------------------------------------- */
+.chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #e5e5e5 transparent;
+}
+
+.chat-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background-color: #e5e5e5;
+  border-radius: 9999px;
+  border: 3px solid #ffffff;
+}
