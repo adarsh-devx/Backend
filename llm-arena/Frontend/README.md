@@ -1,14 +1,18 @@
 # Verdict — AI Solution Comparison (Frontend)
 
-A production-quality React frontend that takes a problem, shows **two mock AI
+A production-quality React frontend that takes a problem, shows **two AI
 solutions side by side**, and has a **judge** score both, explain its reasoning,
 and pick a winner when the scores support one.
 
-> **Frontend-only.** There is no backend, database, or real AI integration yet.
-> Everything runs through a mock service and a LocalStorage repository behind
-> clean interfaces, so a future Node/Express/MongoDB backend can be dropped in
-> without rewriting the UI. Mock results are labeled as mock — they are never
-> presented as genuine AI output.
+> **Connected to the real backend.** Comparisons run through the
+> Node/Express + LangGraph backend in `../Backend` (`POST /invoke`): Mistral and
+> Cohere generate the solutions, Gemini judges them. `services/api/apiClient.js`
+> owns the HTTP call and maps the backend's snake_case payload onto the UI data
+> model. Override the backend URL with the `VITE_API_BASE_URL` env var
+> (default `http://localhost:3000`). Conversations still persist to
+> LocalStorage behind the repository interface.
+>
+> Expect a comparison to take **1–3 minutes** — three LLMs run per problem.
 
 ## Run it
 
@@ -25,7 +29,7 @@ npm test         # Vitest unit tests
 
 Feature-based folders. Components render and handle interaction; hooks hold
 reusable state; utils hold deterministic logic (scoring, titles, export,
-formatting); services hold the mock generator and the repository. **Components
+formatting); services hold the API client and the repository. **Components
 never touch LocalStorage directly** — only the repository and the `storage` lib
 do.
 
@@ -42,9 +46,9 @@ src/
     judge/             JudgeEvaluation, ScoreDisplay, WinnerBadge, winner util
     conversation-actions/  Markdown + JSON export utils
   services/
-    mock/              comparisonService (async, labeled mock, /fail trigger)
+    mock/              legacy mock fixtures (offline demos/tests only)
     repositories/      interface + LocalStorage impl (+ tests)
-    api/               apiClient placeholder for the future HTTP layer
+    api/               apiClient: real backend client + response mapping (+ tests)
   hooks/               useClipboard, usePersistentState, useScrollLock
   lib/                 id, safe storage helpers (quarantine on corrupt JSON)
   constants/           storage key, statuses, score scale, example prompts
@@ -52,15 +56,21 @@ src/
   styles/              global.css (Tailwind v4)
 ```
 
-### Mock service & repository
+### Comparison API & repository
 
-- `comparisonService.generateComparison(problem)` returns a Promise resolving to
-  `{ solutionA, solutionB, judge }` with realistic latency. A problem starting
-  with `/fail` rejects, so failure/retry can be demonstrated deterministically.
+- `apiClient.generateComparison(problem)` POSTs to the backend's `/invoke` and
+  returns `{ solutionA: { content, provider }, solutionB: { content, provider },
+  judge: { solutionAScore, solutionBScore, reasoning, recommendedSolution } }`.
+  The backend emits snake_case (`solution_1`, `solution_1_score`, …); the
+  mapping lives only in `apiClient.js`, so no component sees backend field
+  names. Failures reject with UI-safe messages (validation, unreachable
+  backend, timeout, backend error envelope). A problem starting with `/fail`
+  rejects client-side, so failure/retry states stay demonstrable offline.
 - `conversationRepository` exposes `list / getById / create / update / remove /
   save`. The LocalStorage implementation centralizes one versioned key, safely
   parses JSON, and **quarantines malformed data under `<key>.corrupt`** instead of
-  crashing. Swap in an HTTP implementation of the same interface for the backend.
+  crashing. Swap in an HTTP implementation of the same interface for a future
+  persistence backend.
 
 ### Winner logic
 
@@ -68,18 +78,31 @@ src/
 wins, equal scores are a tie, missing/invalid scores are inconclusive. An explicit
 judge verdict, when present and valid, is honored and never silently contradicted.
 
-## Future backend
+## Backend contract
 
-Replace the LocalStorage repository with an HTTP repository calling the
-Node/Express API (`GET/POST/PATCH/DELETE /api/conversations`, `POST
-/api/comparisons`). The contract must be agreed when the backend is built. The
-frontend never connects to MongoDB directly.
+`POST {backend}/invoke` with `{ input: <problem> }` responds:
+
+```jsonc
+{ "success": true, "result": {
+    "problem": "…",
+    "solution_1": "…", "solution_1_provider": "Mistral (open-mistral-7b)",
+    "solution_2": "…", "solution_2_provider": "Cohere (command-r-plus-08-2024)",
+    "judge": { "solution_1_score": 4.5, "solution_2_score": 8.5,
+               "solution_1_reasoning": "…", "solution_2_reasoning": "…" } } }
+```
+
+Failures: `400` for a missing/blank `input`, `502` when the graph fails — both
+as `{ "success": false, "error": "…" }`. The judge has no explicit
+recommendation field, so the winner is derived from the scores (labelled
+"higher score" in the UI). Conversation persistence is still LocalStorage; an
+HTTP repository (`GET/POST/PATCH/DELETE /api/conversations`) is the planned
+next step. The frontend never connects to MongoDB directly.
 
 ## Verified
 
-- Build, lint, and 45 unit tests pass.
-- Manual browser pass: submit → two solutions → judge; multi-message
-  conversations; reload persistence; rename/delete (with confirm + cancel);
-  edit → invalidate → regenerate; `/fail` failure + retry; copy + Markdown/JSON
-  export; sidebar collapse + mobile drawer; corrupt-JSON quarantine; responsive
-  from 320px up; keyboard + focus states; no console errors.
+- Backend `tsc --noEmit` clean; build + lint clean; 57 unit tests pass.
+- End-to-end against both dev servers: submit → two real solutions with
+  provider badges + judge scores/reasoning → score-derived verdict; CORS
+  preflight; generating skeleton; `/fail` failure + retry; backend `400`/`502`
+  envelopes; clean browser console. (Persistence/rename/delete/export covered
+  by unit tests and the earlier manual pass.)
