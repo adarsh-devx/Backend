@@ -3,7 +3,7 @@ import MarkdownRenderer from './MarkdownRenderer.jsx'
 import { formatScore } from '../../judge/utils/winner.js'
 
 /**
- * One solution panel: label, mock provider badge, score, copy action, and
+ * One solution panel: label, provider badge, score, copy action, and
  * Markdown content. Heights are natural — long content expands (no fixed
  * heights that cut off solutions).
  */
