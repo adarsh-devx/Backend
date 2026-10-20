@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ConversationsContext } from './conversationsContext.js'
 import { useToast } from './useToast.js'
 import { conversationRepository } from '../../services/repositories/index.js'
-import { generateComparison } from '../../services/mock/comparisonService.js'
+import { generateComparison } from '../../services/api/apiClient.js'
 import { titleFromProblem } from '../../features/chat-history/utils/title.js'
 import { createId } from '../../lib/id.js'
 import { MAX_PROBLEM_LENGTH, MESSAGE_STATUS } from '../../constants/index.js'
@@ -25,8 +25,8 @@ function upsertConversation(conversations, conversation) {
 /**
  * Application store: conversation list, active selection, lifecycle states,
  * and every mutation (submit, regenerate, rename, delete). All persistence
- * goes through the repository layer; all generation goes through the mock
- * service — components only see this context.
+ * goes through the repository layer; all generation goes through the backend
+ * comparison API (services/api) — components only see this context.
  */
 export default function ConversationsProvider({ children }) {
   const navigate = useNavigate()
@@ -137,7 +137,7 @@ export default function ConversationsProvider({ children }) {
     [applyConversations, commit],
   )
 
-  /** Run (or re-run) mock generation for one message with a stale-guard token. */
+  /** Run (or re-run) backend generation for one message with a stale-guard token. */
   const runGeneration = useCallback(
     async (conversationId, messageId, problem) => {
       const token = createId('gen')

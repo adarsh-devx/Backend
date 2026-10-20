@@ -13,20 +13,21 @@ import { createLocalStorageConversationRepository } from './localStorageConversa
  *   saveConversation(conversation): Promise<Conversation>  // full replace/upsert
  *   deleteConversation(id): Promise<boolean>
  *
- * Replacing LocalStorage with the future backend
- * -------------------------------------------------
- * When the Node.js/Express + MongoDB backend exists, swap the export below
- * for an HTTP implementation with the same method signatures calling:
+ * Replacing LocalStorage with backend persistence
+ * -----------------------------------------------
+ * Comparisons already run through the real backend (services/api/apiClient.js,
+ * POST /invoke). Conversations still persist to LocalStorage; when the
+ * backend grows conversation endpoints, swap the export below for an HTTP
+ * implementation with the same method signatures calling:
  *
  *   GET    /api/conversations
  *   GET    /api/conversations/:id
  *   POST   /api/conversations
  *   PATCH  /api/conversations/:id
  *   DELETE /api/conversations/:id
- *   POST   /api/comparisons            (replaces services/mock)
  *
  * NOTE: these routes are proposed examples, not existing endpoints — the
- * final contract must be agreed when the backend is implemented. No UI code
+ * final contract must be agreed when the backend implements them. No UI code
  * changes, because callers only depend on the Promise contract above.
  */
 export const conversationRepository = createLocalStorageConversationRepository()
