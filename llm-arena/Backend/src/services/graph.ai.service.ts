@@ -9,7 +9,13 @@ import {
   MessagesAnnotation,
 } from "@langchain/langgraph";
 import type { GraphNode } from "@langchain/langgraph";
-import { mistralModel, cohereModel, geminiModel } from "./models.service.js";
+import {
+  mistralModel,
+  cohereModel,
+  geminiModel,
+  MISTRAL_PROVIDER_LABEL,
+  COHERE_PROVIDER_LABEL,
+} from "./models.service.js";
 import { createAgent, providerStrategy } from "langchain";
 import { z } from "zod";
 
@@ -17,7 +23,9 @@ const State = new StateSchema({
 
   problem: z.string().default(""),
   solution_1: z.string().default(""),
+  solution_1_provider: z.string().default(""),
   solution_2: z.string().default(""),
+  solution_2_provider: z.string().default(""),
   judge: z.object({
     solution_1_score: z.number().default(0),
     solution_2_score: z.number().default(0),
@@ -37,10 +45,12 @@ const solutionNode: GraphNode< typeof State.State > = async (state) => {
       typeof mistralResponse.content === "string"
         ? mistralResponse.content
         : JSON.stringify(mistralResponse.content),
+    solution_1_provider: MISTRAL_PROVIDER_LABEL,
     solution_2:
       typeof cohereResponse.content === "string"
         ? cohereResponse.content
         : JSON.stringify(cohereResponse.content),
+    solution_2_provider: COHERE_PROVIDER_LABEL,
   };
 };
 
