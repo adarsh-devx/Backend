@@ -37,12 +37,6 @@ export default function AppHeader({
             <Scale size={14} strokeWidth={2.25} aria-hidden="true" />
           </span>
           <span className="text-[15px] font-semibold tracking-tight text-neutral-900">{APP_NAME}</span>
-          <span
-            title="Solutions and judge results come from local mock fixtures, not a real AI provider."
-            className="hidden items-center gap-1 rounded-full border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[11px] font-medium text-neutral-500 lg:inline-flex"
-          >
-            Mock data
-          </span>
         </div>
 
         <div className="flex-1" />
