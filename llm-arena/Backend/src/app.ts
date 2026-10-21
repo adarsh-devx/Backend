@@ -29,9 +29,8 @@ app.use(cors({
   credentials : true
 }));
 
-app.get('/' , async ( req , res) => {
-    const result = await runGraph('Write an code for Factorial function in js')
-    res.json(result)
+app.get('/', (req, res) => {
+    res.json({ status: 'ok', message: 'LLM Arena backend is running' });
 })
 
 /** Read and trim the problem statement; null when missing or blank. */

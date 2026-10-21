@@ -13,7 +13,7 @@ export const MISTRAL_PROVIDER_LABEL = `Mistral (${MISTRAL_MODEL_ID})`;
 export const COHERE_PROVIDER_LABEL = `Cohere (${COHERE_MODEL_ID})`;
 
 export const geminiModel = new ChatGoogle({
-    model:"gemini-flash-latest", 
+    model:"gemini-1.5-flash", 
     apiKey:config.GEMINI_API_KEY
 })
 
