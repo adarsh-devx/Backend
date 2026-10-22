@@ -3,16 +3,35 @@ import jwt from "jsonwebtoken";
 import {config} from "../config/config.js";
 
 
-async function sendTokenResponse(user , res){
+async function sendTokenResponse(user , res , message){
     const token = jwt.sign({
         id: user._id,    
-    }, config.JWT_SECRET,{expiresIn: "10d"})
+    }, config.JWT_SECRET,{
+        expiresIn: "10d"
+    })
+
+    res.cookie("token", token)
+
+
+
+
+    res.status(200).json({
+        message,
+        success: true,
+        user: {
+            _id: user._id,
+            email: user.email,
+            contact: user.contact,
+            fullName: user.fullName,
+            role: user.role
+        }
+    })
 } 
 
 
 
 export const registerUser = async (req,res)=>{
-    const {email,contact,password,fullName} = req.body;
+    const {email,contact,password,fullName,isSeller} = req.body;
     try {
         //check if user already exists
         const existingUser = await userModel.findOne({
@@ -27,9 +46,11 @@ export const registerUser = async (req,res)=>{
             email,
             contact,
             password,
-            fullName
+            fullName,
+            role: isSeller ? "seller" : "buyer"
         })
-        return res.status(201).json({message:"User registered successfully", user})
+
+        return sendTokenResponse(user , res, "User registered successfully")
     } catch (error) {
         console.log(error)
         return res.status(500).json({message:"Internal server error"})
