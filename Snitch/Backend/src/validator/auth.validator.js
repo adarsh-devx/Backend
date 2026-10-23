@@ -35,3 +35,22 @@ export const validateRegisterUser = [
 
   validateRequest,
 ];
+
+
+export const validateLoginUser = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("invalid Email formate"),
+
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+
+  validateRequest,
+];
