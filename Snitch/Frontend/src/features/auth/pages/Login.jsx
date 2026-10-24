@@ -227,15 +227,23 @@ const Login = () => {
 
           {/* Remember me & Forgot password */}
           <div className="flex items-center justify-between text-xs pt-0.5">
-            <label className="flex items-center gap-2 cursor-pointer">
+            <div className="checkbox-wrapper-46">
               <input
                 type="checkbox"
+                id="cbx-remember"
+                className="inp-cbx"
                 checked={formData.rememberMe}
                 onChange={(e) => handleInputChange("rememberMe", e.target.checked)}
-                className="w-3.5 h-3.5 shrink-0 rounded-[4px] border-zinc-300 accent-zinc-900 cursor-pointer"
               />
-              <span className="text-zinc-500 font-medium">Remember me</span>
-            </label>
+              <label htmlFor="cbx-remember" className="cbx">
+                <span>
+                  <svg viewBox="0 0 12 10" height="9px" width="11px">
+                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                  </svg>
+                </span>
+                <span className="text-zinc-500 font-medium">Remember me</span>
+              </label>
+            </div>
             <a
               href="#"
               className="text-zinc-950 font-semibold hover:underline cursor-pointer"

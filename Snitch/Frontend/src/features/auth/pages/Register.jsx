@@ -346,41 +346,65 @@ const Register = () => {
             <PasswordStrengthIndicator password={formData.password} />
           </div>
 
-          {/* Register as a seller - Compact Sleek Design */}
-          <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          {/* Register as a seller - Animated Checkbox */}
+          <div className="checkbox-wrapper-46">
             <input
               type="checkbox"
+              id="cbx-seller"
+              className="inp-cbx"
               checked={formData.isSeller}
               onChange={(e) => handleInputChange("isSeller", e.target.checked)}
-              className="w-3.5 h-3.5 shrink-0 rounded-[4px] border-zinc-300 accent-zinc-900 cursor-pointer"
             />
-            <div className="flex items-center gap-1.5 text-xs text-zinc-700">
-              <Store className="h-3.5 w-3.5 text-zinc-800 shrink-0" />
-              <span className="font-semibold text-zinc-900">Register as a seller</span>
-              <span className="text-zinc-400 text-[11px]">(start selling on Snitch)</span>
-            </div>
-          </label>
-
-          {/* Terms checkbox */}
-          <div>
-            <label className="flex items-center gap-2.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={formData.agreeToTerms}
-                onChange={(e) => handleInputChange("agreeToTerms", e.target.checked)}
-                className="w-3.5 h-3.5 shrink-0 rounded-[4px] border-zinc-300 accent-zinc-900 cursor-pointer"
-              />
-              <span className="text-zinc-500 text-[11px] sm:text-xs">
-                I agree to the{" "}
-                <a href="#" className="text-zinc-950 font-medium underline underline-offset-2 hover:text-zinc-700">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="#" className="text-zinc-950 font-medium underline underline-offset-2 hover:text-zinc-700">
-                  Privacy Policy
-                </a>
+            <label htmlFor="cbx-seller" className="cbx">
+              <span>
+                <svg viewBox="0 0 12 10" height="9px" width="11px">
+                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                </svg>
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-xs text-zinc-700">
+                <Store className="h-3.5 w-3.5 text-zinc-800 shrink-0" />
+                <span className="font-semibold text-zinc-900">Register as a seller</span>
+                <span className="text-zinc-400 text-[11px]">(start selling on Snitch)</span>
               </span>
             </label>
+          </div>
+
+          {/* Terms checkbox - Animated Checkbox */}
+          <div>
+            <div className="checkbox-wrapper-46">
+              <input
+                type="checkbox"
+                id="cbx-terms"
+                className="inp-cbx"
+                checked={formData.agreeToTerms}
+                onChange={(e) => handleInputChange("agreeToTerms", e.target.checked)}
+              />
+              <label htmlFor="cbx-terms" className="cbx">
+                <span>
+                  <svg viewBox="0 0 12 10" height="9px" width="11px">
+                    <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                  </svg>
+                </span>
+                <span className="text-zinc-500 text-[11px] sm:text-xs">
+                  I agree to the{" "}
+                  <a
+                    href="#"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-zinc-950 font-medium underline underline-offset-2 hover:text-zinc-700"
+                  >
+                    Terms of Service
+                  </a>{" "}
+                  and{" "}
+                  <a
+                    href="#"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-zinc-950 font-medium underline underline-offset-2 hover:text-zinc-700"
+                  >
+                    Privacy Policy
+                  </a>
+                </span>
+              </label>
+            </div>
             {errors.agreeToTerms && (
               <p className="text-red-500 text-[11px] mt-1 pl-6.5 flex items-center gap-1 font-medium">
                 <AlertTriangle className="h-3 w-3 shrink-0" />
