@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import "dotenv/config";
 import authRouter from "./routes/auth.routes.js"
+import productRouter from "./routes/product.routes.js"
 import cors from "cors"
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
@@ -44,5 +45,7 @@ passport.use(new GoogleStrategy({
 // ── Routes Mounting ──────────────────────────────────────────────────────────
 // Mount authentication endpoints under /api/auth
 app.use('/api/auth', authRouter);
+
+app.use("/api/products", productRouter);
 
 export default app;
