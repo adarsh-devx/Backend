@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Loader2,
 } from "lucide-react";
+import GoogleButton from "../components/GoogleButton";
 
 const Login = () => {
   const { handleLogin } = useAuth();
@@ -121,13 +122,13 @@ const Login = () => {
     );
 
   return (
-    <div className="relative min-h-screen bg-[#fbfaf8] flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-hidden">
+    <div className="relative min-h-screen bg-[#fbfaf8] flex items-center justify-center p-3 sm:p-4 py-6 overflow-x-hidden">
       {/* ── Background Illustration 1: User's Swallow Bird with Measuring Tape Ribbon ── */}
       <img
         src="/assets/bird.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none select-none absolute top-2 right-2 sm:top-5 sm:right-6 lg:top-6 lg:right-10 w-56 sm:w-72 md:w-96 lg:w-[480px] max-w-[42vw] object-contain mix-blend-multiply opacity-85 sm:opacity-95 z-0"
+        className="pointer-events-none select-none absolute top-2 right-2 sm:top-5 sm:right-6 lg:top-6 lg:right-10 w-40 sm:w-64 md:w-80 lg:w-[420px] max-w-[40vw] object-contain mix-blend-multiply opacity-60 sm:opacity-95 z-0"
       />
 
       {/* ── Background Illustration 2: Bottom-Left Lookbooks, Mannequin & Botanical ── */}
@@ -135,7 +136,7 @@ const Login = () => {
         src="/assets/atelier-collage.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none select-none absolute bottom-4 left-4 sm:bottom-6 sm:left-8 lg:bottom-8 lg:left-12 w-36 sm:w-48 md:w-60 lg:w-72 max-w-[28vw] object-contain mix-blend-multiply opacity-80 sm:opacity-95 z-0"
+        className="pointer-events-none select-none absolute bottom-3 left-3 sm:bottom-6 sm:left-8 lg:bottom-8 lg:left-12 w-28 sm:w-44 md:w-56 lg:w-68 max-w-[28vw] object-contain mix-blend-multiply opacity-55 sm:opacity-95 z-0"
       />
 
       {/* ── Central Form Card with High Contrast & Generous Padding ── */}
@@ -231,7 +232,7 @@ const Login = () => {
                 type="checkbox"
                 checked={formData.rememberMe}
                 onChange={(e) => handleInputChange("rememberMe", e.target.checked)}
-                className="w-4 h-4 rounded border-zinc-300 accent-zinc-900 cursor-pointer"
+                className="w-3.5 h-3.5 shrink-0 rounded-[4px] border-zinc-300 accent-zinc-900 cursor-pointer"
               />
               <span className="text-zinc-500 font-medium">Remember me</span>
             </label>
@@ -259,6 +260,19 @@ const Login = () => {
             )}
           </button>
         </form>
+
+        {/* Social Login Separator */}
+        <div className="relative my-4 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-zinc-200" />
+          </div>
+          <span className="relative bg-white/80 backdrop-blur-xs px-3 text-[11px] uppercase tracking-wider text-zinc-400 font-medium">
+            or continue with
+          </span>
+        </div>
+
+        {/* Google Button */}
+        <GoogleButton />
 
         {/* Bottom toggle */}
         <p className="text-center text-xs text-zinc-500 mt-5">

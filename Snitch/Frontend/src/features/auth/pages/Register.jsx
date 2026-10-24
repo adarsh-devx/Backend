@@ -13,6 +13,7 @@ import {
   Loader2,
   Store,
 } from "lucide-react";
+import GoogleButton from "../components/GoogleButton";
 
 // ── Password strength ────────────────────────────────────────────────────────
 const calculatePasswordStrength = (password) => {
@@ -193,19 +194,19 @@ const Register = () => {
 
   const inputClass = (hasError) =>
     cn(
-      "w-full h-11 pl-10 pr-4 bg-zinc-50/50 border rounded-xl text-sm text-zinc-900",
+      "w-full h-10 pl-10 pr-4 bg-zinc-50/50 border rounded-xl text-xs sm:text-sm text-zinc-900",
       "placeholder:text-zinc-400 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all",
       hasError ? "border-red-500 ring-1 ring-red-500/20" : "border-zinc-200"
     );
 
   return (
-    <div className="relative min-h-screen bg-[#fbfaf8] flex items-center justify-center p-4 sm:p-6 lg:p-8 overflow-hidden">
+    <div className="relative min-h-screen bg-[#fbfaf8] flex items-center justify-center p-3 sm:p-4 py-6 overflow-x-hidden">
       {/* ── Background Illustration 1: User's Swallow Bird with Measuring Tape Ribbon ── */}
       <img
         src="/assets/bird.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none select-none absolute top-2 right-2 sm:top-5 sm:right-6 lg:top-6 lg:right-10 w-56 sm:w-72 md:w-96 lg:w-[480px] max-w-[42vw] object-contain mix-blend-multiply opacity-85 sm:opacity-95 z-0"
+        className="pointer-events-none select-none absolute top-2 right-2 sm:top-4 sm:right-6 lg:top-5 lg:right-10 w-40 sm:w-64 md:w-80 lg:w-[420px] max-w-[40vw] object-contain mix-blend-multiply opacity-60 sm:opacity-95 z-0"
       />
 
       {/* ── Background Illustration 2: Bottom-Left Lookbooks, Mannequin & Botanical ── */}
@@ -213,46 +214,46 @@ const Register = () => {
         src="/assets/atelier-collage.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none select-none absolute bottom-4 left-4 sm:bottom-6 sm:left-8 lg:bottom-8 lg:left-12 w-36 sm:w-48 md:w-60 lg:w-72 max-w-[28vw] object-contain mix-blend-multiply opacity-80 sm:opacity-95 z-0"
+        className="pointer-events-none select-none absolute bottom-3 left-3 sm:bottom-5 sm:left-6 lg:bottom-6 lg:left-8 w-28 sm:w-40 md:w-52 lg:w-64 max-w-[28vw] object-contain mix-blend-multiply opacity-55 sm:opacity-95 z-0"
       />
 
-      {/* ── Central Form Card with High Contrast & Generous Padding ── */}
-      <div className="relative z-10 w-full max-w-[420px] mx-auto p-6 sm:p-8 bg-white border border-zinc-200/90 rounded-2xl shadow-[0_12px_40px_-6px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.02)]">
-        {/* Header - Option 2 Strong Modern Typography */}
-        <div className="text-center mb-6">
-          <span className="text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase mb-1 block">
+      {/* ── Central Form Card with High Contrast & Compact Spacing ── */}
+      <div className="relative z-10 w-full max-w-[410px] mx-auto p-5 sm:p-6 bg-white border border-zinc-200/90 rounded-2xl shadow-[0_12px_40px_-6px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.02)]">
+        {/* Header */}
+        <div className="text-center mb-3.5">
+          <span className="text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase mb-0.5 block">
             Snitch Atelier
           </span>
-          <h1 className="text-2xl sm:text-[1.65rem] font-bold tracking-[-0.03em] text-zinc-950 uppercase">
+          <h1 className="text-xl sm:text-[1.45rem] font-bold tracking-[-0.03em] text-zinc-950 uppercase leading-tight">
             Create an Account
           </h1>
-          <p className="text-zinc-500 text-xs sm:text-[13px] mt-1 font-normal">
+          <p className="text-zinc-500 text-xs mt-0.5 font-normal">
             Join Snitch for seamless shopping & selling
           </p>
         </div>
 
         {/* Error banner */}
         {errors.general && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
+          <div className="mb-3 p-2.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
             <AlertTriangle className="h-4 w-4 text-red-600 shrink-0" />
             <span>{errors.general}</span>
           </div>
         )}
 
         {/* Modern Tab Switcher */}
-        <div className="flex bg-zinc-100/80 rounded-xl p-1 mb-5">
+        <div className="flex bg-zinc-100/80 rounded-xl p-1 mb-3.5">
           <Link
             to="/login"
-            className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center text-zinc-500 hover:text-zinc-900 cursor-pointer"
+            className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center text-zinc-500 hover:text-zinc-900 cursor-pointer"
           >
             Sign In
           </Link>
-          <span className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center bg-white text-zinc-950 shadow-xs cursor-default">
+          <span className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center bg-white text-zinc-950 shadow-xs cursor-default">
             Sign Up
           </span>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3.5">
+        <form onSubmit={handleSubmit} className="space-y-2.5">
           {/* Full Name */}
           <div>
             <div className="relative">
@@ -267,7 +268,7 @@ const Register = () => {
               />
             </div>
             {errors.name && (
-              <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1 font-medium">
+              <p className="text-red-500 text-[11px] mt-1 flex items-center gap-1 font-medium">
                 <AlertTriangle className="h-3 w-3" />
                 {errors.name}
               </p>
@@ -288,7 +289,7 @@ const Register = () => {
               />
             </div>
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1 font-medium">
+              <p className="text-red-500 text-[11px] mt-1 flex items-center gap-1 font-medium">
                 <AlertTriangle className="h-3 w-3" />
                 {errors.email}
               </p>
@@ -309,7 +310,7 @@ const Register = () => {
               />
             </div>
             {errors.phone && (
-              <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1 font-medium">
+              <p className="text-red-500 text-[11px] mt-1 flex items-center gap-1 font-medium">
                 <AlertTriangle className="h-3 w-3" />
                 {errors.phone}
               </p>
@@ -337,7 +338,7 @@ const Register = () => {
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1 font-medium">
+              <p className="text-red-500 text-[11px] mt-1 flex items-center gap-1 font-medium">
                 <AlertTriangle className="h-3 w-3" />
                 {errors.password}
               </p>
@@ -345,37 +346,31 @@ const Register = () => {
             <PasswordStrengthIndicator password={formData.password} />
           </div>
 
-          {/* Register as a seller */}
-          <label className="flex items-start gap-3 p-3.5 rounded-xl border border-zinc-200 bg-zinc-50/60 hover:bg-zinc-50 transition-colors cursor-pointer group">
+          {/* Register as a seller - Compact Sleek Design */}
+          <label className="flex items-center gap-2.5 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={formData.isSeller}
               onChange={(e) => handleInputChange("isSeller", e.target.checked)}
-              className="w-4 h-4 mt-0.5 rounded border-zinc-300 accent-zinc-900 cursor-pointer"
+              className="w-3.5 h-3.5 shrink-0 rounded-[4px] border-zinc-300 accent-zinc-900 cursor-pointer"
             />
-            <div className="flex-1">
-              <div className="flex items-center gap-1.5">
-                <Store className="h-3.5 w-3.5 text-zinc-900" />
-                <p className="text-xs font-semibold text-zinc-900 leading-none">
-                  Register as a seller
-                </p>
-              </div>
-              <p className="mt-1 text-[11px] text-zinc-500">
-                List products and start selling your brand on Snitch
-              </p>
+            <div className="flex items-center gap-1.5 text-xs text-zinc-700">
+              <Store className="h-3.5 w-3.5 text-zinc-800 shrink-0" />
+              <span className="font-semibold text-zinc-900">Register as a seller</span>
+              <span className="text-zinc-400 text-[11px]">(start selling on Snitch)</span>
             </div>
           </label>
 
           {/* Terms checkbox */}
           <div>
-            <label className="flex items-start gap-2 cursor-pointer text-xs">
+            <label className="flex items-center gap-2.5 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={formData.agreeToTerms}
                 onChange={(e) => handleInputChange("agreeToTerms", e.target.checked)}
-                className="w-4 h-4 mt-0.5 rounded border-zinc-300 accent-zinc-900 cursor-pointer"
+                className="w-3.5 h-3.5 shrink-0 rounded-[4px] border-zinc-300 accent-zinc-900 cursor-pointer"
               />
-              <span className="text-zinc-500">
+              <span className="text-zinc-500 text-[11px] sm:text-xs">
                 I agree to the{" "}
                 <a href="#" className="text-zinc-950 font-medium underline underline-offset-2 hover:text-zinc-700">
                   Terms of Service
@@ -387,8 +382,8 @@ const Register = () => {
               </span>
             </label>
             {errors.agreeToTerms && (
-              <p className="text-red-500 text-xs mt-1 flex items-center gap-1 font-medium">
-                <AlertTriangle className="h-3 w-3" />
+              <p className="text-red-500 text-[11px] mt-1 pl-6.5 flex items-center gap-1 font-medium">
+                <AlertTriangle className="h-3 w-3 shrink-0" />
                 {errors.agreeToTerms}
               </p>
             )}
@@ -398,7 +393,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full h-11 mt-2 bg-zinc-950 text-white font-semibold rounded-xl text-xs sm:text-sm tracking-wider uppercase hover:bg-zinc-800 active:scale-[0.99] disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+            className="w-full h-10 mt-1 bg-zinc-950 text-white font-semibold rounded-xl text-xs sm:text-sm tracking-wider uppercase hover:bg-zinc-800 active:scale-[0.99] disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
@@ -411,16 +406,18 @@ const Register = () => {
           </button>
         </form>
 
-        {/* Bottom toggle */}
-        <p className="text-center text-xs text-zinc-500 mt-5">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-zinc-950 font-semibold hover:underline cursor-pointer"
-          >
-            Sign in
-          </Link>
-        </p>
+        {/* Social Login Separator */}
+        <div className="relative my-3 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-zinc-200" />
+          </div>
+          <span className="relative bg-white/80 backdrop-blur-xs px-2.5 text-[10px] uppercase tracking-wider text-zinc-400 font-medium">
+            or continue with
+          </span>
+        </div>
+
+        {/* Google Button */}
+        <GoogleButton className="h-10" />
       </div>
     </div>
   );
