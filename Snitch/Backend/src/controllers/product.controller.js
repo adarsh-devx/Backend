@@ -64,14 +64,15 @@ export async function createProduct(req, res) {
  * Returns only products where seller matches req.user._id
  */
 export async function getSellerProducts(req, res) {
+  const seller = req.user;
   try {
     const products = await productModel
-      .find({ seller: req.user._id })
+      .find({ seller: seller._id })
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
+      message: "Products fetched successfully",
       success: true,
-      count: products.length,
       products,
     });
   } catch (error) {

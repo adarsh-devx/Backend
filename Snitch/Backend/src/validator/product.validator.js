@@ -16,15 +16,16 @@ export const createProductValidator = [
     body("description")
         .notEmpty()
         .withMessage("Description is required"),
-    body("price.amount")
-        .notEmpty()
-        .withMessage("Price amount is required")
-        .isNumeric()
-        .withMessage("Price amount must be a number"),
-    body("price.currency")
-        .notEmpty()
-        .withMessage("Price currency is required")
-        .isIn(["USD", "INR"])
-        .withMessage("Invalid price currency"),
+    body().custom((value, { req }) => {
+        const amount = req.body.priceAmount ?? req.body?.price?.amount ?? req.body["price.amount"] ?? req.body["price[amount]"];
+        if (amount === undefined || amount === null || amount === "" || isNaN(Number(amount)) || Number(amount) <= 0) {
+            throw new Error("Price amount must be a positive number");
+        }
+        const currency = req.body.priceCurrency ?? req.body?.price?.currency ?? req.body["price.currency"] ?? req.body["price[currency]"] ?? "INR";
+        if (!["USD", "INR"].includes(String(currency).toUpperCase())) {
+            throw new Error("Invalid price currency (must be INR or USD)");
+        }
+        return true;
+    }),
     validateRequest
 ];
