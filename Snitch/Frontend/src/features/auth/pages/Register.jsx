@@ -15,72 +15,7 @@ import {
 } from "lucide-react";
 import GoogleButton from "../components/GoogleButton";
 
-// ── Password strength ────────────────────────────────────────────────────────
-const calculatePasswordStrength = (password) => {
-  const requirements = {
-    length: password.length >= 8,
-    uppercase: /[A-Z]/.test(password),
-    lowercase: /[a-z]/.test(password),
-    number: /\d/.test(password),
-    special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
-  };
-  const score = Object.values(requirements).filter(Boolean).length;
-  const feedback = [];
-  if (!requirements.length) feedback.push("At least 8 characters");
-  if (!requirements.uppercase) feedback.push("One uppercase letter");
-  if (!requirements.lowercase) feedback.push("One lowercase letter");
-  if (!requirements.number) feedback.push("One number");
-  if (!requirements.special) feedback.push("One special character");
-  return { score, feedback };
-};
 
-const PasswordStrengthIndicator = ({ password }) => {
-  const strength = calculatePasswordStrength(password);
-
-  const getStrengthColor = (score) => {
-    if (score <= 1) return "text-destructive";
-    if (score <= 2) return "text-orange-500";
-    if (score <= 3) return "text-yellow-500";
-    if (score <= 4) return "text-blue-500";
-    return "text-emerald-500";
-  };
-
-  const getStrengthText = (score) => {
-    if (score <= 1) return "Very Weak";
-    if (score <= 2) return "Weak";
-    if (score <= 3) return "Fair";
-    if (score <= 4) return "Good";
-    return "Strong";
-  };
-
-  if (!password) return null;
-
-  return (
-    <div className="mt-2 space-y-2">
-      <div className="flex items-center gap-2">
-        <div className="flex-1 bg-zinc-100 rounded-full h-1.5 overflow-hidden">
-          <div
-            className={`h-full ${getStrengthColor(strength.score)} bg-current rounded-full transition-all duration-300`}
-            style={{ width: `${(strength.score / 5) * 100}%` }}
-          />
-        </div>
-        <span className="text-xs text-zinc-500 min-w-[60px] text-right font-medium">
-          {getStrengthText(strength.score)}
-        </span>
-      </div>
-      {strength.feedback.length > 0 && (
-        <div className="grid grid-cols-2 gap-1">
-          {strength.feedback.map((item, index) => (
-            <div key={index} className="flex items-center gap-1 text-xs text-amber-600">
-              <AlertTriangle className="h-3 w-3 shrink-0" />
-              <span>{item}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
 
 // ── Register Page ────────────────────────────────────────────────────────────
 const Register = () => {
@@ -105,33 +40,35 @@ const Register = () => {
     switch (field) {
       case "name":
         if (!String(value || "").trim()) {
-          error = "Full name is required";
+          error = "REQUIRED";
+        } else if (String(value || "").trim().length < 3) {
+          error = "Full name must be at least 3 characters";
         }
         break;
       case "email":
         if (!value || !String(value).trim()) {
-          error = "Email is required";
+          error = "REQUIRED";
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
           error = "Please enter a valid email address";
         }
         break;
       case "password":
         if (!value) {
-          error = "Password is required";
+          error = "REQUIRED";
         } else if (String(value).length < 6) {
           error = "Password must be at least 6 characters";
         }
         break;
       case "phone":
         if (!value || !String(value).trim()) {
-          error = "Contact number is required";
+          error = "REQUIRED";
         } else if (!/^\+?[\d\s\-()]{7,15}$/.test(String(value).trim())) {
           error = "Please enter a valid contact number";
         }
         break;
       case "agreeToTerms":
         if (!value) {
-          error = "You must agree to the terms and conditions";
+          error = "REQUIRED";
         }
         break;
       default:
@@ -192,11 +129,10 @@ const Register = () => {
     }
   };
 
-  const inputClass = (hasError) =>
+  const inputClass = () =>
     cn(
-      "w-full h-10 pl-10 pr-4 bg-zinc-50/50 border rounded-xl text-xs sm:text-sm text-zinc-900",
-      "placeholder:text-zinc-400 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all",
-      hasError ? "border-red-500 ring-1 ring-red-500/20" : "border-zinc-200"
+      "w-full h-10 pl-10 pr-4 bg-zinc-50/50 border border-zinc-200 rounded-xl text-xs sm:text-sm text-zinc-900",
+      "placeholder:text-zinc-400 hover:border-zinc-300 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all"
     );
 
   return (
@@ -267,9 +203,8 @@ const Register = () => {
                 className={inputClass(errors.name)}
               />
             </div>
-            {errors.name && (
-              <p className="text-red-500 text-[11px] mt-1 flex items-center gap-1 font-medium">
-                <AlertTriangle className="h-3 w-3" />
+            {errors.name && errors.name !== "REQUIRED" && (
+              <p className="text-red-500 text-[11px] mt-1 font-medium">
                 {errors.name}
               </p>
             )}
@@ -288,9 +223,8 @@ const Register = () => {
                 className={inputClass(errors.email)}
               />
             </div>
-            {errors.email && (
-              <p className="text-red-500 text-[11px] mt-1 flex items-center gap-1 font-medium">
-                <AlertTriangle className="h-3 w-3" />
+            {errors.email && errors.email !== "REQUIRED" && (
+              <p className="text-red-500 text-[11px] mt-1 font-medium">
                 {errors.email}
               </p>
             )}
@@ -309,9 +243,8 @@ const Register = () => {
                 className={inputClass(errors.phone)}
               />
             </div>
-            {errors.phone && (
-              <p className="text-red-500 text-[11px] mt-1 flex items-center gap-1 font-medium">
-                <AlertTriangle className="h-3 w-3" />
+            {errors.phone && errors.phone !== "REQUIRED" && (
+              <p className="text-red-500 text-[11px] mt-1 font-medium">
                 {errors.phone}
               </p>
             )}
@@ -337,13 +270,11 @@ const Register = () => {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-[11px] mt-1 flex items-center gap-1 font-medium">
-                <AlertTriangle className="h-3 w-3" />
+            {errors.password && errors.password !== "REQUIRED" && (
+              <p className="text-red-500 text-[11px] mt-1 font-medium">
                 {errors.password}
               </p>
             )}
-            <PasswordStrengthIndicator password={formData.password} />
           </div>
 
           {/* Register as a seller - Animated Checkbox */}

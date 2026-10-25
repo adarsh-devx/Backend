@@ -40,14 +40,14 @@ const Login = () => {
     switch (field) {
       case "email":
         if (!value || !String(value).trim()) {
-          error = "Email is required";
+          error = "REQUIRED";
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
           error = "Please enter a valid email address";
         }
         break;
       case "password":
         if (!value) {
-          error = "Password is required";
+          error = "REQUIRED";
         }
         break;
       default:
@@ -114,11 +114,10 @@ const Login = () => {
     }
   };
 
-  const inputClass = (hasError) =>
+  const inputClass = () =>
     cn(
-      "w-full h-11 pl-10 pr-4 bg-zinc-50/50 border rounded-xl text-sm text-zinc-900",
-      "placeholder:text-zinc-400 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all",
-      hasError ? "border-red-500 ring-1 ring-red-500/20" : "border-zinc-200"
+      "w-full h-11 pl-10 pr-4 bg-zinc-50/50 border border-zinc-200 rounded-xl text-sm text-zinc-900",
+      "placeholder:text-zinc-400 hover:border-zinc-300 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all"
     );
 
   return (
@@ -189,9 +188,8 @@ const Login = () => {
                 className={inputClass(errors.email)}
               />
             </div>
-            {errors.email && (
-              <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1 font-medium">
-                <AlertTriangle className="h-3 w-3" />
+            {errors.email && errors.email !== "REQUIRED" && (
+              <p className="text-red-500 text-xs mt-1 font-medium">
                 {errors.email}
               </p>
             )}
@@ -217,12 +215,6 @@ const Login = () => {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1 font-medium">
-                <AlertTriangle className="h-3 w-3" />
-                {errors.password}
-              </p>
-            )}
           </div>
 
           {/* Remember me & Forgot password */}
