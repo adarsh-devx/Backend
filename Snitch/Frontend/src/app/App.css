@@ -47,6 +47,73 @@
   --color-ring: var(--ring);
 }
 
+/* ── Sleek Minimal Studio Scrollbars ────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+
+/* ── Genjutsu Kinetic Motion & Shimmer ─────────────────────────────────────── */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+.btn-luxury-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-luxury-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.16),
+    transparent
+  );
+  transform: translateX(-150%) skewX(-20deg);
+  pointer-events: none;
+}
+
+.btn-luxury-shimmer:hover::after {
+  animation: shimmer-sweep 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropzone-flow {
+  0%, 100% {
+    border-color: #18181b;
+    box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
+  }
+  50% {
+    border-color: #71717a;
+    box-shadow: 0 0 0 6px rgba(24, 24, 27, 0.04);
+  }
+}
+
+.dropzone-kinetic-active {
+  animation: dropzone-flow 1.5s ease-in-out infinite;
+}
+
 /* ── From Uiverse.io by vishnupprajapat: Animated Checkbox ──────────────────── */
 .checkbox-wrapper-46 input[type="checkbox"] {
   display: none;
