@@ -2,20 +2,15 @@ import { useState, useRef, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router";
 import { useProduct } from "../hook/use.product";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   UploadCloud,
-  X,
   Star,
   Trash2,
   Plus,
   AlertCircle,
   ShoppingBag,
-  Sparkles,
   Loader2,
   ArrowLeft,
   Heart,
@@ -28,11 +23,12 @@ const MAX_FILE_SIZE_MB = 10;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
 
 const QUICK_TAGS = [
-  "100% Cotton",
-  "Oversized Fit",
+  "100% Raw Cotton",
+  "Oversized Silhouette",
   "Cuban Collar",
-  "Waffle Knit",
-  "Pre-washed",
+  "Heavyweight Waffle Knit",
+  "Water-Repellent DWR",
+  "Pre-washed Techwear",
 ];
 
 export default function CreateProduct() {
@@ -202,7 +198,7 @@ export default function CreateProduct() {
     });
 
     if (!validateForm()) {
-      window.scrollTo({ top: 60, behavior: "smooth" });
+      window.scrollTo({ top: 40, behavior: "smooth" });
       return;
     }
 
@@ -253,58 +249,61 @@ export default function CreateProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf9f6] text-zinc-900 flex flex-col font-sans antialiased selection:bg-zinc-900 selection:text-white overflow-x-hidden">
-      {/* ── Studio Top Header ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-zinc-200">
+    <div className="min-h-screen bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter select-none antialiased overflow-x-hidden">
+      {/* ── Atelier Top Header ────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-30 bg-[#e7e7e0]/95 backdrop-blur-xs border-b border-zinc-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
-              to="/"
-              className="group flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-950 transition-colors pr-3 border-r border-zinc-200"
+              to="/seller/dashboard"
+              className="group flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider uppercase text-zinc-700 hover:text-zinc-950 transition-colors pr-3 border-r border-zinc-300"
             >
               <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-1" />
-              <span className="hidden sm:inline">Back</span>
+              <span className="hidden sm:inline">DASHBOARD</span>
             </Link>
 
             <div className="flex items-center gap-2">
-              <span className="font-extrabold tracking-widest text-sm uppercase text-zinc-950 font-serif">
+              <Link
+                to="/"
+                className="font-michroma text-base sm:text-lg font-bold tracking-[0.25em] uppercase text-zinc-950"
+              >
                 SNITCH
-              </span>
-              <span className="text-zinc-300">/</span>
-              <span className="text-[11px] font-semibold tracking-wider uppercase text-zinc-500 font-mono">
-                STUDIO
+              </Link>
+              <span className="text-zinc-400 font-mono text-xs">/</span>
+              <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-zinc-600">
+                STUDIO WORKBENCH
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
+              type="button"
               onClick={handleReset}
               disabled={isLoading}
-              className="group text-xs text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 h-8 px-2.5 flex items-center gap-1.5 transition-colors"
+              className="text-xs font-mono font-bold tracking-wider uppercase text-zinc-700 hover:text-zinc-950 hover:bg-[#eae9e2] bg-[#f4f4f0] border border-zinc-300 h-8 px-3 rounded-none flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
             >
               <RotateCcw className="w-3 h-3 text-zinc-400 group-hover:text-zinc-700 group-hover:-rotate-180 transition-transform duration-500" />
-              <span>Clear</span>
-            </Button>
-            <Button
+              <span>CLEAR</span>
+            </button>
+            <button
+              type="button"
               onClick={handleSubmit}
               disabled={isLoading}
-              className="btn-luxury-shimmer group bg-zinc-950 hover:bg-zinc-800 text-white text-xs sm:text-sm font-medium h-8 px-3.5 rounded-lg flex items-center gap-1.5 shadow-xs transition-all active:scale-95 cursor-pointer"
+              className="bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-mono font-bold tracking-wider uppercase h-8 px-4 rounded-none flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs active:scale-95"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Publishing...</span>
+                  <span>PUBLISHING...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300 transition-all duration-300 group-hover:rotate-45 group-hover:scale-125" />
-                  <span>Publish Product</span>
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>PUBLISH PRODUCT</span>
                 </>
               )}
-            </Button>
+            </button>
           </div>
         </div>
       </header>
@@ -312,30 +311,29 @@ export default function CreateProduct() {
       {/* ── Main Workspace ──────────────────────────────────────────────── */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-3.5 sm:py-4">
         {/* Breadcrumb Header */}
-        <div className="mb-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+        <div className="mb-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-zinc-300/80 pb-2.5">
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-zinc-950">
-              New Product Listing
+            <h1 className="font-michroma text-lg sm:text-xl font-bold uppercase tracking-tight text-zinc-950">
+              CREATE APPAREL LISTING
             </h1>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Add product imagery, specifications, and pricing for your storefront.
+            <p className="text-xs font-mono text-zinc-600 mt-0.5">
+              Specify high-resolution assets, pricing tiers, and garment
+              architecture.
             </p>
           </div>
-          <Badge
-            variant="outline"
-            className="w-fit text-xs font-medium bg-amber-50 text-amber-800 border-amber-200/80 py-0.5 px-2.5 rounded-full"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5 animate-pulse" />
-            Unpublished Draft
-          </Badge>
+          <span className="w-fit text-[10px] font-mono font-bold uppercase tracking-widest bg-[#f4f4f0] text-zinc-800 border border-zinc-300 py-0.5 px-2.5 rounded-none shadow-2xs">
+            STATUS // UNPUBLISHED DRAFT
+          </span>
         </div>
 
         {/* Global Error Banner */}
         {errors.submit && (
-          <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-start gap-2.5 text-xs animate-in fade-in">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
+          <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-700 flex items-start gap-2 text-xs font-mono animate-in fade-in rounded-none">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
             <div>
-              <span className="font-semibold text-red-800">Publishing Failed: </span>
+              <span className="font-bold text-red-900 uppercase">
+                PUBLISHING ERROR:{" "}
+              </span>
               <span>{errors.submit}</span>
             </div>
           </div>
@@ -345,39 +343,38 @@ export default function CreateProduct() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
           {/* ── Left Column: Form Details (7 cols) ────────────────────── */}
           <div className="lg:col-span-7 space-y-4">
-            {/* 1. Media & Dropzone (21st.dev style joyco dropzone) */}
-            <Card className="border-zinc-200/90 shadow-xs rounded-xl overflow-hidden bg-white">
-              <div className="px-4 py-2.5 border-b border-zinc-100 flex items-center justify-between">
-                <div>
-                  <h2 className="text-xs font-bold text-zinc-900 uppercase tracking-wider">
-                    Product Imagery
-                  </h2>
-                </div>
+            {/* 1. Media & Dropzone */}
+            <div className="border border-zinc-300 shadow-2xs rounded-none overflow-hidden bg-[#f4f4f0]">
+              <div className="px-4 py-2.5 border-b border-zinc-300/80 flex items-center justify-between bg-[#deddd6]/65">
+                <h2 className="font-mono text-xs font-bold text-zinc-900 uppercase tracking-wider">
+                  CURATED ASSETS // IMAGERY
+                </h2>
                 <span
                   className={cn(
-                    "text-[11px] font-mono px-2 py-0.5 rounded-full border",
+                    "text-[10px] font-mono font-bold px-2 py-0.5 border rounded-none",
                     images.length >= MAX_IMAGES
-                      ? "bg-amber-50 text-amber-800 border-amber-200"
-                      : "bg-zinc-50 text-zinc-600 border-zinc-200",
+                      ? "bg-zinc-900 text-white border-zinc-900"
+                      : "bg-[#eae9e2] text-zinc-700 border-zinc-300",
                   )}
                 >
-                  {images.length} / {MAX_IMAGES}
+                  {images.length} / {MAX_IMAGES} SLOTS
                 </span>
               </div>
 
-              <CardContent className="p-4 space-y-3">
-                {/* 21st.dev joyco Dropzone */}
+              <div className="p-4 space-y-3">
+                {/* Soft Brutalist Dropzone */}
                 <div
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
                   className={cn(
-                    "relative group cursor-pointer rounded-lg border-2 border-dashed py-4 px-3 text-center transition-all duration-300",
+                    "relative group cursor-pointer rounded-none border-2 border-dashed py-4 px-3 text-center transition-all duration-200",
                     isDragging
-                      ? "border-zinc-950 bg-zinc-100/90 dropzone-kinetic-active scale-[1.015]"
-                      : "border-zinc-300 hover:border-zinc-900 bg-zinc-50/50 hover:bg-zinc-50",
-                    images.length >= MAX_IMAGES && "pointer-events-none opacity-50",
+                      ? "border-zinc-950 bg-[#e4e3dc]"
+                      : "border-zinc-300 hover:border-zinc-950 bg-[#eae9e2]/60 hover:bg-[#eae9e2]",
+                    images.length >= MAX_IMAGES &&
+                      "pointer-events-none opacity-50",
                   )}
                 >
                   <input
@@ -394,144 +391,114 @@ export default function CreateProduct() {
                   />
 
                   <div className="flex flex-col items-center justify-center gap-1.5">
-                    <div
-                      className={cn(
-                        "w-9 h-9 rounded-full border flex items-center justify-center shadow-xs transition-all duration-300",
-                        isDragging
-                          ? "bg-zinc-950 text-white border-zinc-950 scale-125 -translate-y-1 shadow-md"
-                          : "bg-white border-zinc-200 text-zinc-700 group-hover:bg-zinc-950 group-hover:text-white group-hover:border-zinc-950 group-hover:shadow-md",
-                      )}
-                    >
-                      <UploadCloud
-                        className={cn(
-                          "w-4 h-4 transition-transform duration-300",
-                          isDragging
-                            ? "scale-110 -translate-y-0.5"
-                            : "group-hover:-translate-y-0.5 group-hover:scale-110",
-                        )}
-                      />
+                    <div className="p-2 bg-[#f4f4f0] border border-zinc-300 shadow-2xs group-hover:scale-105 transition-transform duration-200">
+                      <UploadCloud className="w-5 h-5 text-zinc-700 group-hover:text-zinc-950" />
                     </div>
                     <div>
-                      <p className="text-xs sm:text-sm font-semibold text-zinc-900">
-                        Drop photos here or{" "}
-                        <span className="text-zinc-950 underline underline-offset-2 font-bold">
-                          browse files
-                        </span>
-                      </p>
-                      <p className="text-[11px] text-zinc-400 mt-0.5">
-                        Supports JPG, PNG, WEBP (up to {MAX_IMAGES} images, max {MAX_FILE_SIZE_MB}MB each)
-                      </p>
+                      <span className="font-space text-xs font-bold uppercase tracking-wider text-zinc-950 block">
+                        UPLOAD APPAREL SHOTS
+                      </span>
+                      <span className="font-mono text-[11px] text-zinc-600 mt-0.5 block">
+                        Drag and drop or browse files (Max 10MB each)
+                      </span>
                     </div>
+                    <span className="font-mono text-[9px] uppercase tracking-widest text-zinc-500 bg-[#eae9e2] border border-zinc-300 px-2 py-0.5">
+                      JPG • PNG • WEBP
+                    </span>
                   </div>
                 </div>
 
                 {errors.images && (
-                  <p className="text-xs text-red-600 flex items-center gap-1 font-medium">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-                    <span>{errors.images}</span>
+                  <p className="text-xs text-red-600 font-mono font-medium flex items-center gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {errors.images}
                   </p>
                 )}
 
-                {/* Uploaded Thumbnails Grid */}
+                {/* Thumbnail Strip */}
                 {images.length > 0 && (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 pt-1">
-                    {images.map((item, idx) => {
+                  <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 pt-2 border-t border-zinc-300/70">
+                    {images.map((img, idx) => {
                       const isCover = idx === 0;
-                      const isSelected = activePreviewIndex === idx;
+                      const isActive = idx === activePreviewIndex;
+
                       return (
                         <div
-                          key={item.id}
+                          key={img.id}
                           onClick={() => setActivePreviewIndex(idx)}
                           className={cn(
-                            "group relative rounded-lg border overflow-hidden bg-zinc-50 transition-all cursor-pointer select-none",
-                            isSelected
-                              ? "border-zinc-950 ring-2 ring-zinc-950 shadow-md scale-[1.02]"
-                              : isCover
-                              ? "border-zinc-900/60 ring-1 ring-zinc-900/20"
-                              : "border-zinc-200 hover:border-zinc-400",
+                            "group relative aspect-[3/4] rounded-none border overflow-hidden cursor-pointer transition-all p-0.5 bg-[#eae9e2]",
+                            isActive
+                              ? "border-zinc-950 ring-1 ring-zinc-950 shadow-xs"
+                              : "border-zinc-300 opacity-80 hover:opacity-100",
                           )}
                         >
-                          <div className="aspect-[3/4] w-full relative overflow-hidden">
-                            <img
-                              src={item.previewUrl}
-                              alt={item.name}
-                              className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-200"
-                            />
+                          <img
+                            src={img.previewUrl}
+                            alt={img.name}
+                            className="w-full h-full object-cover"
+                          />
 
-                            {/* Cover Badge */}
-                            {isCover && (
-                              <div className="absolute top-1 left-1 z-10 pointer-events-none">
-                                <span className="bg-zinc-950 text-white font-mono text-[8px] font-bold uppercase px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-xs">
-                                  <Star className="w-2.5 h-2.5 fill-amber-300 text-amber-300 animate-pulse" />
-                                  Cover
-                                </span>
-                              </div>
-                            )}
+                          {isCover && (
+                            <span className="absolute top-1 left-1 bg-zinc-950 text-white font-mono text-[8px] font-bold px-1 py-0.2 tracking-widest uppercase rounded-none">
+                              PRIMARY
+                            </span>
+                          )}
 
-                            {/* Viewing Badge if selected but not cover */}
-                            {isSelected && !isCover && (
-                              <div className="absolute top-1 left-1 z-10 pointer-events-none">
-                                <span className="bg-zinc-900/90 backdrop-blur-xs text-white font-mono text-[8px] font-bold uppercase px-1.5 py-0.5 rounded shadow-xs">
-                                  Viewing
-                                </span>
-                              </div>
-                            )}
-
-                            {/* Hover Actions */}
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none">
-                              {!isCover && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleSetCover(idx);
-                                  }}
-                                  title="Set as hero cover"
-                                  className="pointer-events-auto group/btn p-1.5 rounded-md bg-white/95 text-zinc-700 hover:text-amber-500 hover:bg-white shadow-xs transition-all active:scale-90"
-                                >
-                                  <Star className="w-3 h-3 transition-transform duration-200 group-hover/btn:scale-125 group-hover/btn:rotate-12" />
-                                </button>
-                              )}
+                          {/* Hover Action Strip */}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1 z-10">
+                            {!isCover && (
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleRemoveImage(idx);
+                                  handleSetCover(idx);
                                 }}
-                                title="Remove photo"
-                                className="pointer-events-auto group/trash p-1.5 rounded-md bg-white/95 text-zinc-700 hover:text-red-600 hover:bg-white shadow-xs transition-all active:scale-90"
+                                title="Set as primary hero"
+                                className="p-1 bg-[#f4f4f0] text-zinc-900 hover:bg-zinc-950 hover:text-white transition-colors rounded-none cursor-pointer"
                               >
-                                <Trash2 className="w-3 h-3 transition-transform duration-200 group-hover/trash:-rotate-12 group-hover/trash:scale-110" />
+                                <Star className="w-3 h-3" />
                               </button>
-                            </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveImage(idx);
+                              }}
+                              title="Delete asset"
+                              className="p-1 bg-[#f4f4f0] text-zinc-900 hover:bg-red-600 hover:text-white transition-colors rounded-none cursor-pointer"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
                           </div>
                         </div>
                       );
                     })}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* 2. Product Details & OriginUI Joined Price Input */}
-            <Card className="border-zinc-200/90 shadow-xs rounded-xl overflow-hidden bg-white">
-              <div className="px-4 py-2.5 border-b border-zinc-100">
-                <h2 className="text-xs font-bold text-zinc-900 uppercase tracking-wider">
-                  Product Details & Pricing
+            {/* 2. Product Details & Pricing */}
+            <div className="border border-zinc-300 shadow-2xs rounded-none overflow-hidden bg-[#f4f4f0]">
+              <div className="px-4 py-2.5 border-b border-zinc-300/80 bg-[#deddd6]/65">
+                <h2 className="font-mono text-xs font-bold text-zinc-900 uppercase tracking-wider">
+                  EDITORIAL SPECS & CURRENCY PRICING
                 </h2>
               </div>
 
-              <CardContent className="p-4 space-y-3.5">
+              <div className="p-4 space-y-3.5">
                 {/* Title */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label
                       htmlFor="product-title"
-                      className="text-xs font-semibold text-zinc-800 uppercase tracking-wider"
+                      className="font-mono text-xs font-bold text-zinc-900 uppercase tracking-wider"
                     >
-                      Product Title <span className="text-red-500">*</span>
+                      APPAREL TITLE <span className="text-red-500">*</span>
                     </label>
-                    <span className="text-[11px] text-zinc-400 font-mono">
+                    <span className="text-[10px] text-zinc-500 font-mono">
                       {formData.title.length}/120
                     </span>
                   </div>
@@ -542,30 +509,29 @@ export default function CreateProduct() {
                     onChange={(e) => handleInputChange("title", e.target.value)}
                     placeholder="e.g. Classic Oversized Cuban Collar Linen Shirt"
                     className={cn(
-                      "h-10 text-sm font-medium",
+                      "h-9 text-xs font-mono font-medium rounded-none border-zinc-300 focus-visible:ring-zinc-950 bg-[#eae9e2]/55 focus-visible:bg-[#fcfcf9] placeholder:text-zinc-400",
                       errors.title && touched.title && "border-red-500",
                     )}
                   />
                   {errors.title && touched.title && (
-                    <p className="text-xs text-red-600 mt-1 font-medium flex items-center gap-1">
+                    <p className="text-xs text-red-600 font-mono mt-1 font-medium flex items-center gap-1">
                       <AlertCircle className="w-3.5 h-3.5" />
                       {errors.title}
                     </p>
                   )}
                 </div>
 
-                {/* Price & Currency (21st.dev OriginUI Joined Input) */}
+                {/* Price & Currency */}
                 <div>
                   <label
                     htmlFor="product-price"
-                    className="text-xs font-semibold text-zinc-800 uppercase tracking-wider block mb-1"
+                    className="font-mono text-xs font-bold text-zinc-900 uppercase tracking-wider block mb-1"
                   >
-                    Pricing & Currency <span className="text-red-500">*</span>
+                    PRICE ACQUISITION <span className="text-red-500">*</span>
                   </label>
 
-                  {/* OriginUI Joined Add-on Pattern */}
-                  <div className="relative flex rounded-lg shadow-2xs border border-zinc-200 bg-white focus-within:border-zinc-950 focus-within:ring-1 focus-within:ring-zinc-950/20 transition-all">
-                    <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-sm font-bold text-zinc-500">
+                  <div className="relative flex rounded-none border border-zinc-300 bg-[#eae9e2]/55 focus-within:bg-[#fcfcf9] focus-within:border-zinc-950 focus-within:ring-1 focus-within:ring-zinc-950 transition-all h-9">
+                    <span className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-xs font-space font-bold text-zinc-700">
                       {currencySymbol}
                     </span>
                     <input
@@ -574,14 +540,18 @@ export default function CreateProduct() {
                       min="1"
                       step="any"
                       value={formData.priceAmount}
-                      onChange={(e) => handleInputChange("priceAmount", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("priceAmount", e.target.value)
+                      }
                       placeholder="e.g. 2499"
-                      className="h-10 w-full bg-transparent ps-7 pe-2 text-sm font-semibold text-zinc-950 placeholder:text-zinc-400 outline-none"
+                      className="h-full w-full bg-transparent ps-7 pe-2 text-xs font-mono font-bold text-zinc-950 placeholder:text-zinc-400 outline-none"
                     />
                     <select
                       value={formData.priceCurrency}
-                      onChange={(e) => handleInputChange("priceCurrency", e.target.value)}
-                      className="inline-flex items-center rounded-r-lg border-l border-zinc-200 bg-zinc-50 px-2.5 text-xs font-semibold text-zinc-700 outline-none hover:bg-zinc-100 cursor-pointer transition-colors"
+                      onChange={(e) =>
+                        handleInputChange("priceCurrency", e.target.value)
+                      }
+                      className="inline-flex items-center rounded-none border-l border-zinc-300 bg-[#deddd6] hover:bg-[#d5d4cd] px-2.5 text-xs font-mono font-bold text-zinc-800 outline-none cursor-pointer transition-colors"
                     >
                       <option value="INR">INR (₹)</option>
                       <option value="USD">USD ($)</option>
@@ -589,18 +559,22 @@ export default function CreateProduct() {
                   </div>
 
                   {errors.priceAmount && touched.priceAmount && (
-                    <p className="text-xs text-red-600 mt-1 font-medium flex items-center gap-1">
+                    <p className="text-xs text-red-600 font-mono mt-1 font-medium flex items-center gap-1">
                       <AlertCircle className="w-3.5 h-3.5" />
                       {errors.priceAmount}
                     </p>
                   )}
 
-                  {/* Inline Payout pill */}
+                  {/* Net Payout Summary */}
                   {Number(formData.priceAmount) > 0 && (
-                    <div className="mt-1.5 py-1 px-2.5 bg-zinc-50 border border-zinc-200/80 rounded-md flex items-center justify-between text-[11px] text-zinc-600">
-                      <span>Platform fee (2%): -{currencySymbol}{(Number(formData.priceAmount) * 0.02).toFixed(2)}</span>
-                      <span className="font-semibold text-emerald-700">
-                        Est. Net Payout: {currencySymbol}{netPayout}
+                    <div className="mt-1.5 py-1 px-2.5 bg-[#eae9e2] border border-zinc-300/80 rounded-none flex items-center justify-between text-[11px] font-mono text-zinc-700">
+                      <span>
+                        Atelier fee (2%): -{currencySymbol}
+                        {(Number(formData.priceAmount) * 0.02).toFixed(2)}
+                      </span>
+                      <span className="font-bold text-zinc-950">
+                        Net Payout: {currencySymbol}
+                        {netPayout}
                       </span>
                     </div>
                   )}
@@ -611,81 +585,91 @@ export default function CreateProduct() {
                   <div className="flex items-center justify-between mb-1">
                     <label
                       htmlFor="product-description"
-                      className="text-xs font-semibold text-zinc-800 uppercase tracking-wider"
+                      className="font-mono text-xs font-bold text-zinc-900 uppercase tracking-wider"
                     >
-                      Description & Fabric Specs <span className="text-red-500">*</span>
+                      GARMENT SPECIFICATION{" "}
+                      <span className="text-red-500">*</span>
                     </label>
-                    <span className="text-xs text-zinc-400">Detailed overview</span>
+                    <span className="text-[10px] text-zinc-500 font-mono">
+                      ARCHIVE DETAILS
+                    </span>
                   </div>
                   <Textarea
                     id="product-description"
                     rows={3}
                     value={formData.description}
-                    onChange={(e) => handleInputChange("description", e.target.value)}
-                    placeholder="Detail the silhouette, fabric blend, fit notes, and washing instructions..."
+                    onChange={(e) =>
+                      handleInputChange("description", e.target.value)
+                    }
+                    placeholder="Detail the silhouette cut, fabric blend, fit notes, and technical care instructions..."
                     className={cn(
-                      "text-sm leading-relaxed min-h-[75px]",
-                      errors.description && touched.description && "border-red-500",
+                      "text-xs font-inter leading-relaxed min-h-[68px] rounded-none border-zinc-300 focus-visible:ring-zinc-950 bg-[#eae9e2]/55 focus-visible:bg-[#fcfcf9] placeholder:text-zinc-400",
+                      errors.description &&
+                        touched.description &&
+                        "border-red-500",
                     )}
                   />
                   {errors.description && touched.description && (
-                    <p className="text-xs text-red-600 mt-1 font-medium flex items-center gap-1">
+                    <p className="text-xs text-red-600 font-mono mt-1 font-medium flex items-center gap-1">
                       <AlertCircle className="w-3.5 h-3.5" />
                       {errors.description}
                     </p>
                   )}
 
-                  {/* Compact Quick Tags */}
+                  {/* Quick Tags */}
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                    <span className="text-xs text-zinc-400 font-medium">Quick add:</span>
+                    <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+                      QUICK SPEC:
+                    </span>
                     {QUICK_TAGS.map((tag) => (
                       <button
                         key={tag}
                         type="button"
                         onClick={() => handleAddQuickTag(tag)}
-                        className="group/tag inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-zinc-100 hover:bg-zinc-900 hover:text-white text-zinc-700 transition-all duration-200 border border-zinc-200/60 font-medium active:scale-95"
+                        className="group/tag inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-none bg-[#eae9e2] hover:bg-zinc-950 hover:text-white text-zinc-800 transition-colors border border-zinc-300 cursor-pointer"
                       >
-                        <Plus className="w-3 h-3 text-zinc-400 group-hover/tag:text-white group-hover/tag:rotate-90 transition-all duration-200" />
+                        <Plus className="w-2.5 h-2.5 text-zinc-400 group-hover/tag:text-white" />
                         <span>{tag}</span>
                       </button>
                     ))}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
-          {/* ── Right Column: Storefront Preview & Actions (5 cols) ────────── */}
-          <div className="lg:col-span-5 flex flex-col items-center lg:items-end space-y-4 lg:sticky lg:top-20">
-            {/* 21st.dev shadcnstore E-Commerce Card Preview (Properly sized max 290px) */}
-            <div className="w-full max-w-[280px] sm:max-w-[290px] bg-white rounded-xl border border-zinc-200/90 shadow-sm overflow-hidden transition-all duration-300">
-              <div className="px-3.5 py-2.5 bg-zinc-50 border-b border-zinc-100 flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
-                  Storefront Preview
-                </span>
-                <span className="text-[10px] font-mono text-zinc-400">Live Sync</span>
+          {/* ── Right Column: Storefront Preview (5 cols) ────────── */}
+          <div className="lg:col-span-5 flex flex-col items-center lg:items-end space-y-3.5 lg:sticky lg:top-16">
+            {/* Storefront Card Preview (Balanced Warm-Tone Sizing) */}
+            <div className="w-full max-w-[280px] sm:max-w-[290px] bg-[#f4f4f0] rounded-none border border-zinc-300 shadow-2xs overflow-hidden transition-all duration-300">
+              <div className="px-3.5 py-2 bg-[#deddd6]/65 border-b border-zinc-300/80 flex items-center justify-between font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-600">
+                <span>RUNWAY PREVIEW</span>
+                <span className="text-zinc-500">LIVE SYNC</span>
               </div>
 
-              {/* 3:4 Fashion Aspect Media */}
-              <div className="aspect-[3/4] w-full bg-zinc-100 relative overflow-hidden flex items-center justify-center">
+              {/* 3:4 Media Stage */}
+              <div className="aspect-[3/4] w-full bg-[#eae9e2] relative overflow-hidden flex items-center justify-center">
                 {images.length > 0 ? (
                   <img
                     key={images[activePreviewIndex]?.id || activePreviewIndex}
-                    src={images[activePreviewIndex]?.previewUrl || images[0]?.previewUrl}
+                    src={
+                      images[activePreviewIndex]?.previewUrl ||
+                      images[0]?.previewUrl
+                    }
                     alt="Storefront Preview"
-                    className="w-full h-full object-cover transition-all duration-300 animate-in fade-in zoom-in-95 ease-out"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center text-zinc-400 gap-2 p-4 text-center">
-                    <ShoppingBag className="w-7 h-7 text-zinc-300" />
-                    <span className="text-xs font-medium text-zinc-400">
-                      Photo preview
+                    <ShoppingBag className="w-7 h-7 stroke-[1.2] text-zinc-400" />
+                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-400">
+                      NO ASSET LOADED
                     </span>
                   </div>
                 )}
 
                 {/* Badge */}
-                <span className="absolute top-2.5 left-2.5 bg-zinc-950/90 text-white text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-xs">
+                <span className="absolute top-2.5 left-2.5 bg-zinc-950 text-white text-[9px] font-mono font-bold tracking-widest uppercase px-2 py-0.5 rounded-none">
                   NEW ARRIVAL
                 </span>
 
@@ -693,17 +677,21 @@ export default function CreateProduct() {
                 <button
                   type="button"
                   onClick={() => setIsWishlisted((prev) => !prev)}
-                  title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                  title={
+                    isWishlisted ? "Remove from wishlist" : "Add to wishlist"
+                  }
                   className={cn(
-                    "absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/95 flex items-center justify-center shadow-xs transition-all duration-200 active:scale-75 cursor-pointer",
-                    isWishlisted ? "text-red-500 scale-105" : "text-zinc-600 hover:text-zinc-900",
+                    "absolute top-2.5 right-2.5 w-7 h-7 rounded-none bg-[#f4f4f0]/95 border border-zinc-300 hover:border-zinc-950 flex items-center justify-center shadow-xs transition-all cursor-pointer",
+                    isWishlisted
+                      ? "text-red-500"
+                      : "text-zinc-600 hover:text-zinc-950",
                   )}
                 >
                   <Heart
                     className={cn(
-                      "w-3.5 h-3.5 transition-all duration-200",
+                      "w-3.5 h-3.5",
                       isWishlisted
-                        ? "fill-red-500 text-red-500 animate-in zoom-in-75"
+                        ? "fill-red-500 text-red-500"
                         : "fill-transparent text-zinc-600",
                     )}
                   />
@@ -718,10 +706,10 @@ export default function CreateProduct() {
                         type="button"
                         onClick={() => setActivePreviewIndex(dotIdx)}
                         className={cn(
-                          "h-1.5 rounded-full transition-all",
+                          "h-1 rounded-none transition-all cursor-pointer",
                           activePreviewIndex === dotIdx
-                            ? "w-3.5 bg-white"
-                            : "w-1.5 bg-white/50 hover:bg-white",
+                            ? "w-4 bg-zinc-950"
+                            : "w-2 bg-zinc-950/40 hover:bg-zinc-950",
                         )}
                       />
                     ))}
@@ -729,78 +717,86 @@ export default function CreateProduct() {
                 )}
               </div>
 
-              {/* Product Info footer */}
-              <div className="p-3.5 space-y-1">
-                <span className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase block">
-                  SNITCH STUDIO
+              {/* Product Info */}
+              <div className="p-3 space-y-1 bg-[#f4f4f0] border-t border-zinc-300/70">
+                <span className="text-[9px] font-mono font-bold tracking-widest text-zinc-500 uppercase block">
+                  SNITCH ATELIER
                 </span>
-                <p className="text-xs font-semibold text-zinc-900 truncate">
-                  {formData.title.trim() || "Product Title"}
+                <p className="font-space text-xs font-semibold text-zinc-950 uppercase truncate">
+                  {formData.title.trim() || "Untitled Product"}
                 </p>
                 <div className="flex items-center justify-between pt-0.5">
-                  <span className="text-sm font-bold text-zinc-950 font-mono">
-                    {currencySymbol} {formData.priceAmount ? Number(formData.priceAmount).toLocaleString() : "0"}
+                  <span className="font-space text-sm font-bold text-zinc-950">
+                    {currencySymbol}{" "}
+                    {formData.priceAmount
+                      ? Number(formData.priceAmount).toLocaleString()
+                      : "0"}
                   </span>
-                  <span className="text-[10px] text-zinc-400">Tax incl.</span>
+                  <span className="font-mono text-[9px] text-zinc-500 uppercase">
+                    TAX INCL.
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Quick Publish CTA button */}
             <div className="w-full max-w-[280px] sm:max-w-[290px]">
-              <Button
+              <button
+                type="button"
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="btn-luxury-shimmer group w-full bg-zinc-950 hover:bg-zinc-800 text-white text-xs sm:text-sm font-semibold h-10 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
+                className="w-full bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-space font-bold uppercase tracking-widest h-10 rounded-none flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs active:scale-[0.99]"
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Publishing...</span>
+                    <span>PUBLISHING...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 text-amber-300 transition-all duration-300 group-hover:rotate-45 group-hover:scale-125" />
-                    <span>Publish to Snitch Store</span>
+                    <Plus className="w-4 h-4" />
+                    <span>PUBLISH TO RUNWAY</span>
                   </>
                 )}
-              </Button>
+              </button>
             </div>
           </div>
         </div>
       </main>
 
-      {/* ── Success Celebration Modal ────────────────────────────────────── */}
+      {/* ── Success Modal ────────────────────────────────────── */}
       {successData && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-5 text-center border border-zinc-200 shadow-xl space-y-3 animate-in zoom-in-95">
-            <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center shadow-inner">
-              <CheckCircle2 className="w-6 h-6" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in select-none">
+          <div className="bg-[#f4f4f0] rounded-none max-w-sm w-full p-5 text-center border border-zinc-950 shadow-2xl space-y-3 animate-in zoom-in-95">
+            <div className="w-11 h-11 bg-[#deddd6] border border-zinc-400 text-zinc-950 mx-auto flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-zinc-900" />
             </div>
 
-            <div>
-              <h3 className="text-base font-bold text-zinc-950">
-                Product Published!
+            <div className="space-y-0.5">
+              <h3 className="font-michroma text-sm font-bold uppercase tracking-tight text-zinc-950">
+                PRODUCT PUBLISHED
               </h3>
-              <p className="text-xs text-zinc-500 mt-0.5">
-                &ldquo;{successData?.title || formData.title}&rdquo; is now active in your seller catalog.
+              <p className="text-xs font-mono text-zinc-600">
+                &ldquo;{successData?.title || formData.title}&rdquo; is now
+                active on the runway catalog.
               </p>
             </div>
 
             <div className="pt-2 flex gap-2">
-              <Button
-                variant="outline"
+              <button
+                type="button"
                 onClick={handleReset}
-                className="flex-1 text-xs h-9 rounded-lg"
+                className="flex-1 text-xs font-mono font-bold uppercase tracking-wider h-8.5 rounded-none border border-zinc-300 bg-[#eae9e2] hover:bg-[#deddd6] text-zinc-900 transition-colors cursor-pointer"
               >
-                Add Another
-              </Button>
-              <Button
-                onClick={() => navigate("/")}
-                className="flex-1 bg-zinc-950 text-white hover:bg-zinc-800 text-xs h-9 rounded-lg"
+                CREATE ANOTHER
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/seller/dashboard")}
+                className="flex-1 bg-zinc-950 text-white hover:bg-zinc-800 text-xs font-mono font-bold uppercase tracking-wider h-8.5 rounded-none transition-colors cursor-pointer"
               >
-                Done
-              </Button>
+                VIEW DASHBOARD
+              </button>
             </div>
           </div>
         </div>
