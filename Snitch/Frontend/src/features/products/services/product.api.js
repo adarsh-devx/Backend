@@ -5,24 +5,42 @@ const productApiInstance = axios.create({
   withCredentials: true,
 });
 
-
 //create product
-export async function createProduct(formData){
-    try {
-        const response = await productApiInstance.post("/",formData);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+export async function createProduct(formData) {
+  try {
+    const response = await productApiInstance.post("/", formData);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 }
 
-
 //get seller products
-export async function getSellerProduct(){
-    try {
-        const response = await productApiInstance.get("/seller");
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
+export async function getSellerProduct() {
+  try {
+    const response = await productApiInstance.get("/seller");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+//get all products
+export async function getAllProducts() {
+  try {
+    const response = await productApiInstance.get("/");
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+//get single product by ID
+export async function getProductById(id) {
+  try {
+    const response = await productApiInstance.get(`/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 }

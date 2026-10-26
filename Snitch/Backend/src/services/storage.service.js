@@ -16,7 +16,11 @@ const client = new ImageKit({
  * @param {string} [folder] - Optional destination folder in ImageKit DAM
  * @returns {Promise<{ url: string, fileId: string, name: string }>}
  */
-export async function uploadToImageKit(buffer, originalname, folder = "/snitch/products") {
+export async function uploadToImageKit(
+  buffer,
+  originalname,
+  folder = "/snitch/products",
+) {
   try {
     const fileName = `${Date.now()}-${originalname.replace(/\s+/g, "-")}`;
     const file = await toFile(buffer, fileName);

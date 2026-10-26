@@ -29,8 +29,11 @@ export async function createProduct(req, res) {
     }
 
     // Format price object matching product schema ({ amount, currency }) with flexible fallbacks
-    const amount = Number(priceAmount ?? req.body.price?.amount ?? req.body.price);
-    const currency = priceCurrency || req.body.price?.currency || req.body.currency || "INR";
+    const amount = Number(
+      priceAmount ?? req.body.price?.amount ?? req.body.price,
+    );
+    const currency =
+      priceCurrency || req.body.price?.currency || req.body.currency || "INR";
 
     const formattedPrice = {
       amount,
@@ -77,6 +80,53 @@ export async function getSellerProducts(req, res) {
     });
   } catch (error) {
     console.error("Get Seller Products Error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+/**
+ * Controller: Get All Products
+ * Returns all products with seller details population
+ */
+export async function getAllProducts(req, res) {
+  try {
+    const products = await productModel.find();
+
+    return res.status(200).json({
+      message: "Products fetched successfully",
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.error("Get All Products Error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+/**
+ * Controller: Get Single Product By ID
+ * Returns full product details with seller info
+ */
+export async function getProductById(req, res) {
+  try {
+    const { id } = req.params;
+    const product = await productModel
+      .findById(id)
+      .populate("seller", "fullName email");
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ message: "Product not found", success: false });
+    }
+
+    return res.status(200).json({
+      message: "Product fetched successfully",
+      success: true,
+      product,
+    });
+  } catch (error) {
+    console.error("Get Product By ID Error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 }
