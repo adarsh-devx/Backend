@@ -15,7 +15,13 @@ const authApiInstance = axios.create({
  * Register a new user account.
  * Sends user details to POST /api/auth/register and extracts human-readable error messages.
  */
-export async function register({ email, contact, password, fullName, isSeller }) {
+export async function register({
+  email,
+  contact,
+  password,
+  fullName,
+  isSeller,
+}) {
   try {
     const response = await authApiInstance.post("/register", {
       email,
@@ -54,6 +60,21 @@ export async function login({ email, password }) {
       error.response?.data?.message ||
       error.message ||
       "Login failed";
+    throw new Error(message);
+  }
+}
+
+export async function getMe() {
+  try {
+    const response = await authApiInstance.get("/me");
+    return response.data;
+  } catch (error) {
+    // Extract error message for inline display in the UI form
+    const message =
+      error.response?.data?.errors?.[0]?.msg ||
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch user";
     throw new Error(message);
   }
 }

@@ -2,14 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../hook/use.auth";
 import { cn } from "@/lib/utils";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertTriangle,
-  Loader2,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertTriangle, Loader2 } from "lucide-react";
 import GoogleButton from "../components/GoogleButton";
 
 const Login = () => {
@@ -64,7 +57,7 @@ const Login = () => {
         setErrors((prev) => ({ ...prev, [field]: error || undefined }));
       }
     },
-    [fieldTouched, validateField]
+    [fieldTouched, validateField],
   );
 
   const handleFieldBlur = useCallback(
@@ -73,7 +66,7 @@ const Login = () => {
       const error = validateField(field, formData[field]);
       setErrors((prev) => ({ ...prev, [field]: error || undefined }));
     },
-    [formData, validateField]
+    [formData, validateField],
   );
 
   const validateForm = useCallback(() => {
@@ -93,7 +86,7 @@ const Login = () => {
     setIsLoading(true);
     setErrors({});
     try {
-      await handleLogin({
+      const loggedUser = await handleLogin({
         email: formData.email,
         password: formData.password,
       });
@@ -106,9 +99,15 @@ const Login = () => {
         localStorage.removeItem("rememberMe");
       }
 
-      navigate("/");
+      if (loggedUser?.role === "seller") {
+        navigate("/seller/dashboard");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
-      setErrors({ general: err?.message || "Invalid credentials. Please try again." });
+      setErrors({
+        general: err?.message || "Invalid credentials. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +116,7 @@ const Login = () => {
   const inputClass = () =>
     cn(
       "w-full h-11 pl-10 pr-4 bg-zinc-50/50 border border-zinc-200 rounded-xl text-sm text-zinc-900",
-      "placeholder:text-zinc-400 hover:border-zinc-300 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all"
+      "placeholder:text-zinc-400 hover:border-zinc-300 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all",
     );
 
   return (
@@ -212,7 +211,11 @@ const Login = () => {
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>
@@ -225,7 +228,9 @@ const Login = () => {
                 id="cbx-remember"
                 className="inp-cbx"
                 checked={formData.rememberMe}
-                onChange={(e) => handleInputChange("rememberMe", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("rememberMe", e.target.checked)
+                }
               />
               <label htmlFor="cbx-remember" className="cbx">
                 <span>

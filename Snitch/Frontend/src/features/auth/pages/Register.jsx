@@ -15,8 +15,6 @@ import {
 } from "lucide-react";
 import GoogleButton from "../components/GoogleButton";
 
-
-
 // ── Register Page ────────────────────────────────────────────────────────────
 const Register = () => {
   const { handleRegister } = useAuth();
@@ -85,7 +83,7 @@ const Register = () => {
         setErrors((prev) => ({ ...prev, [field]: error || undefined }));
       }
     },
-    [fieldTouched, validateField]
+    [fieldTouched, validateField],
   );
 
   const handleFieldBlur = useCallback(
@@ -94,7 +92,7 @@ const Register = () => {
       const error = validateField(field, formData[field]);
       setErrors((prev) => ({ ...prev, [field]: error || undefined }));
     },
-    [formData, validateField]
+    [formData, validateField],
   );
 
   const validateForm = useCallback(() => {
@@ -123,7 +121,9 @@ const Register = () => {
       });
       navigate("/");
     } catch (err) {
-      setErrors({ general: err?.message || "Registration failed. Please try again." });
+      setErrors({
+        general: err?.message || "Registration failed. Please try again.",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -132,7 +132,7 @@ const Register = () => {
   const inputClass = () =>
     cn(
       "w-full h-10 pl-10 pr-4 bg-zinc-50/50 border border-zinc-200 rounded-xl text-xs sm:text-sm text-zinc-900",
-      "placeholder:text-zinc-400 hover:border-zinc-300 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all"
+      "placeholder:text-zinc-400 hover:border-zinc-300 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all",
     );
 
   return (
@@ -267,7 +267,11 @@ const Register = () => {
                 onClick={() => setShowPassword((v) => !v)}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
               </button>
             </div>
             {errors.password && errors.password !== "REQUIRED" && (
@@ -294,8 +298,12 @@ const Register = () => {
               </span>
               <span className="inline-flex items-center gap-1.5 text-xs text-zinc-700">
                 <Store className="h-3.5 w-3.5 text-zinc-800 shrink-0" />
-                <span className="font-semibold text-zinc-900">Register as a seller</span>
-                <span className="text-zinc-400 text-[11px]">(start selling on Snitch)</span>
+                <span className="font-semibold text-zinc-900">
+                  Register as a seller
+                </span>
+                <span className="text-zinc-400 text-[11px]">
+                  (start selling on Snitch)
+                </span>
               </span>
             </label>
           </div>
@@ -308,7 +316,9 @@ const Register = () => {
                 id="cbx-terms"
                 className="inp-cbx"
                 checked={formData.agreeToTerms}
-                onChange={(e) => handleInputChange("agreeToTerms", e.target.checked)}
+                onChange={(e) =>
+                  handleInputChange("agreeToTerms", e.target.checked)
+                }
               />
               <label htmlFor="cbx-terms" className="cbx">
                 <span>

@@ -59,7 +59,7 @@ export const GoogleButton = ({
         "rounded-xl shadow-xs hover:shadow-sm",
         "transition-all duration-150 cursor-pointer select-none",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20",
-        className
+        className,
       )}
     >
       <GoogleIcon className="h-4 w-4 shrink-0" />

@@ -1,15 +1,19 @@
-import './App.css'
-import { RouterProvider } from "react-router"
-import { Provider } from "react-redux"
-import { store } from "./app.store.js"
-import { routes } from "./app.routes.jsx"
+import "./App.css";
+import { RouterProvider } from "react-router";
+import { routes } from "./app.routes.jsx";
+import { useAuth } from "@/features/auth/hook/use.auth";
+import { useEffect } from "react";
 
 const App = () => {
-  return (
-    <Provider store={store}>
-      <RouterProvider router={routes}/>
-    </Provider>
-  )
-}
+  const { handleGetMe } = useAuth();
 
-export default App
+  useEffect(() => {
+    handleGetMe().catch(() => {
+      // Unauthenticated session (guest user) - ignore silently
+    });
+  }, []);
+
+  return <RouterProvider router={routes} />;
+};
+
+export default App;
