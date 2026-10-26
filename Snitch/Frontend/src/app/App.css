@@ -47,6 +47,19 @@
   --color-ring: var(--ring);
 }
 
+.font-michroma {
+  font-family: "Michroma", sans-serif;
+}
+.font-syncopate {
+  font-family: "Syncopate", sans-serif;
+}
+.font-space {
+  font-family: "Space Grotesk", sans-serif;
+}
+.font-inter {
+  font-family: "Inter", sans-serif;
+}
+
 /* ── Sleek Minimal Studio Scrollbars ────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 5px;
@@ -100,7 +113,8 @@
 }
 
 @keyframes dropzone-flow {
-  0%, 100% {
+  0%,
+  100% {
     border-color: #18181b;
     box-shadow: 0 0 0 3px rgba(24, 24, 27, 0.08);
   }
