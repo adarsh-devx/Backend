@@ -143,7 +143,7 @@ export const LogoMarquee = memo(function LogoMarquee({
   logos = [],
   children,
   className,
-  duration = 32,
+  duration = 42,
   durationOnHover = 70,
   gap = 36,
   reverse = false,
