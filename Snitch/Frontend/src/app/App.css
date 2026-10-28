@@ -218,3 +218,54 @@
     transform: scale(0.9);
   }
 }
+
+/* ── Uiverse.io Search Input by boryanakrasteva ── */
+.uiverse-search-container {
+  width: 220px;
+  position: relative;
+}
+
+.uiverse-search-container .uiverse-search-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uiverse-search-input {
+  width: 100%;
+  height: 38px;
+  padding: 8px 36px 8px 10px;
+  transition: 0.2s linear;
+  border: 2px solid black;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background-color: #ffffff;
+  color: #000000;
+  font-family: inherit;
+}
+
+.uiverse-search-input:focus {
+  outline: none;
+  border: 1px solid black;
+  box-shadow: -4px -4px 0px black;
+}
+
+.uiverse-search-container:hover > .uiverse-search-icon {
+  animation: uiverse-search-anim 1s linear infinite;
+}
+
+@keyframes uiverse-search-anim {
+  0%,
+  100% {
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.15);
+  }
+}
