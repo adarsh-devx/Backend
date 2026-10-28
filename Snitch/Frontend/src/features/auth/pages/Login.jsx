@@ -144,11 +144,11 @@ const Login = () => {
           <span className="text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase mb-1 block">
             Snitch Atelier
           </span>
-          <h1 className="text-2xl sm:text-[1.65rem] font-bold tracking-[-0.03em] text-zinc-950 uppercase">
-            Log In to Snitch
+          <h1 className="text-2xl sm:text-[1.65rem] font-bold tracking-[-0.03em] text-zinc-950">
+            Welcome Back
           </h1>
           <p className="text-zinc-500 text-xs sm:text-[13px] mt-1 font-normal">
-            Welcome back. Access your clothing & store world.
+            Access your clothing & store world.
           </p>
         </div>
 

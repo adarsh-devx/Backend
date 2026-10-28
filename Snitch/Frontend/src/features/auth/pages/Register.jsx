@@ -160,8 +160,8 @@ const Register = () => {
           <span className="text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase mb-0.5 block">
             Snitch Atelier
           </span>
-          <h1 className="text-xl sm:text-[1.45rem] font-bold tracking-[-0.03em] text-zinc-950 uppercase leading-tight">
-            Create an Account
+          <h1 className="text-xl sm:text-[1.45rem] font-bold tracking-[-0.03em] text-zinc-950 leading-tight">
+            Create Account
           </h1>
           <p className="text-zinc-500 text-xs mt-0.5 font-normal">
             Join Snitch for seamless shopping & selling
