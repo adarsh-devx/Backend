@@ -27,6 +27,6 @@ router.get("/seller", authenticateSeller, getSellerProducts);
 router.get("/", getAllProducts);
 
 // GET /api/products/:id - Get single product details by ID (Public)
-router.get("/:id", getProductById);
+router.get("/detail/:id", getProductById);
 
 export default router;

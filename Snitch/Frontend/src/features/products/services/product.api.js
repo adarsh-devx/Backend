@@ -38,7 +38,7 @@ export async function getAllProducts() {
 //get single product by ID
 export async function getProductById(id) {
   try {
-    const response = await productApiInstance.get(`/${id}`);
+    const response = await productApiInstance.get(`/detail/${id}`);
     return response.data;
   } catch (error) {
     throw error;
