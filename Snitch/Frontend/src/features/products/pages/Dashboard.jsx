@@ -463,7 +463,6 @@ export default function Dashboard() {
                       product={product}
                       isSelected={activeProduct?._id === product._id}
                       onSelectHero={handleSelectHero}
-                      onQuickLook={setInspectProduct}
                     />
                   ))}
                 </div>

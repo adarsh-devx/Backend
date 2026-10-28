@@ -1,17 +1,16 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { cn } from "@/lib/utils";
-import { Eye, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 /**
  * High-Fashion Techwear Lookbook Product Card (SHADXW Brutalist Style)
- * Includes Animos 3D perspective mouse tilt, photo switcher dots, and instant hero selector
+ * Includes Animos 3D perspective mouse tilt, photo switcher dots, and direct navigation
  */
 export default function ProductCard({
   product,
   isSelected = false,
   onSelectHero,
-  onQuickLook,
   actionLabel,
   onAction,
 }) {
@@ -69,8 +68,9 @@ export default function ProductCard({
     }
   };
 
-  const primaryBtnText =
-    actionLabel || (onSelectHero ? "Feature on Stage" : "View Details ↗");
+  const rawLabel =
+    actionLabel || (onSelectHero ? "Feature on Stage" : "View Product");
+  const cleanButtonText = rawLabel.replace(/[↗→\s]+$/, "");
 
   return (
     <div
@@ -107,11 +107,13 @@ export default function ProductCard({
           </span>
         </div>
 
-        {/* Quick Action Overlay on Hover */}
+        {/* Quick Action - Single Clean CTA grounded at bottom */}
         <div
           className={cn(
-            "absolute inset-0 bg-black/35 backdrop-blur-[1px] flex flex-col items-center justify-center gap-2 p-4 transition-opacity duration-200 z-20",
-            isHovered ? "opacity-100" : "opacity-0 pointer-events-none"
+            "absolute inset-x-3 bottom-3.5 z-20 transition-all duration-200",
+            isHovered
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 translate-y-2 pointer-events-none"
           )}
         >
           <button
@@ -120,30 +122,21 @@ export default function ProductCard({
               e.stopPropagation();
               handleCardClick();
             }}
-            className="w-full py-2 bg-white text-zinc-950 font-space text-xs font-bold uppercase tracking-wider hover:bg-zinc-100 transition-colors flex items-center justify-center gap-1 shadow-md cursor-pointer"
+            className="w-full py-2 bg-white/95 text-zinc-950 hover:bg-zinc-950 hover:text-white font-space text-xs font-bold uppercase tracking-wider border border-zinc-300 hover:border-zinc-950 transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer rounded-none active:scale-95"
           >
-            <span>{primaryBtnText}</span>
+            <span>{cleanButtonText}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </button>
-
-          {onQuickLook && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onQuickLook(product);
-              }}
-              className="w-full py-1.5 bg-zinc-900/80 hover:bg-zinc-950 text-white font-mono text-[10px] font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-1 cursor-pointer"
-            >
-              <Eye className="w-3 h-3" />
-              <span>Inspect Specs</span>
-            </button>
-          )}
         </div>
 
         {/* Multi-photo switcher preview dots */}
         {images.length > 1 && (
-          <div className="absolute bottom-2 inset-x-0 flex items-center justify-center gap-1 z-10 pointer-events-auto">
+          <div
+            className={cn(
+              "absolute bottom-1.5 inset-x-0 flex items-center justify-center gap-1 z-10 pointer-events-auto transition-opacity duration-200",
+              isHovered ? "opacity-0 pointer-events-none" : "opacity-100"
+            )}
+          >
             {images.slice(0, 5).map((_, idx) => (
               <button
                 key={idx}
