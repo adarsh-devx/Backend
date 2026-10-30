@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: auto !important;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
 @layer base {
   :root {
     --background: #fbfaf8;
@@ -59,21 +68,20 @@
 .font-inter {
   font-family: "Inter", sans-serif;
 }
+.font-ruthie {
+  font-family: "Ruthie", cursive;
+}
 
-/* ── Sleek Minimal Studio Scrollbars ────────────────────────────────────────── */
+/* ── Hide native scrollbars for Awwwards luxury aesthetic ────────────────── */
+html,
+body {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE / Edge */
+}
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+  display: none !important; /* Chrome, Safari, Edge, Opera */
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* ── Genjutsu Kinetic Motion & Shimmer ─────────────────────────────────────── */
@@ -267,5 +275,24 @@
   }
   50% {
     transform: translateY(-50%) scale(1.15);
+  }
+}
+
+/* ── Infinite Ribbon Marquee Keyframes (Global & Hardware Accelerated) ── */
+@keyframes iconiq-infinite-ribbon {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes iconiq-infinite-ribbon-reverse {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
   }
 }

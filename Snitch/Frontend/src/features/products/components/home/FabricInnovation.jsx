@@ -1,6 +1,17 @@
+import { useRef } from "react";
 import { Droplets, Wind, ShieldCheck, CloudSun, ArrowRight } from "lucide-react";
+import { motion, useScroll, useTransform } from "motion/react";
 
 export default function FabricInnovation({ onLearnMore }) {
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"],
+  });
+
+  // Bidirectional parallax lift on scroll-down and scroll-up
+  const fabricParallax = useTransform(scrollYProgress, [0, 1], [-28, 28]);
+
   const specs = [
     {
       icon: Droplets,
@@ -24,16 +35,28 @@ export default function FabricInnovation({ onLearnMore }) {
     },
   ];
 
+  const easeCurve = [0.16, 1, 0.3, 1];
+
   return (
-    <section className="w-full bg-zinc-950 text-white border-b border-zinc-900 py-16 sm:py-24 select-none">
+    <section
+      ref={containerRef}
+      className="w-full bg-zinc-950 text-white border-b border-zinc-900 py-16 sm:py-24 select-none overflow-hidden"
+    >
       <div className="max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-        {/* Left Side: Macro Material Texture & Performance Heading */}
-        <div className="lg:col-span-7 space-y-6">
+        {/* Left Side: Macro Material Texture & Performance Heading - Glides in from Left */}
+        <motion.div
+          initial={{ opacity: 0, x: -75 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.85, ease: easeCurve }}
+          className="lg:col-span-7 space-y-6"
+        >
           <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] bg-zinc-900 border border-zinc-800 overflow-hidden shadow-xl group">
-            <img
+            <motion.img
               src="/useImage/mockups/fabric_water_resistant_droplets.jpg"
               alt="SNITCH Hydrophobic Fabric Innovation"
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              style={{ y: fabricParallax }}
+              className="w-full h-[115%] -top-[7%] relative object-cover transition-transform duration-700 group-hover:scale-105 will-change-transform"
               loading="lazy"
             />
             {/* Fine Fabric Tag Overlay */}
@@ -65,15 +88,25 @@ export default function FabricInnovation({ onLearnMore }) {
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Right Side: 4 Technical Specification Claims */}
-        <div className="lg:col-span-5 space-y-6 sm:space-y-8 lg:pl-6">
+        {/* Right Side: 4 Technical Specification Claims - Glides in from Right */}
+        <motion.div
+          initial={{ opacity: 0, x: 75 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.85, ease: easeCurve }}
+          className="lg:col-span-5 space-y-6 sm:space-y-8 lg:pl-6"
+        >
           {specs.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div
+              <motion.div
                 key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 + idx * 0.1, ease: easeCurve }}
                 className="flex items-start gap-4 p-3 first:pt-0 border-b border-zinc-800/80 last:border-b-0 hover:bg-zinc-900/40 transition-colors"
               >
                 <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 shrink-0 shadow-2xs">
@@ -87,10 +120,10 @@ export default function FabricInnovation({ onLearnMore }) {
                     {item.desc}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

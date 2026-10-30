@@ -1,20 +1,41 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router";
 import { Heart, User, ShoppingBag, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import UiverseSearchInput from "@/components/ui/UiverseSearchInput";
+import DrawUnderlineLink from "@/components/ui/DrawUnderlineLink";
 
 export default function MainNavbar({
   wishlistCount = 0,
   cartCount = 0,
   onOpenWishlist,
   onOpenCart,
-  onSearch,
 }) {
-  const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState("MEN");
-  const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNavVisible, setIsNavVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 120) {
+        if (currentScrollY > lastScrollY.current + 8) {
+          // Scrolling Down -> Hide navbar to maximize runway screen space
+          setIsNavVisible(false);
+        } else if (currentScrollY < lastScrollY.current - 6) {
+          // Scrolling Up -> Smoothly reveal navbar
+          setIsNavVisible(true);
+        }
+      } else {
+        // At the top of page -> always visible
+        setIsNavVisible(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navLinks = [
     { label: "MEN", href: "#catalog" },
@@ -34,22 +55,14 @@ export default function MainNavbar({
     }
   };
 
-  const handleSearchSubmit = (e) => {
-    if (e) e.preventDefault();
-    if (searchQuery.trim()) {
-      if (onSearch) {
-        onSearch(searchQuery.trim());
-      }
-      const el = document.getElementById("catalog");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  };
-
   return (
     <>
-      <header className="w-full bg-[#F3F1E9]/95 backdrop-blur-xs border-b border-[#D9D6CE] sticky top-0 z-40 select-none">
+      <header
+        className={cn(
+          "w-full bg-[#F3F1E9]/95 backdrop-blur-md border-b border-[#D9D6CE] sticky top-0 z-40 select-none transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform",
+          isNavVisible ? "translate-y-0 shadow-xs" : "-translate-y-full shadow-none",
+        )}
+      >
         <div className="max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12 py-3 sm:py-3.5 flex items-center justify-between gap-4 lg:gap-6">
           {/* Left: SNITCH Brand Wordmark */}
           <Link
@@ -59,22 +72,16 @@ export default function MainNavbar({
             SNITCH
           </Link>
 
-          {/* Center-Left: Navigation Links (MEN, WOMEN, NEW ARRIVALS, COLLECTIONS, EDITORIAL, ABOUT) */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8 font-mono text-xs font-bold uppercase tracking-wider text-zinc-700">
+          {/* Center-Left: Navigation Links with Hand-Drawn Atelier Underline */}
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8 font-mono text-xs uppercase tracking-wider text-zinc-700">
             {navLinks.map((link) => (
-              <button
+              <DrawUnderlineLink
                 key={link.label}
-                type="button"
+                label={link.label}
+                isActive={activeItem === link.label}
                 onClick={() => handleNavClick(link)}
-                className={cn(
-                  "cursor-pointer transition-colors pb-0.5 tracking-wider",
-                  activeItem === link.label
-                    ? "text-zinc-950 border-b-2 border-zinc-950 font-extrabold"
-                    : "hover:text-zinc-950",
-                )}
-              >
-                {link.label}
-              </button>
+                strokeColor="#18181b"
+              />
             ))}
           </nav>
 

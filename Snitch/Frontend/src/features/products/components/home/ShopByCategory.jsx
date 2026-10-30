@@ -1,30 +1,30 @@
-import React from "react";
+import { motion } from "motion/react";
 
 const CATEGORIES = [
   {
     name: "SHIRTS",
     slug: "shirt",
-    image: "/catagory/shirt.png?v=2",
+    image: "/catagory/shirt.webp",
   },
   {
     name: "TROUSERS",
     slug: "trouser",
-    image: "/catagory/trousers.png?v=2",
+    image: "/catagory/trousers.webp",
   },
   {
     name: "T-SHIRTS",
     slug: "t-shirt",
-    image: "/catagory/t-shirt.png?v=2",
+    image: "/catagory/t-shirt.webp",
   },
   {
     name: "JEANS",
     slug: "jeans",
-    image: "/catagory/jeans.png?v=2",
+    image: "/catagory/jeans.webp",
   },
   {
     name: "OUTERWEAR",
     slug: "outerwear",
-    image: "/catagory/outerwear.png?v=2",
+    image: "/catagory/outerwear.webp",
   },
 ];
 
@@ -49,11 +49,19 @@ export default function ShopByCategory({ onSelectCategory }) {
     }
   };
 
+  const easeCurve = [0.16, 1, 0.3, 1];
+
   return (
-    <section className="w-full bg-[#fbfbf9] border-b border-zinc-200 py-8 sm:py-12 select-none">
+    <section className="w-full bg-[#fbfbf9] border-b border-zinc-200 py-8 sm:py-12 select-none overflow-hidden">
       <div className="max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12">
-        {/* Header with Title and Orange Underline */}
-        <div className="mb-6 sm:mb-8">
+        {/* Header with Title and Orange Underline - Smooth Slide In */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.65, ease: easeCurve }}
+          className="mb-6 sm:mb-8"
+        >
           <div className="inline-block">
             <h2 className="text-xl sm:text-2xl lg:text-[25px] tracking-tight text-zinc-900 leading-tight">
               <span className="font-light block text-base sm:text-lg text-zinc-600 tracking-wide mb-0.5">
@@ -65,13 +73,21 @@ export default function ShopByCategory({ onSelectCategory }) {
             </h2>
             <div className="h-[2.5px] w-full bg-[#f1592a] mt-1.5 rounded-full" />
           </div>
-        </div>
+        </motion.div>
 
-        {/* Categories Row (5 columns with OUTERWEAR, clean title inside image, balanced size) */}
+        {/* Categories Row (5 columns with staggered wave entrance) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 items-start justify-items-center">
-          {CATEGORIES.map((cat) => (
-            <div
+          {CATEGORIES.map((cat, idx) => (
+            <motion.div
               key={cat.slug}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{
+                duration: 0.65,
+                delay: idx * 0.1,
+                ease: easeCurve,
+              }}
               onClick={() => handleCategoryClick(cat)}
               className="group flex flex-col items-center justify-start cursor-pointer w-full"
             >
@@ -83,12 +99,18 @@ export default function ShopByCategory({ onSelectCategory }) {
                   loading="lazy"
                 />
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* SHOP ALL Link */}
-        <div className="mt-6 sm:mt-8">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="mt-6 sm:mt-8"
+        >
           <button
             type="button"
             onClick={handleShopAll}
@@ -96,7 +118,7 @@ export default function ShopByCategory({ onSelectCategory }) {
           >
             SHOP ALL
           </button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

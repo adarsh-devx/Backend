@@ -18,18 +18,9 @@ import RealPeoplePlaces from "../components/home/RealPeoplePlaces";
 import BeyondApparel from "../components/home/BeyondApparel";
 import JoinTheArchive from "../components/home/JoinTheArchive";
 import AtelierFooter from "../components/home/AtelierFooter";
-import LogoMarquee from "@/components/ui/logo-marquee";
+import InfiniteRibbonMarquee from "@/components/ui/infinite-ribbon";
+import SnitchOpeningLoader from "@/components/ui/SnitchOpeningLoader";
 
-const MARQUEE_ITEMS = [
-  "SNITCH ATELIER",
-  "AUTUMN / WINTER 2026",
-  "TOKYO RUNWAY ARCHIVE",
-  "TECHNICAL SHELL INNOVATION",
-  "LIMITED RUN DROPS",
-  "STREETS TO ARCHIVE",
-  "EXPRESS ALL-INDIA DISPATCH",
-  "PARIS EDITORIAL CURATION",
-];
 
 export default function Home() {
   const navigate = useNavigate();
@@ -39,12 +30,12 @@ export default function Home() {
   const [wishlistedIds, setWishlistedIds] = useState([]);
   const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([
+  const [cartItems] = useState([
     {
       id: "6adc7fa06ef2657b685ff2b8",
       title: "BRANDED BLACK JACKET",
       price: 1111,
-      image: "/refrenceCatalogItems/windbreaker_4x3.png",
+      image: "/refrenceCatalogItems/windbreaker_4x3.webp",
       quantity: 1,
       size: "M",
     },
@@ -83,7 +74,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter">
-
+      {/* ── EXACT MEERMOHSIN WEBGL PERLIN SHADER PRELOADER ── */}
+      <SnitchOpeningLoader />
 
       {/* ── SECTION 02 — MAIN NAVIGATION ───────────────────────────────── */}
       <MainNavbar
@@ -96,11 +88,15 @@ export default function Home() {
       {/* ── SECTION 03 — HERO / RUNWAY ARCHIVE ─────────────────────────── */}
       <HeroSection onExplore={handleExplore} onWatchFilm={handleWatchFilm} />
 
-      {/* ── KINETIC RUNWAY TICKER MARQUEE ──────────────────────────────── */}
-      <LogoMarquee logos={MARQUEE_ITEMS} duration={42} durationOnHover={70} />
-
       {/* ── SECTION 04 — BRAND TRUST / BENEFIT STRIP ──────────────────── */}
       <BrandTrustStrip />
+
+      {/* ── CRISS-CROSS DUAL ATELIER RIBBON MARQUEE (JUST ABOVE SHOP BY CATEGORY) ── */}
+      <InfiniteRibbonMarquee
+        text="SNITCH ATELIER // AUTUMN WINTER 2026 // TOKYO RUNWAY ARCHIVE // TECHNICAL SHELL INNOVATION // LIMITED RUN DROPS // STREETS TO ARCHIVE // PARIS EDITORIAL //"
+        duration={35}
+        rotation={2.8}
+      />
 
       {/* ── SECTION 05 — SHOP BY CATEGORY ────────────────────────────── */}
       <ShopByCategory />
@@ -111,7 +107,6 @@ export default function Home() {
         wishlistedIds={wishlistedIds}
         onToggleWishlist={handleToggleWishlist}
       />
-
 
       {/* ── SECTION 08 — FW/26 COLLECTION / LOOKBOOK ────────────────────── */}
       <FwCollection onViewLookbook={handleViewLookbook} />

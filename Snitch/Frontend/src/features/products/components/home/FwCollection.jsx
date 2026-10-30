@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
 const STORY_TILES = [
@@ -20,16 +21,25 @@ const STORY_TILES = [
 export default function FwCollection({ onViewLookbook }) {
   const [activeSlide, setActiveSlide] = useState(1);
 
+  // Smooth luxury cubic-bezier curve
+  const easeCurve = [0.16, 1, 0.3, 1];
+
   return (
     <section
       id="fw26"
-      className="w-full bg-zinc-950 text-white border-b border-zinc-900 py-10 sm:py-20 select-none"
+      className="w-full bg-zinc-950 text-white border-b border-zinc-900 py-10 sm:py-20 select-none overflow-hidden"
     >
       <div className="max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12 space-y-12">
         {/* Top Area: Collection Headline, Copy, CTA & Large Model Visual */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left Text & CTA */}
-          <div className="lg:col-span-5 xl:col-span-4 space-y-5 sm:space-y-6">
+          {/* Left Text & CTA - Glides in from Left */}
+          <motion.div
+            initial={{ opacity: 0, x: -80 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.85, ease: easeCurve }}
+            className="lg:col-span-5 xl:col-span-4 space-y-5 sm:space-y-6"
+          >
             <h2 className="font-michroma text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-tight text-white leading-tight">
               FW/26
               <br />
@@ -50,10 +60,16 @@ export default function FwCollection({ onViewLookbook }) {
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Right Hero Visual with Slide Numbering */}
-          <div className="lg:col-span-7 xl:col-span-8 relative flex items-center justify-end">
+          {/* Right Hero Visual (Image 1) - Glides in from Right */}
+          <motion.div
+            initial={{ opacity: 0, x: 90 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.9, ease: easeCurve }}
+            className="lg:col-span-7 xl:col-span-8 relative flex items-center justify-end"
+          >
             <div className="relative w-full max-w-[760px] h-[280px] sm:h-[315px] bg-zinc-900 border border-zinc-800 overflow-hidden shadow-xl group">
               <img
                 src="/FW26 Lookbook/Urban Skybound Streetwear Pose.webp"
@@ -86,31 +102,52 @@ export default function FwCollection({ onViewLookbook }) {
                 FW 26 // RUNWAY ARCHIVE
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Bottom 3 Story Tiles */}
+        {/* Bottom 3 Story Tiles (Images 2, 3, 4) - Converging from Left, Center, and Right */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 pt-4">
-          {STORY_TILES.map((tile, idx) => (
-            <div
-              key={idx}
-              className="relative aspect-[4/3] bg-zinc-900 border border-zinc-800 overflow-hidden group cursor-pointer shadow-sm "
-            >
-              <img
-                src={tile.image}
-                alt={tile.title}
-                className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
+          {STORY_TILES.map((tile, idx) => {
+            // Directional choreography:
+            // idx 0 -> Fly from Left
+            // idx 1 -> Rise up from Center
+            // idx 2 -> Fly from Right
+            const initialMotion =
+              idx === 0
+                ? { opacity: 0, x: -100 }
+                : idx === 1
+                  ? { opacity: 0, y: 70, scale: 0.96 }
+                  : { opacity: 0, x: 100 };
 
-              {/* Bottom Label Overlay */}
-              <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center">
-                <span className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-200 group-hover:text-white transition-colors">
-                  {tile.title}
-                </span>
-              </div>
-            </div>
-          ))}
+            return (
+              <motion.div
+                key={idx}
+                initial={initialMotion}
+                whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{
+                  duration: 0.85,
+                  delay: idx * 0.12,
+                  ease: easeCurve,
+                }}
+                className="relative aspect-[4/3] bg-zinc-900 border border-zinc-800 overflow-hidden group cursor-pointer shadow-sm"
+              >
+                <img
+                  src={tile.image}
+                  alt={tile.title}
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+
+                {/* Bottom Label Overlay */}
+                <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center">
+                  <span className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-200 group-hover:text-white transition-colors">
+                    {tile.title}
+                  </span>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import { Globe, ShieldCheck, Box, Leaf } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function BrandTrustStrip() {
   const promises = [
@@ -24,14 +25,24 @@ export default function BrandTrustStrip() {
     },
   ];
 
+  const easeCurve = [0.16, 1, 0.3, 1];
+
   return (
-    <section className="w-full bg-[#e7e7e0] border-b border-zinc-300 select-none">
+    <section className="w-full bg-[#e7e7e0] border-b border-zinc-300 select-none overflow-hidden">
       <div className="max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12 py-4 sm:py-5 grid grid-cols-2 lg:grid-cols-4 gap-4 divide-y sm:divide-y-0 sm:divide-x divide-zinc-300/80">
         {promises.map((p, idx) => {
           const Icon = p.icon;
           return (
-            <div
+            <motion.div
               key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{
+                duration: 0.6,
+                delay: idx * 0.08,
+                ease: easeCurve,
+              }}
               className="flex items-center gap-3 pt-3 sm:pt-0 sm:px-4 first:pl-0 last:pr-0"
             >
               <div className="w-8 h-8 rounded-full bg-white/70 border border-zinc-300 flex items-center justify-center shrink-0 text-zinc-900 shadow-2xs">
@@ -45,7 +56,7 @@ export default function BrandTrustStrip() {
                   {p.desc}
                 </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>

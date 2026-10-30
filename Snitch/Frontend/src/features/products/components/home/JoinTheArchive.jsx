@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { ArrowRight, Check } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function JoinTheArchive() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle"); // "idle" | "success" | "error"
   const [message, setMessage] = useState("");
+  const easeCurve = [0.16, 1, 0.3, 1];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -23,10 +25,16 @@ export default function JoinTheArchive() {
   };
 
   return (
-    <section className="w-full bg-zinc-950 text-white border-b border-zinc-900 py-16 sm:py-24 select-none">
+    <section className="w-full bg-zinc-950 text-white border-b border-zinc-900 py-16 sm:py-24 select-none overflow-hidden">
       <div className="max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
-        {/* Left Column: Headline, Copy & Signup Form */}
-        <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+        {/* Left Column: Headline, Copy & Signup Form - Glides from Left */}
+        <motion.div
+          initial={{ opacity: 0, x: -75 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.85, ease: easeCurve }}
+          className="lg:col-span-7 space-y-5 sm:space-y-6"
+        >
           <h2 className="font-michroma text-2xl sm:text-3xl md:text-4xl font-bold uppercase tracking-tight text-white leading-tight">
             JOIN THE ARCHIVE
           </h2>
@@ -72,10 +80,16 @@ export default function JoinTheArchive() {
               {message}
             </div>
           )}
-        </div>
+        </motion.div>
 
-        {/* Right Column: Dark Silhouette Portrait */}
-        <div className="lg:col-span-5 flex items-center justify-end">
+        {/* Right Column: Dark Silhouette Portrait - Glides from Right */}
+        <motion.div
+          initial={{ opacity: 0, x: 75 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.85, delay: 0.1, ease: easeCurve }}
+          className="lg:col-span-5 flex items-center justify-end"
+        >
           <div className="w-full max-w-[380px] aspect-[4/3] sm:aspect-[1/1] overflow-hidden bg-zinc-900 border border-zinc-800 shadow-xl group">
             <img
               src="/useImage/mockups/newsletter_archive_collector.png"
@@ -84,7 +98,7 @@ export default function JoinTheArchive() {
               loading="lazy"
             />
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
