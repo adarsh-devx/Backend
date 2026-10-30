@@ -147,7 +147,7 @@ const Register = () => {
 
       {/* ── Background Illustration 2: Bottom-Left Lookbooks, Mannequin & Botanical ── */}
       <img
-        src="/assets/atelier-collage.png"
+        src="/assets/atelier-collage.webp"
         alt=""
         aria-hidden="true"
         className="pointer-events-none select-none absolute bottom-3 left-3 sm:bottom-5 sm:left-6 lg:bottom-6 lg:left-8 w-28 sm:w-40 md:w-52 lg:w-64 max-w-[28vw] object-contain mix-blend-multiply opacity-55 sm:opacity-95 z-0"

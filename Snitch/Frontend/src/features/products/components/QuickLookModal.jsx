@@ -3,10 +3,11 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function QuickLookModal({ product, onClose, onSelectAsHero }) {
+  const [selectedImgIdx, setSelectedImgIdx] = useState(0);
+
   if (!product) return null;
 
   const images = product?.images || [];
-  const [selectedImgIdx, setSelectedImgIdx] = useState(0);
 
   const activeImg =
     images[selectedImgIdx]?.url || images[0]?.url || "/assets/hero_black.jpg";
