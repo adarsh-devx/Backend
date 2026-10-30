@@ -1,11 +1,19 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
-import Register from "../features/auth/pages/Register.jsx";
-import Login from "../features/auth/pages/Login.jsx";
-import CreateProduct from "../features/products/pages/CreateProduct.jsx";
-import Dashboard from "@/features/products/pages/Dashboard.jsx";
 import Protected from "../features/auth/components/Protected.jsx";
 import Home from "../features/products/pages/Home.jsx";
-import ProductDetail from "../features/products/pages/ProductDetail.jsx";
+
+const Register = lazy(() => import("../features/auth/pages/Register.jsx"));
+const Login = lazy(() => import("../features/auth/pages/Login.jsx"));
+const CreateProduct = lazy(() => import("../features/products/pages/CreateProduct.jsx"));
+const Dashboard = lazy(() => import("@/features/products/pages/Dashboard.jsx"));
+const ProductDetail = lazy(() => import("../features/products/pages/ProductDetail.jsx"));
+
+const withSuspense = (Component) => (
+  <Suspense fallback={<div className="min-h-screen bg-[#e7e7e0]" />}>
+    <Component />
+  </Suspense>
+);
 
 export const routes = createBrowserRouter([
   {
@@ -14,15 +22,15 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/products/:id",
-    element: <ProductDetail />,
+    element: withSuspense(ProductDetail),
   },
   {
     path: "/register",
-    element: <Register />,
+    element: withSuspense(Register),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: withSuspense(Login),
   },
   {
     path: "/seller",
@@ -31,7 +39,7 @@ export const routes = createBrowserRouter([
         path: "create-product",
         element: (
           <Protected role="seller">
-            <CreateProduct />
+            {withSuspense(CreateProduct)}
           </Protected>
         ),
       },
@@ -39,7 +47,7 @@ export const routes = createBrowserRouter([
         path: "dashboard",
         element: (
           <Protected role="seller">
-            <Dashboard />
+            {withSuspense(Dashboard)}
           </Protected>
         ),
       },

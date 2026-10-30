@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local Image and Asset Backups
+.image_backup
+public/.image_backup
