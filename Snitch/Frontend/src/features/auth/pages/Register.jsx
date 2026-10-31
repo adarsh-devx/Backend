@@ -131,12 +131,12 @@ const Register = () => {
 
   const inputClass = () =>
     cn(
-      "w-full h-10 pl-10 pr-4 bg-zinc-50/50 border border-zinc-200 rounded-xl text-xs sm:text-sm text-zinc-900",
-      "placeholder:text-zinc-400 hover:border-zinc-300 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all",
+      "w-full h-10 pl-10 pr-4 bg-[#eae9e2]/80 border border-zinc-300 rounded-xl text-xs sm:text-sm text-zinc-950",
+      "placeholder:text-zinc-500 hover:border-zinc-400 focus:bg-[#fcfcf9] focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all",
     );
 
   return (
-    <div className="relative min-h-screen bg-[#fbfaf8] flex items-center justify-center p-3 sm:p-4 py-6 overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#e7e7e0] flex items-center justify-center p-3 sm:p-4 py-6 overflow-x-hidden">
       {/* ── Background Illustration 1: User's Swallow Bird with Measuring Tape Ribbon ── */}
       <img
         src="/assets/bird.png"
@@ -154,16 +154,16 @@ const Register = () => {
       />
 
       {/* ── Central Form Card with High Contrast & Compact Spacing ── */}
-      <div className="relative z-10 w-full max-w-[410px] mx-auto p-5 sm:p-6 bg-white border border-zinc-200/90 rounded-2xl shadow-[0_12px_40px_-6px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.02)]">
+      <div className="relative z-10 w-full max-w-[410px] mx-auto p-5 sm:p-6 bg-[#f4f4f0]/95 backdrop-blur-md border border-zinc-300 rounded-2xl shadow-[0_12px_40px_-6px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.02)]">
         {/* Header */}
         <div className="text-center mb-3.5">
-          <span className="text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase mb-0.5 block">
+          <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-zinc-600 uppercase mb-0.5 block">
             Snitch Atelier
           </span>
-          <h1 className="text-xl sm:text-[1.45rem] font-bold tracking-[-0.03em] text-zinc-950 leading-tight">
+          <h1 className="font-syne text-xl sm:text-[1.45rem] font-bold tracking-[-0.03em] text-zinc-950 leading-tight">
             Create Account
           </h1>
-          <p className="text-zinc-500 text-xs mt-0.5 font-normal">
+          <p className="text-zinc-600 text-xs mt-0.5 font-normal">
             Join Snitch for seamless shopping & selling
           </p>
         </div>
@@ -177,14 +177,14 @@ const Register = () => {
         )}
 
         {/* Modern Tab Switcher */}
-        <div className="flex bg-zinc-100/80 rounded-xl p-1 mb-3.5">
+        <div className="flex bg-[#deddd6] border border-zinc-300/80 rounded-xl p-1 mb-3.5">
           <Link
             to="/login"
-            className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center text-zinc-500 hover:text-zinc-900 cursor-pointer"
+            className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center text-zinc-600 hover:text-zinc-950 cursor-pointer"
           >
             Sign In
           </Link>
-          <span className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center bg-white text-zinc-950 shadow-xs cursor-default">
+          <span className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center bg-[#fcfcf9] text-zinc-950 shadow-xs cursor-default">
             Sign Up
           </span>
         </div>
@@ -193,7 +193,7 @@ const Register = () => {
           {/* Full Name */}
           <div>
             <div className="relative">
-              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Full Name"
@@ -213,7 +213,7 @@ const Register = () => {
           {/* Email Address */}
           <div>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
               <input
                 type="email"
                 placeholder="Email Address"
@@ -233,7 +233,7 @@ const Register = () => {
           {/* Contact Number */}
           <div>
             <div className="relative">
-              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
               <input
                 type="tel"
                 placeholder="Contact Number"
@@ -253,7 +253,7 @@ const Register = () => {
           {/* Password */}
           <div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password (min 6 characters)"
@@ -265,7 +265,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -301,7 +301,7 @@ const Register = () => {
                 <span className="font-semibold text-zinc-900">
                   Register as a seller
                 </span>
-                <span className="text-zinc-400 text-[11px]">
+                <span className="text-zinc-600 text-[11px]">
                   (start selling on Snitch)
                 </span>
               </span>
@@ -326,7 +326,7 @@ const Register = () => {
                     <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
                   </svg>
                 </span>
-                <span className="text-zinc-500 text-[11px] sm:text-xs">
+                <span className="text-zinc-600 text-[11px] sm:text-xs">
                   I agree to the{" "}
                   <a
                     href="#"
@@ -374,9 +374,9 @@ const Register = () => {
         {/* Social Login Separator */}
         <div className="relative my-3 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-zinc-200" />
+            <div className="w-full border-t border-zinc-300" />
           </div>
-          <span className="relative bg-white/80 backdrop-blur-xs px-2.5 text-[10px] uppercase tracking-wider text-zinc-400 font-medium">
+          <span className="relative bg-[#f4f4f0] px-2.5 text-[10px] uppercase tracking-wider text-zinc-600 font-medium">
             or continue with
           </span>
         </div>

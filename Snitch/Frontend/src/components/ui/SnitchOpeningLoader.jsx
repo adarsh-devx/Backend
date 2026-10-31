@@ -43,8 +43,16 @@ export default function SnitchOpeningLoader({ onComplete }) {
 
     // --- WebGL Context & Exact Shader from meermohsin.me ---
     const gl =
-      canvas.getContext("webgl2", { alpha: true, antialias: true, premultipliedAlpha: false }) ||
-      canvas.getContext("webgl", { alpha: true, antialias: true, premultipliedAlpha: false });
+      canvas.getContext("webgl2", {
+        alpha: true,
+        antialias: true,
+        premultipliedAlpha: false,
+      }) ||
+      canvas.getContext("webgl", {
+        alpha: true,
+        antialias: true,
+        premultipliedAlpha: false,
+      });
 
     if (!gl) {
       document.body.style.overflow = prevBodyOverflow;
@@ -226,7 +234,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
-      gl.STATIC_DRAW
+      gl.STATIC_DRAW,
     );
     const posLoc = gl.getAttribLocation(prog, "position");
 

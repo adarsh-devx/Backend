@@ -20,7 +20,8 @@ export default function AtelierScrollIndicator() {
       const scrollTop = window.scrollY || document.documentElement.scrollTop;
       const docHeight =
         document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0;
+      const progress =
+        docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0;
       setScrollProgress(progress);
 
       // Show indicator
@@ -50,7 +51,8 @@ export default function AtelierScrollIndicator() {
     const rect = trackRef.current.getBoundingClientRect();
     const clickY = e.clientY - rect.top;
     const progress = Math.min(1, Math.max(0, clickY / rect.height));
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const docHeight =
+      document.documentElement.scrollHeight - window.innerHeight;
     window.scrollTo({
       top: progress * docHeight,
       behavior: "smooth",

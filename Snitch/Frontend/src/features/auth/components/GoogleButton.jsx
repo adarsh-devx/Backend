@@ -52,9 +52,9 @@ export const GoogleButton = ({
       role="button"
       className={cn(
         "w-full h-10 flex items-center justify-center gap-3 px-4",
-        "bg-white hover:bg-zinc-50/90 active:scale-[0.99]",
-        "border border-zinc-200 hover:border-zinc-300",
-        "text-zinc-800 text-xs sm:text-sm font-semibold tracking-wide",
+        "bg-[#fcfcf9] hover:bg-white active:scale-[0.99]",
+        "border border-zinc-300 hover:border-zinc-400",
+        "text-zinc-900 text-xs sm:text-sm font-semibold tracking-wide",
         "rounded-xl shadow-xs hover:shadow-sm",
         "transition-all duration-150 cursor-pointer select-none",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950/20",

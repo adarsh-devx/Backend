@@ -115,12 +115,12 @@ const Login = () => {
 
   const inputClass = () =>
     cn(
-      "w-full h-11 pl-10 pr-4 bg-zinc-50/50 border border-zinc-200 rounded-xl text-sm text-zinc-900",
-      "placeholder:text-zinc-400 hover:border-zinc-300 focus:bg-white focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/5 transition-all",
+      "w-full h-11 pl-10 pr-4 bg-[#eae9e2]/80 border border-zinc-300 rounded-xl text-sm text-zinc-950",
+      "placeholder:text-zinc-500 hover:border-zinc-400 focus:bg-[#fcfcf9] focus:outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all",
     );
 
   return (
-    <div className="relative min-h-screen bg-[#fbfaf8] flex items-center justify-center p-3 sm:p-4 py-6 overflow-x-hidden">
+    <div className="relative min-h-screen bg-[#e7e7e0] flex items-center justify-center p-3 sm:p-4 py-6 overflow-x-hidden">
       {/* ── Background Illustration 1: User's Swallow Bird with Measuring Tape Ribbon ── */}
       <img
         src="/assets/bird.png"
@@ -138,16 +138,16 @@ const Login = () => {
       />
 
       {/* ── Central Form Card with High Contrast & Generous Padding ── */}
-      <div className="relative z-10 w-full max-w-[420px] mx-auto p-6 sm:p-8 bg-white border border-zinc-200/90 rounded-2xl shadow-[0_12px_40px_-6px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.02)]">
+      <div className="relative z-10 w-full max-w-[420px] mx-auto p-6 sm:p-8 bg-[#f4f4f0]/95 backdrop-blur-md border border-zinc-300 rounded-2xl shadow-[0_12px_40px_-6px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.02)]">
         {/* Header - Option 2 Strong Modern Typography */}
         <div className="text-center mb-6">
-          <span className="text-[11px] font-bold tracking-[0.2em] text-zinc-400 uppercase mb-1 block">
+          <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-zinc-600 uppercase mb-1 block">
             Snitch Atelier
           </span>
-          <h1 className="text-2xl sm:text-[1.65rem] font-bold tracking-[-0.03em] text-zinc-950">
+          <h1 className="font-syne text-2xl sm:text-[1.65rem] font-bold tracking-[-0.03em] text-zinc-950">
             Welcome Back
           </h1>
-          <p className="text-zinc-500 text-xs sm:text-[13px] mt-1 font-normal">
+          <p className="text-zinc-600 text-xs sm:text-[13px] mt-1 font-normal">
             Access your clothing & store world.
           </p>
         </div>
@@ -161,13 +161,13 @@ const Login = () => {
         )}
 
         {/* Modern Tab Switcher */}
-        <div className="flex bg-zinc-100/80 rounded-xl p-1 mb-5">
-          <span className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center bg-white text-zinc-950 shadow-xs cursor-default">
+        <div className="flex bg-[#deddd6] border border-zinc-300/80 rounded-xl p-1 mb-5">
+          <span className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center bg-[#fcfcf9] text-zinc-950 shadow-xs cursor-default">
             Sign In
           </span>
           <Link
             to="/register"
-            className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center text-zinc-500 hover:text-zinc-900 cursor-pointer"
+            className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center text-zinc-600 hover:text-zinc-950 cursor-pointer"
           >
             Sign Up
           </Link>
@@ -177,7 +177,7 @@ const Login = () => {
           {/* Email Address */}
           <div>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
               <input
                 type="email"
                 placeholder="Email Address"
@@ -197,7 +197,7 @@ const Login = () => {
           {/* Password */}
           <div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500 pointer-events-none" />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
@@ -209,7 +209,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />
@@ -238,7 +238,7 @@ const Login = () => {
                     <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
                   </svg>
                 </span>
-                <span className="text-zinc-500 font-medium">Remember me</span>
+                <span className="text-zinc-700 font-medium">Remember me</span>
               </label>
             </div>
             <a
@@ -269,9 +269,9 @@ const Login = () => {
         {/* Social Login Separator */}
         <div className="relative my-4 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-zinc-200" />
+            <div className="w-full border-t border-zinc-300" />
           </div>
-          <span className="relative bg-white/80 backdrop-blur-xs px-3 text-[11px] uppercase tracking-wider text-zinc-400 font-medium">
+          <span className="relative bg-[#f4f4f0] px-3 text-[11px] uppercase tracking-wider text-zinc-600 font-medium">
             or continue with
           </span>
         </div>
@@ -280,7 +280,7 @@ const Login = () => {
         <GoogleButton />
 
         {/* Bottom toggle */}
-        <p className="text-center text-xs text-zinc-500 mt-5">
+        <p className="text-center text-xs text-zinc-600 mt-5">
           Don't have an account?{" "}
           <Link
             to="/register"

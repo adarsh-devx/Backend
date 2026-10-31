@@ -10,7 +10,7 @@ function Textarea({ className, ...props }) {
         "focus-visible:border-zinc-950 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-950/20",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "aria-invalid:border-red-500 aria-invalid:ring-red-500/20",
-        className
+        className,
       )}
       {...props}
     />

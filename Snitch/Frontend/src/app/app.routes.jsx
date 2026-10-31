@@ -2,12 +2,17 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
 import Protected from "../features/auth/components/Protected.jsx";
 import Home from "../features/products/pages/Home.jsx";
+import SellerProductDetail from "@/features/products/pages/SellerProductDetail.jsx";
 
 const Register = lazy(() => import("../features/auth/pages/Register.jsx"));
 const Login = lazy(() => import("../features/auth/pages/Login.jsx"));
-const CreateProduct = lazy(() => import("../features/products/pages/CreateProduct.jsx"));
+const CreateProduct = lazy(
+  () => import("../features/products/pages/CreateProduct.jsx"),
+);
 const Dashboard = lazy(() => import("@/features/products/pages/Dashboard.jsx"));
-const ProductDetail = lazy(() => import("../features/products/pages/ProductDetail.jsx"));
+const ProductDetail = lazy(
+  () => import("../features/products/pages/ProductDetail.jsx"),
+);
 
 const withSuspense = (Component) => (
   <Suspense fallback={<div className="min-h-screen bg-[#e7e7e0]" />}>
@@ -38,16 +43,18 @@ export const routes = createBrowserRouter([
       {
         path: "create-product",
         element: (
-          <Protected role="seller">
-            {withSuspense(CreateProduct)}
-          </Protected>
+          <Protected role="seller">{withSuspense(CreateProduct)}</Protected>
         ),
       },
       {
         path: "dashboard",
+        element: <Protected role="seller">{withSuspense(Dashboard)}</Protected>,
+      },
+      {
+        path: "product/:productId",
         element: (
           <Protected role="seller">
-            {withSuspense(Dashboard)}
+            <SellerProductDetail />
           </Protected>
         ),
       },
