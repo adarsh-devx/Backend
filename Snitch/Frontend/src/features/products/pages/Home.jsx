@@ -21,7 +21,6 @@ import AtelierFooter from "../components/home/AtelierFooter";
 import InfiniteRibbonMarquee from "@/components/ui/infinite-ribbon";
 import SnitchOpeningLoader from "@/components/ui/SnitchOpeningLoader";
 
-
 export default function Home() {
   const navigate = useNavigate();
   const { handleGetAllProducts } = useProduct();
@@ -183,7 +182,7 @@ export default function Home() {
                     <button
                       type="button"
                       onClick={() => handleToggleWishlist(id)}
-                      className="p-1.5 hover:text-red-500 text-zinc-400 transition-colors cursor-pointer"
+                      className="p-1.5 hover:text-red-500 text-zinc-600 transition-colors cursor-pointer"
                       title="Remove"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -192,7 +191,7 @@ export default function Home() {
                 ))
               ) : (
                 <div className="h-56 flex flex-col items-center justify-center text-center font-mono text-xs text-zinc-500 space-y-2.5">
-                  <Heart className="w-8 h-8 text-zinc-400 stroke-1" />
+                  <Heart className="w-8 h-8 text-zinc-500 stroke-1" />
                   <span className="font-bold text-zinc-700">
                     NO PIECES CURATED YET
                   </span>

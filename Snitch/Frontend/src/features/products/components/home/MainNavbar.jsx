@@ -60,7 +60,9 @@ export default function MainNavbar({
       <header
         className={cn(
           "w-full bg-[#F3F1E9]/95 backdrop-blur-md border-b border-[#D9D6CE] sticky top-0 z-40 select-none transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform",
-          isNavVisible ? "translate-y-0 shadow-xs" : "-translate-y-full shadow-none",
+          isNavVisible
+            ? "translate-y-0 shadow-xs"
+            : "-translate-y-full shadow-none",
         )}
       >
         <div className="max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12 py-3 sm:py-3.5 flex items-center justify-between gap-4 lg:gap-6">
@@ -87,7 +89,6 @@ export default function MainNavbar({
 
           {/* Right: Search Input + Heart + User + Bag + Hamburger */}
           <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-
             {/* Wishlist Heart Icon */}
             <button
               type="button"

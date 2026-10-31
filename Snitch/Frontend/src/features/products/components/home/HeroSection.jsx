@@ -127,8 +127,8 @@ export default function HeroSection({
 
             {/* Supporting Copy */}
             <p className="font-inter text-xs xl:text-[13px] text-zinc-700 font-medium tracking-wide uppercase leading-relaxed max-w-sm">
-              TECHNICAL APPAREL FOR A FASTER, BOLDER TOMORROW. CLEAN SILHOUETTES.
-              REAL-WORLD FUNCTION. TIMELESS STYLE.
+              TECHNICAL APPAREL FOR A FASTER, BOLDER TOMORROW. CLEAN
+              SILHOUETTES. REAL-WORLD FUNCTION. TIMELESS STYLE.
             </p>
 
             {/* Dual CTAs: SHOP MEN / SHOP WOMEN (Equal Width & Size) */}
@@ -292,8 +292,8 @@ export default function HeroSection({
               RUNWAY
             </h1>
             <p className="font-inter text-xs sm:text-sm text-zinc-700 font-medium tracking-wide uppercase leading-relaxed max-w-lg">
-              TECHNICAL APPAREL FOR A FASTER, BOLDER TOMORROW. CLEAN SILHOUETTES.
-              REAL-WORLD FUNCTION. TIMELESS STYLE.
+              TECHNICAL APPAREL FOR A FASTER, BOLDER TOMORROW. CLEAN
+              SILHOUETTES. REAL-WORLD FUNCTION. TIMELESS STYLE.
             </p>
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <button

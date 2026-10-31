@@ -1,5 +1,11 @@
 import { useRef } from "react";
-import { Droplets, Wind, ShieldCheck, CloudSun, ArrowRight } from "lucide-react";
+import {
+  Droplets,
+  Wind,
+  ShieldCheck,
+  CloudSun,
+  ArrowRight,
+} from "lucide-react";
 import { motion, useScroll, useTransform } from "motion/react";
 
 export default function FabricInnovation({ onLearnMore }) {
@@ -106,7 +112,11 @@ export default function FabricInnovation({ onLearnMore }) {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 + idx * 0.1, ease: easeCurve }}
+                transition={{
+                  duration: 0.5,
+                  delay: 0.2 + idx * 0.1,
+                  ease: easeCurve,
+                }}
                 className="flex items-start gap-4 p-3 first:pt-0 border-b border-zinc-800/80 last:border-b-0 hover:bg-zinc-900/40 transition-colors"
               >
                 <div className="w-10 h-10 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 shrink-0 shadow-2xs">

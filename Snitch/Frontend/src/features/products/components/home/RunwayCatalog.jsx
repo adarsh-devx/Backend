@@ -268,7 +268,8 @@ export default function RunwayCatalog({
 
               <div className="space-y-4">
                 <p className="font-inter text-xs text-zinc-400 leading-relaxed">
-                  Discover all season pieces, limited archival garments, and tailored progressive silhouettes.
+                  Discover all season pieces, limited archival garments, and
+                  tailored progressive silhouettes.
                 </p>
                 <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-white group-hover:translate-x-1 transition-transform">
                   <span>VIEW ALL PRODUCTS</span>
@@ -293,7 +294,7 @@ export default function RunwayCatalog({
               />
             </div>
           </div>
-          <span className="hidden md:inline text-zinc-400">
+          <span className="hidden md:inline text-zinc-600">
             AUTUMN / WINTER 2026 ARCHIVE
           </span>
         </div>

@@ -41,8 +41,7 @@ export default function FeaturedDrop({ featuredProduct }) {
   // Bidirectional parallax lift on scroll-down and scroll-up
   const dropParallax = useTransform(scrollYProgress, [0, 1], [-12, 12]);
 
-  const targetProductId =
-    featuredProduct?._id || "6adc8023b4aa805289d00ab1";
+  const targetProductId = featuredProduct?._id || "6adc8023b4aa805289d00ab1";
 
   const handlePrev = () => {
     setActiveThumbIdx((prev) => (prev > 0 ? prev - 1 : totalAngles - 1));
