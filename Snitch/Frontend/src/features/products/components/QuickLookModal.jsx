@@ -92,7 +92,7 @@ export default function QuickLookModal({ product, onClose, onSelectAsHero }) {
             </div>
 
             <div className="border-t border-b border-zinc-100 py-4 space-y-2">
-              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 block">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-600 block">
                 Editorial Description
               </span>
               <p className="text-xs text-zinc-600 leading-relaxed font-inter">
@@ -103,7 +103,7 @@ export default function QuickLookModal({ product, onClose, onSelectAsHero }) {
 
             <div className="grid grid-cols-2 gap-3 text-xs font-mono">
               <div className="p-2.5 bg-zinc-50 border border-zinc-100">
-                <span className="text-[10px] text-zinc-400 uppercase block">
+                <span className="text-[10px] text-zinc-600 uppercase block">
                   Total Imagery
                 </span>
                 <span className="font-bold text-zinc-900">
@@ -111,7 +111,7 @@ export default function QuickLookModal({ product, onClose, onSelectAsHero }) {
                 </span>
               </div>
               <div className="p-2.5 bg-zinc-50 border border-zinc-100">
-                <span className="text-[10px] text-zinc-400 uppercase block">
+                <span className="text-[10px] text-zinc-600 uppercase block">
                   Currency
                 </span>
                 <span className="font-bold text-zinc-900">

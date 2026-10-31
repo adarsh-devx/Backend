@@ -24,7 +24,7 @@ export default function DecagonButton({
       onMouseLeave={() => setIsHovered(false)}
       className={cn(
         "inline-flex items-center gap-4 cursor-pointer group select-none transition-transform duration-200 active:scale-95",
-        className
+        className,
       )}
     >
       {/* Decagon Polygon Frame */}
@@ -33,7 +33,7 @@ export default function DecagonButton({
           viewBox="0 0 80 80"
           className={cn(
             "w-full h-full text-zinc-900 transition-transform duration-500 ease-out",
-            isHovered ? "rotate-45 scale-105" : "rotate-0 scale-100"
+            isHovered ? "rotate-45 scale-105" : "rotate-0 scale-100",
           )}
         >
           <polygon
@@ -49,7 +49,7 @@ export default function DecagonButton({
         <div
           className={cn(
             "absolute inset-0 flex items-center justify-center transition-transform duration-300",
-            isHovered ? "translate-x-0.5 -translate-y-0.5" : ""
+            isHovered ? "translate-x-0.5 -translate-y-0.5" : "",
           )}
         >
           <svg

@@ -51,6 +51,7 @@ export default function CreateProduct() {
   // Status / Feedback States
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [successData, setSuccessData] = useState(null);
@@ -203,6 +204,14 @@ export default function CreateProduct() {
     }
 
     setIsLoading(true);
+    setUploadProgress(15);
+    const progressInterval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 92) return prev;
+        return prev + Math.floor(Math.random() * 8) + 4;
+      });
+    }, 200);
+
     try {
       const payload = new FormData();
       payload.append("title", formData.title.trim());
@@ -215,8 +224,12 @@ export default function CreateProduct() {
       });
 
       const res = await handleCreateProduct(payload);
+      clearInterval(progressInterval);
+      setUploadProgress(100);
       setSuccessData(res || { title: formData.title });
     } catch (err) {
+      clearInterval(progressInterval);
+      setUploadProgress(0);
       console.error("Product creation error:", err);
       const msg =
         err.response?.data?.message ||
@@ -225,6 +238,7 @@ export default function CreateProduct() {
         "Failed to publish product. Please check your inputs.";
       setErrors((prev) => ({ ...prev, submit: msg }));
     } finally {
+      clearInterval(progressInterval);
       setIsLoading(false);
     }
   };
@@ -269,7 +283,7 @@ export default function CreateProduct() {
               >
                 SNITCH
               </Link>
-              <span className="text-zinc-400 font-mono text-xs">/</span>
+              <span className="text-zinc-500 font-mono text-xs">/</span>
               <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-zinc-600">
                 STUDIO WORKBENCH
               </span>
@@ -283,19 +297,23 @@ export default function CreateProduct() {
               disabled={isLoading}
               className="text-xs font-mono font-bold tracking-wider uppercase text-zinc-700 hover:text-zinc-950 hover:bg-[#eae9e2] bg-[#f4f4f0] border border-zinc-300 h-8 px-3 rounded-none flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
             >
-              <RotateCcw className="w-3 h-3 text-zinc-400 group-hover:text-zinc-700 group-hover:-rotate-180 transition-transform duration-500" />
+              <RotateCcw className="w-3 h-3 text-zinc-600 group-hover:text-zinc-950 group-hover:-rotate-180 transition-transform duration-500" />
               <span>CLEAR</span>
             </button>
             <button
               type="button"
               onClick={handleSubmit}
               disabled={isLoading}
-              className="bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-mono font-bold tracking-wider uppercase h-8 px-4 rounded-none flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs active:scale-95"
+              className="relative overflow-hidden bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-mono font-bold tracking-wider uppercase h-8 px-4 rounded-none flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs active:scale-95"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>PUBLISHING...</span>
+                  <span>UPLOADING {uploadProgress}%</span>
+                  <div
+                    className="absolute bottom-0 left-0 h-0.5 bg-white/80 transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
                 </>
               ) : (
                 <>
@@ -628,7 +646,7 @@ export default function CreateProduct() {
                         onClick={() => handleAddQuickTag(tag)}
                         className="group/tag inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-none bg-[#eae9e2] hover:bg-zinc-950 hover:text-white text-zinc-800 transition-colors border border-zinc-300 cursor-pointer"
                       >
-                        <Plus className="w-2.5 h-2.5 text-zinc-400 group-hover/tag:text-white" />
+                        <Plus className="w-2.5 h-2.5 text-zinc-600 group-hover/tag:text-white" />
                         <span>{tag}</span>
                       </button>
                     ))}
@@ -660,9 +678,9 @@ export default function CreateProduct() {
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-zinc-400 gap-2 p-4 text-center">
-                    <ShoppingBag className="w-7 h-7 stroke-[1.2] text-zinc-400" />
-                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-400">
+                  <div className="flex flex-col items-center justify-center text-zinc-500 gap-2 p-4 text-center">
+                    <ShoppingBag className="w-7 h-7 stroke-[1.2] text-zinc-500" />
+                    <span className="font-mono text-xs uppercase tracking-wider text-zinc-600">
                       NO ASSET LOADED
                     </span>
                   </div>
@@ -745,12 +763,16 @@ export default function CreateProduct() {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="w-full bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-space font-bold uppercase tracking-widest h-10 rounded-none flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs active:scale-[0.99]"
+                className="relative overflow-hidden w-full bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-space font-bold uppercase tracking-widest h-10 rounded-none flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs active:scale-[0.99]"
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>PUBLISHING...</span>
+                    <span>UPLOADING MEDIA... {uploadProgress}%</span>
+                    <div
+                      className="absolute bottom-0 left-0 h-1 bg-white/70 transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
                   </>
                 ) : (
                   <>

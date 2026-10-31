@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo, useRef } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useProduct } from "../hook/use.product";
 import { useSelector } from "react-redux";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,7 @@ import ProductCard from "../components/ProductCard";
 import QuickLookModal from "../components/QuickLookModal";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { handleGetSellerProduct } = useProduct();
   const sellerProducts =
     useSelector((state) => state.product.sellerProducts) || [];
@@ -148,7 +149,7 @@ export default function Dashboard() {
           <span className="font-michroma text-xl sm:text-2xl font-bold tracking-[0.25em] uppercase text-zinc-950 group-hover:opacity-80 transition-opacity">
             SNITCH
           </span>
-          <span className="text-zinc-400 font-mono text-xs hidden sm:inline">
+          <span className="text-zinc-500 font-mono text-xs hidden sm:inline">
             /
           </span>
           <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-600 font-bold hidden sm:inline">
@@ -198,7 +199,7 @@ export default function Dashboard() {
       ) : sellerProducts.length === 0 ? (
         /* Clean Brutalist Empty State */
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center max-w-xl mx-auto space-y-6">
-          <PackageOpen className="w-16 h-16 stroke-[1.2] text-zinc-400" />
+          <PackageOpen className="w-16 h-16 stroke-[1.2] text-zinc-500" />
           <div className="space-y-2">
             <h2 className="font-michroma text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 uppercase">
               NO PRODUCTS PUBLISHED
@@ -226,7 +227,7 @@ export default function Dashboard() {
               <div className="space-y-3">
                 <h1
                   ref={titleRef}
-                  className="font-michroma text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-bold tracking-tight text-zinc-950 uppercase leading-[1.05]"
+                  className="font-syne text-3xl sm:text-4xl md:text-5xl lg:text-[46px] font-extrabold tracking-tight text-zinc-950 uppercase leading-[1.05]"
                 >
                   {activeProduct?.title}
                 </h1>
@@ -242,7 +243,10 @@ export default function Dashboard() {
                 <DecagonButton
                   price={activePriceStr}
                   label="VIEW PRODUCT"
-                  onClick={() => setInspectProduct(activeProduct)}
+                  onClick={() =>
+                    activeProduct?._id &&
+                    navigate(`/seller/product/${activeProduct._id}`)
+                  }
                 />
               </div>
             </div>
@@ -264,7 +268,10 @@ export default function Dashboard() {
                 <DecagonButton
                   price={activePriceStr}
                   label="VIEW PRODUCT"
-                  onClick={() => setInspectProduct(activeProduct)}
+                  onClick={() =>
+                    activeProduct?._id &&
+                    navigate(`/seller/product/${activeProduct._id}`)
+                  }
                 />
               </div>
             </div>
@@ -462,7 +469,11 @@ export default function Dashboard() {
                       key={product._id}
                       product={product}
                       isSelected={activeProduct?._id === product._id}
-                      onSelectHero={handleSelectHero}
+                      actionLabel="VIEW DETAILS"
+                      onAction={() =>
+                        product?._id &&
+                        navigate(`/seller/product/${product._id}`)
+                      }
                     />
                   ))}
                 </div>
@@ -506,7 +517,9 @@ export default function Dashboard() {
                           return (
                             <tr
                               key={p._id}
-                              onClick={() => handleSelectHero(p)}
+                              onClick={() =>
+                                p?._id && navigate(`/seller/product/${p._id}`)
+                              }
                               className={cn(
                                 "hover:bg-zinc-50 transition-colors cursor-pointer group",
                                 isCurrent && "bg-zinc-100/80 font-bold",
@@ -523,7 +536,7 @@ export default function Dashboard() {
                                     <span className="font-space text-xs font-bold text-zinc-950 block group-hover:underline">
                                       {p.title}
                                     </span>
-                                    <span className="text-[10px] text-zinc-400">
+                                    <span className="text-[10px] text-zinc-600">
                                       ID: {prodId}
                                     </span>
                                   </div>
@@ -553,11 +566,12 @@ export default function Dashboard() {
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    setInspectProduct(p);
+                                    p?._id &&
+                                      navigate(`/seller/product/${p._id}`);
                                   }}
-                                  className="text-[11px] text-zinc-500 hover:text-zinc-950 px-2 py-1 cursor-pointer"
+                                  className="text-[11px] font-bold text-zinc-900 hover:text-black underline px-2 py-1 cursor-pointer"
                                 >
-                                  Inspect
+                                  View &rarr;
                                 </button>
                               </td>
                             </tr>
@@ -580,7 +594,7 @@ export default function Dashboard() {
             <span className="uppercase tracking-wider font-semibold text-zinc-900">
               SNITCH ATELIER // SELLER WORKBENCH
             </span>
-            <span className="text-zinc-400">|</span>
+            <span className="text-zinc-500">|</span>
             <span className="hidden sm:inline">LIVE STOREFRONT ACTIVE</span>
           </div>
 

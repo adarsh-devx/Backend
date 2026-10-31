@@ -21,9 +21,7 @@ export default function ProductCard({
 
   const images = product?.images || [];
   const primaryImg =
-    images[activeImgIdx]?.url ||
-    images[0]?.url ||
-    "/assets/hero_black.jpg";
+    images[activeImgIdx]?.url || images[0]?.url || "/assets/hero_black.jpg";
 
   const currencySymbol = product?.price?.currency === "USD" ? "$" : "₹";
   const formattedPrice = Number(product?.price?.amount || 0).toLocaleString();
@@ -53,7 +51,8 @@ export default function ProductCard({
   const handleMouseLeave = () => {
     setIsHovered(false);
     setTiltStyle({
-      transform: "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
+      transform:
+        "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
       transition: "transform 0.45s cubic-bezier(0.16, 1, 0.3, 1)",
     });
   };
@@ -84,7 +83,7 @@ export default function ProductCard({
         "group relative bg-white border cursor-pointer select-none transition-all duration-300 flex flex-col will-change-transform",
         isSelected
           ? "border-zinc-950 ring-2 ring-zinc-950 shadow-xl"
-          : "border-zinc-200/90 hover:border-zinc-950 shadow-xs hover:shadow-lg"
+          : "border-zinc-200/90 hover:border-zinc-950 shadow-xs hover:shadow-lg",
       )}
     >
       {/* 3:4 High-Fashion Media Frame */}
@@ -113,7 +112,7 @@ export default function ProductCard({
             "absolute inset-x-3 bottom-3.5 z-20 transition-all duration-200",
             isHovered
               ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 translate-y-2 pointer-events-none"
+              : "opacity-0 translate-y-2 pointer-events-none",
           )}
         >
           <button
@@ -134,7 +133,7 @@ export default function ProductCard({
           <div
             className={cn(
               "absolute bottom-1.5 inset-x-0 flex items-center justify-center gap-1 z-10 pointer-events-auto transition-opacity duration-200",
-              isHovered ? "opacity-0 pointer-events-none" : "opacity-100"
+              isHovered ? "opacity-0 pointer-events-none" : "opacity-100",
             )}
           >
             {images.slice(0, 5).map((_, idx) => (
@@ -147,7 +146,9 @@ export default function ProductCard({
                 }}
                 className={cn(
                   "h-1 rounded-full transition-all cursor-pointer",
-                  activeImgIdx === idx ? "w-4 bg-zinc-950" : "w-1.5 bg-zinc-400/80"
+                  activeImgIdx === idx
+                    ? "w-4 bg-zinc-950"
+                    : "w-1.5 bg-zinc-400/80",
                 )}
                 aria-label={`Select photo ${idx + 1}`}
               />
@@ -163,11 +164,12 @@ export default function ProductCard({
             {product?.title || "Untitled Product"}
           </span>
           <span className="font-mono text-[11px] font-bold text-zinc-950 shrink-0">
-            {currencySymbol}{formattedPrice}
+            {currencySymbol}
+            {formattedPrice}
           </span>
         </div>
 
-        <p className="text-[10px] font-mono text-zinc-400 mt-1 line-clamp-1">
+        <p className="text-[10px] font-mono text-zinc-600 mt-1 line-clamp-1">
           {product?.description || "High-performance techwear apparel"}
         </p>
       </div>

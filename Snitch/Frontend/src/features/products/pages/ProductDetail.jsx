@@ -8,18 +8,15 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
-  Truck,
-  RotateCcw,
-  Share2,
-  Check,
-  ShoppingBag,
-  Heart,
+  ChevronDown,
+  ChevronUp,
   Search,
   Expand,
   X,
-  Star,
-  Leaf,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Check,
   Ruler,
 } from "lucide-react";
 
@@ -35,14 +32,30 @@ export default function ProductDetail() {
   const [error, setError] = useState(null);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [selectedSize, setSelectedSize] = useState("M");
-  const [isCopied, setIsCopied] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAddedToBag, setIsAddedToBag] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [openAccordions, setOpenAccordions] = useState({
+    returnPolicy: true,
+    shipping: false,
+    manufacturing: false,
+  });
+
+  const toggleAccordion = (key) => {
+    setOpenAccordions((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleDecrementQty = () => {
+    setQuantity((prev) => Math.max(1, prev - 1));
+  };
+
+  const handleIncrementQty = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
   const [activeTab, setActiveTab] = useState("details");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -87,17 +100,49 @@ export default function ProductDetail() {
   const formattedPrice = Number(product?.price?.amount || 0).toLocaleString();
   const prodId = product?._id ? product._id.slice(-6).toUpperCase() : "PROD-01";
 
-  const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+  const availableSizes = useMemo(() => {
+    if (product?.variants && product.variants.length > 0) {
+      const set = new Set();
+      product.variants.forEach((v) => {
+        const rawAttrs = v.attributes;
+        const attrs =
+          rawAttrs instanceof Map
+            ? Object.fromEntries(rawAttrs)
+            : typeof rawAttrs === "object" && rawAttrs !== null
+              ? rawAttrs
+              : {};
+        const sz = attrs.size || attrs.Size || attrs.SIZE;
+        if (sz) set.add(sz.toUpperCase());
+      });
+      if (set.size > 0) return Array.from(set);
     }
-  };
+    return ["S", "M", "L", "XL"];
+  }, [product]);
 
   const handleAddToBag = () => {
     setIsAddedToBag(true);
     setTimeout(() => setIsAddedToBag(false), 2500);
+  };
+
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
+
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+  const handleTouchMove = (e) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX) return;
+    const distance = touchStartX - touchEndX;
+    if (distance > 40) {
+      handleNextImage();
+    } else if (distance < -40) {
+      handlePrevImage();
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
   };
 
   const handlePrevImage = () => {
@@ -180,7 +225,7 @@ export default function ProductDetail() {
   return (
     <div className="min-h-screen w-full bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter select-none">
       {/* ── Editorial Header ─────────────────────────────────────────── */}
-      <header className="w-full px-4 sm:px-8 lg:px-12 py-3 border-b border-zinc-300/80 bg-[#e7e7e0]/95 backdrop-blur-xs sticky top-0 z-30">
+      <header className="w-full px-4 sm:px-6 lg:px-8 py-3 border-b border-zinc-300/80 bg-[#e7e7e0]/95 backdrop-blur-xs sticky top-0 z-30">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <Link
             to="/"
@@ -199,7 +244,9 @@ export default function ProductDetail() {
                 onSubmit={(e) => {
                   if (e) e.preventDefault();
                   if (searchQuery.trim()) {
-                    navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+                    navigate(
+                      `/?search=${encodeURIComponent(searchQuery.trim())}`,
+                    );
                   }
                 }}
                 placeholder="search..."
@@ -212,7 +259,7 @@ export default function ProductDetail() {
                   setIsSearchOpen(false);
                   setSearchQuery("");
                 }}
-                className="p-1 hover:text-zinc-950 text-zinc-400 transition-colors cursor-pointer shrink-0"
+                className="p-1 hover:text-zinc-950 text-zinc-600 transition-colors cursor-pointer shrink-0"
                 title="Close Search"
               >
                 <X className="w-4 h-4" />
@@ -239,39 +286,6 @@ export default function ProductDetail() {
               </button>
             )}
 
-            <button
-              type="button"
-              onClick={handleShare}
-              className="p-1.5 hover:text-zinc-950 text-zinc-700 transition-colors cursor-pointer"
-              title="Share Product"
-            >
-              {isCopied ? (
-                <Check className="w-4 h-4 text-emerald-600" />
-              ) : (
-                <Share2 className="w-4 h-4" />
-              )}
-            </button>
-
-            {/* Top Wishlist Viewer with Saved Count Badge */}
-            <button
-              type="button"
-              onClick={() => setIsWishlistDrawerOpen(true)}
-              className="relative p-1.5 hover:text-zinc-950 text-zinc-700 transition-colors cursor-pointer"
-              title="Wishlist Archive"
-            >
-              <Heart
-                className={cn(
-                  "w-4 h-4 transition-colors",
-                  isWishlisted ? "fill-red-500 text-red-500" : "text-zinc-700",
-                )}
-              />
-              {isWishlisted && (
-                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] font-mono font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center animate-in zoom-in-50">
-                  1
-                </span>
-              )}
-            </button>
-
             <div
               className="relative p-1.5 text-zinc-700 hover:text-zinc-950 cursor-pointer transition-colors"
               title="Shopping Bag"
@@ -285,24 +299,24 @@ export default function ProductDetail() {
         </div>
       </header>
 
-      {/* ── Main Detail Canvas: Refined Reference Layout ── */}
+      {/* ── Main Detail Canvas: Refined Reference Layout (Aligned with Navbar) ── */}
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 flex flex-col justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 lg:gap-8 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 items-start w-full">
           {/* ── Left Column: Gallery Unit (Thumbnails Strip + Main Hero Stage) ── */}
-          <div className="md:col-span-7 flex flex-col-reverse md:flex-row gap-2.5 sm:gap-3 items-start w-full">
+          <div className="md:col-span-7 flex flex-col-reverse md:flex-row gap-3 items-start max-w-[540px] w-full">
             {/* Slim Vertical Thumbnails Ribbon */}
             {images.length > 1 && (
-              <div className="w-full md:w-16 shrink-0 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto max-h-[480px] scrollbar-none pb-1 md:pb-0">
+              <div className="w-full md:w-16 shrink-0 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto max-h-[500px] scrollbar-none pb-1 md:pb-0">
                 {images.map((imgUrl, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setActiveImageIdx(idx)}
                     className={cn(
-                      "w-14 sm:w-16 md:w-full aspect-[3/4] bg-[#eae9e2] border overflow-hidden transition-all shrink-0 cursor-pointer p-0.5",
+                      "w-14 sm:w-16 md:w-full aspect-[3/4] overflow-hidden transition-all shrink-0 cursor-pointer p-0.5",
                       activeImageIdx === idx
-                        ? "border-zinc-950 ring-1 ring-zinc-950 shadow-xs"
-                        : "border-zinc-300 opacity-70 hover:opacity-100",
+                        ? "border border-zinc-950 shadow-xs"
+                        : "border border-zinc-300 opacity-70 hover:opacity-100",
                     )}
                   >
                     <img
@@ -315,23 +329,18 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Main Hero Visual Stage */}
-            <div className="flex-1 w-full aspect-[3/4] max-h-[480px] bg-[#eae9e2] border border-zinc-300 overflow-hidden relative shadow-xs flex items-center justify-center">
+            {/* Main Hero Visual Stage (Seamless - Aligned Left Flush with RUNWAY ARCHIVE) */}
+            <div
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="flex-1 max-w-[460px] w-full aspect-[3/4] max-h-[500px] border border-zinc-300 bg-transparent relative select-none group flex items-center justify-center overflow-hidden"
+            >
               <img
                 src={activeImg}
                 alt={product.title}
                 className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
               />
-
-              {/* Technical Badges (Top-Left) */}
-              <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5 font-mono text-[9px] font-bold">
-                <span className="bg-zinc-950 text-white px-2 py-0.5 tracking-widest uppercase">
-                  PRODUCT // {prodId}
-                </span>
-                <span className="bg-white/90 backdrop-blur-xs text-zinc-900 px-1.5 py-0.5 border border-zinc-200">
-                  {activeImageIdx + 1}/{images.length}
-                </span>
-              </div>
 
               {/* Expand Fullscreen Button (Top-Right) */}
               <button
@@ -343,9 +352,9 @@ export default function ProductDetail() {
                 <Expand className="w-3.5 h-3.5" />
               </button>
 
-              {/* Next & Previous Arrow Controls (Bottom-Right) */}
+              {/* Next & Previous Arrow Controls (Desktop Bottom-Right) */}
               {images.length > 1 && (
-                <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5">
+                <div className="absolute bottom-3 right-3 z-10 hidden sm:flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={handlePrevImage}
@@ -364,290 +373,215 @@ export default function ProductDetail() {
                   </button>
                 </div>
               )}
+
+              {/* Mobile Swipe Pagination Indicator Dots */}
+              {images.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex sm:hidden items-center gap-1.5 bg-black/50 backdrop-blur-xs px-2.5 py-1 rounded-full border border-white/20">
+                  {images.map((_, dotIdx) => (
+                    <button
+                      key={dotIdx}
+                      type="button"
+                      onClick={() => setActiveImageIdx(dotIdx)}
+                      className={cn(
+                        "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
+                        activeImageIdx === dotIdx
+                          ? "w-4 bg-white"
+                          : "w-1.5 bg-white/50 hover:bg-white/80",
+                      )}
+                      aria-label={`Go to slide ${dotIdx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* ── Right Column: Unboxed Seamless Product Details (5 cols) ── */}
-          <div className="md:col-span-5 order-3 space-y-3.5 sm:space-y-4">
-            {/* Top Breadcrumb & Wishlist Row */}
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-600">
-                <span>RUNWAY ARCHIVE</span>
-                <span className="text-zinc-400">/</span>
-                <span className="text-zinc-500">FW/26</span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsWishlisted((prev) => !prev)}
-                className="w-8 h-8 rounded-full bg-white/70 hover:bg-white border border-zinc-300 flex items-center justify-center shadow-xs transition-all cursor-pointer"
-                title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-              >
-                <Heart
-                  className={cn(
-                    "w-4 h-4 transition-colors",
-                    isWishlisted
-                      ? "fill-red-500 text-red-500"
-                      : "text-zinc-600 hover:text-zinc-950",
-                  )}
-                />
-              </button>
-            </div>
-
+          {/* ── Right Column: Unboxed Seamless Product Details (Exact Reference Spacing & Placing) ── */}
+          <div className="md:col-span-5 order-3 w-full max-w-[400px]">
             {/* Product Title */}
-            <h1 className="font-michroma text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 uppercase leading-tight">
+            <h1 className="font-syne text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 uppercase leading-tight">
               {product.title}
             </h1>
 
-            {/* Price & Rating Row */}
-            <div className="flex items-baseline justify-between gap-2 border-b border-zinc-300/80 pb-3">
-              <div className="font-space text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight flex items-baseline gap-2">
-                <span>
-                  {currencySymbol}
-                  {formattedPrice}
-                </span>
-                <span className="text-[10px] font-mono text-zinc-500 font-normal uppercase">
-                  TAX INCL.
-                </span>
+            {/* Price */}
+            <div className="font-space text-sm sm:text-base font-semibold text-zinc-700 tracking-tight mt-1.5 sm:mt-2">
+              {currencySymbol}
+              {formattedPrice}
+            </div>
+
+            {/* Divider Line under Price */}
+            <div className="w-full border-b border-zinc-300 mt-4 sm:mt-5" />
+
+            {/* Size Selector */}
+            <div className="mt-6 sm:mt-7">
+              <label className="block text-xs font-space font-semibold uppercase tracking-wider text-zinc-800 mb-2">
+                Size
+              </label>
+              <div className="grid grid-cols-4 gap-2">
+                {availableSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => setSelectedSize(size)}
+                    className={cn(
+                      "h-11 border font-space font-bold text-xs uppercase transition-all flex items-center justify-center cursor-pointer",
+                      selectedSize === size
+                        ? "bg-zinc-950 text-white border-zinc-950 shadow-2xs"
+                        : "bg-white text-zinc-800 border-zinc-200 hover:border-zinc-800",
+                    )}
+                  >
+                    {size}
+                  </button>
+                ))}
               </div>
 
-              <div className="flex items-center gap-1 text-xs font-mono text-zinc-700">
-                <Star className="w-3.5 h-3.5 fill-zinc-950 text-zinc-950" />
-                <span className="font-bold text-zinc-950">4.6</span>
-                <span className="text-zinc-500 text-[11px]">(128 reviews)</span>
+              {/* Find Your Size */}
+              <div className="mt-3">
+                <button
+                  type="button"
+                  className="inline-flex flex-col items-start gap-1 group cursor-pointer"
+                >
+                  <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider uppercase text-zinc-800 group-hover:text-black">
+                    <Ruler className="w-3.5 h-3.5 text-zinc-700" />
+                    <span>FIND YOUR SIZE</span>
+                  </span>
+                  <span className="w-20 h-[2px] bg-zinc-900 group-hover:bg-black transition-colors" />
+                </button>
               </div>
             </div>
 
-            {/* Editorial Synopsis */}
-            <div className="space-y-1">
-              <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-zinc-500 block">
-                EDITORIAL SYNOPSIS
-              </span>
-              <p className="text-xs text-zinc-700 leading-relaxed font-inter">
-                {product.description ||
-                  "Crafted from premium fabric, this silhouette offers breathable comfort, a relaxed structural cut, and timeless architectural style. Engineered for everyday wear and tactical layering."}
-              </p>
-            </div>
-
-            {/* Color & Size Selectors Row */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-zinc-300/80">
-              {/* Color Swatches */}
-              <div className="space-y-1.5">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-zinc-700 block">
-                  COLOR: <span className="text-zinc-950">ARCHIVE TONE</span>
-                </span>
-                <div className="flex items-center gap-1.5">
-                  {images.slice(0, 4).map((url, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setActiveImageIdx(idx)}
-                      className={cn(
-                        "w-7 h-9 border overflow-hidden p-0.5 bg-[#eae9e2] transition-all cursor-pointer",
-                        activeImageIdx === idx
-                          ? "border-zinc-950 ring-1 ring-zinc-950"
-                          : "border-zinc-300 opacity-75 hover:opacity-100",
-                      )}
-                    >
-                      <img
-                        src={url}
-                        alt="Color variation"
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Vertical Divider */}
-              <div className="hidden sm:block h-10 w-[1px] bg-zinc-300/80" />
-
-              {/* Size Selectors */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between gap-3 font-mono text-[10px]">
-                  <span className="font-bold uppercase tracking-wider text-zinc-700">
-                    SIZE
+            {/* Stepper + Add to Cart Row & Buy It Now */}
+            <div className="mt-6 sm:mt-7 space-y-2.5">
+              <div className="flex items-center gap-2.5">
+                {/* Quantity Stepper */}
+                <div className="flex items-center justify-between border border-zinc-300 bg-white h-11 px-3 w-28 shrink-0 shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={handleDecrementQty}
+                    disabled={quantity <= 1}
+                    className="w-5 h-5 flex items-center justify-center text-zinc-500 hover:text-black disabled:opacity-30 cursor-pointer"
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="font-space font-bold text-xs text-zinc-950">
+                    {quantity}
                   </span>
                   <button
                     type="button"
-                    onClick={() => setActiveTab("fabric")}
-                    className="inline-flex items-center gap-1 text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer uppercase text-[9px]"
+                    onClick={handleIncrementQty}
+                    className="w-5 h-5 flex items-center justify-center text-zinc-500 hover:text-black cursor-pointer"
+                    aria-label="Increase quantity"
                   >
-                    <Ruler className="w-3 h-3" />
-                    <span>Size Guide</span>
+                    <Plus className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <div className="flex items-center gap-1">
-                  {SIZES.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => setSelectedSize(size)}
-                      className={cn(
-                        "w-7 sm:w-8 h-8 font-mono text-[11px] font-bold uppercase transition-all flex items-center justify-center cursor-pointer",
-                        selectedSize === size
-                          ? "bg-zinc-950 text-white"
-                          : "bg-white/80 hover:bg-white text-zinc-800 border border-zinc-300",
-                      )}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
 
-            {/* Action Buttons: Primary Buy + Secondary Wishlist */}
-            <div className="space-y-2 pt-1">
+                {/* Add to cart */}
+                <button
+                  type="button"
+                  onClick={handleAddToBag}
+                  className={cn(
+                    "flex-1 h-11 px-4 font-space text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99]",
+                    isAddedToBag
+                      ? "bg-emerald-600 text-white"
+                      : "bg-zinc-950 text-white hover:bg-zinc-800",
+                  )}
+                >
+                  {isAddedToBag ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Added to cart</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>Add to cart</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Buy it now (Full-width button) */}
               <button
                 type="button"
                 onClick={handleAddToBag}
-                className={cn(
-                  "w-full h-11 px-5 font-space text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-between cursor-pointer shadow-xs active:scale-[0.99]",
-                  isAddedToBag
-                    ? "bg-emerald-600 text-white"
-                    : "bg-zinc-950 text-white hover:bg-zinc-800",
-                )}
+                className="w-full h-11 bg-zinc-950 hover:bg-zinc-800 text-white font-space text-xs font-bold uppercase tracking-wider flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-[0.99]"
               >
-                <div className="flex items-center gap-2">
-                  {isAddedToBag ? (
-                    <Check className="w-4 h-4" />
+                <span>Buy it now</span>
+              </button>
+            </div>
+
+            {/* Clean Accordions (Return policy, Shipping, Manufacturing) */}
+            <div className="mt-8 divide-y divide-zinc-200 border-t border-zinc-200">
+              {/* Return policy */}
+              <div className="py-3.5">
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion("returnPolicy")}
+                  className="w-full flex items-center justify-between text-left font-space text-xs font-bold uppercase tracking-wider text-zinc-950 cursor-pointer"
+                >
+                  <span>Return policy</span>
+                  {openAccordions.returnPolicy ? (
+                    <ChevronUp className="w-4 h-4 text-zinc-500" />
                   ) : (
-                    <ShoppingBag className="w-4 h-4" />
+                    <ChevronDown className="w-4 h-4 text-zinc-500" />
                   )}
-                  <span>
-                    {isAddedToBag ? "ADDED TO BAG" : "BUY NOW"}
-                  </span>
-                </div>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+                </button>
+                {openAccordions.returnPolicy && (
+                  <p className="mt-2 text-xs font-inter text-zinc-600 leading-relaxed animate-in fade-in duration-200">
+                    Our goal is for every customer to be totally satisfied with
+                    their purchase. If this isn't the case, let us know and
+                    we'll do our best to work with you to make it right.
+                  </p>
+                )}
+              </div>
 
-              <button
-                type="button"
-                onClick={() => setIsWishlisted((prev) => !prev)}
-                className="w-full h-10 border border-zinc-300 bg-white/70 hover:bg-white text-zinc-800 font-space text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                <Heart
-                  className={cn(
-                    "w-3.5 h-3.5 transition-colors",
-                    isWishlisted ? "fill-red-500 text-red-500" : "text-zinc-600",
+              {/* Shipping */}
+              <div className="py-3.5">
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion("shipping")}
+                  className="w-full flex items-center justify-between text-left font-space text-xs font-bold uppercase tracking-wider text-zinc-950 cursor-pointer"
+                >
+                  <span>Shipping</span>
+                  {openAccordions.shipping ? (
+                    <ChevronUp className="w-4 h-4 text-zinc-500" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-zinc-500" />
                   )}
-                />
-                <span>
-                  {isWishlisted ? "SAVED IN WISHLIST" : "ADD TO WISHLIST"}
-                </span>
-              </button>
-            </div>
+                </button>
+                {openAccordions.shipping && (
+                  <p className="mt-2 text-xs font-inter text-zinc-600 leading-relaxed animate-in fade-in duration-200">
+                    Dispatched from our central atelier within 24 hours.
+                    Complimentary express courier delivery with live telemetry
+                    tracking. Delivery usually takes 2-4 business days.
+                  </p>
+                )}
+              </div>
 
-            {/* Technical Trust Strip (4 items) */}
-            <div className="pt-3 border-t border-zinc-300/80 grid grid-cols-4 gap-2 text-[9px] font-mono text-zinc-600 text-center">
-              <div>
-                <ShieldCheck className="w-3.5 h-3.5 mx-auto text-zinc-800 mb-0.5" />
-                <span className="block uppercase font-bold text-zinc-900 text-[8px]">
-                  AUTHENTIC
-                </span>
-                <span className="text-[8px] text-zinc-500">Atelier Verified</span>
-              </div>
-              <div>
-                <Truck className="w-3.5 h-3.5 mx-auto text-zinc-800 mb-0.5" />
-                <span className="block uppercase font-bold text-zinc-900 text-[8px]">
-                  DISPATCH
-                </span>
-                <span className="text-[8px] text-zinc-500">Within 24h</span>
-              </div>
-              <div>
-                <RotateCcw className="w-3.5 h-3.5 mx-auto text-zinc-800 mb-0.5" />
-                <span className="block uppercase font-bold text-zinc-900 text-[8px]">
-                  RETURNS
-                </span>
-                <span className="text-[8px] text-zinc-500">7-Day Guarantee</span>
-              </div>
-              <div>
-                <Leaf className="w-3.5 h-3.5 mx-auto text-zinc-800 mb-0.5" />
-                <span className="block uppercase font-bold text-zinc-900 text-[8px]">
-                  SUSTAINABLE
-                </span>
-                <span className="text-[8px] text-zinc-500">Ethically Sourced</span>
+              {/* Manufacturing / Product Details */}
+              <div className="py-3.5">
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion("manufacturing")}
+                  className="w-full flex items-center justify-between text-left font-space text-xs font-bold uppercase tracking-wider text-zinc-950 cursor-pointer"
+                >
+                  <span>Manufacturing</span>
+                  {openAccordions.manufacturing ? (
+                    <ChevronUp className="w-4 h-4 text-zinc-500" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-zinc-500" />
+                  )}
+                </button>
+                {openAccordions.manufacturing && (
+                  <p className="mt-2 text-xs font-inter text-zinc-600 leading-relaxed animate-in fade-in duration-200">
+                    {product.description ||
+                      "Engineered with bespoke architectural seams and reinforced stitching. Features ergonomic chest draping, custom matte hardware buttons, and an oversized minimalist silhouette tailored for progressive streetwear styling."}
+                  </p>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* ── Bottom Editorial Tabs (Details, Fabric & Care, Shipping, Reviews) ── */}
-        <div className="mt-8 sm:mt-10 pt-4 border-t border-zinc-300/80">
-          <div className="flex items-center justify-center gap-6 sm:gap-10 font-mono text-xs uppercase tracking-wider text-zinc-500 border-b border-zinc-300/60 pb-2.5">
-            <button
-              type="button"
-              onClick={() => setActiveTab("details")}
-              className={cn(
-                "pb-2.5 -mb-3 transition-colors cursor-pointer",
-                activeTab === "details"
-                  ? "border-b-2 border-zinc-950 font-bold text-zinc-950"
-                  : "hover:text-zinc-950",
-              )}
-            >
-              DETAILS
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("fabric")}
-              className={cn(
-                "pb-2.5 -mb-3 transition-colors cursor-pointer",
-                activeTab === "fabric"
-                  ? "border-b-2 border-zinc-950 font-bold text-zinc-950"
-                  : "hover:text-zinc-950",
-              )}
-            >
-              FABRIC & CARE
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("shipping")}
-              className={cn(
-                "pb-2.5 -mb-3 transition-colors cursor-pointer",
-                activeTab === "shipping"
-                  ? "border-b-2 border-zinc-950 font-bold text-zinc-950"
-                  : "hover:text-zinc-950",
-              )}
-            >
-              SHIPPING & RETURNS
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("reviews")}
-              className={cn(
-                "pb-2.5 -mb-3 transition-colors cursor-pointer",
-                activeTab === "reviews"
-                  ? "border-b-2 border-zinc-950 font-bold text-zinc-950"
-                  : "hover:text-zinc-950",
-              )}
-            >
-              REVIEWS (128)
-            </button>
-          </div>
-
-          {/* Tab Content Display */}
-          <div className="py-4 text-xs font-inter text-zinc-700 max-w-2xl mx-auto text-center leading-relaxed">
-            {activeTab === "details" && (
-              <p>
-                Engineered with bespoke architectural seams and reinforced stitching. Features ergonomic chest draping, custom matte hardware buttons, and an oversized minimalist silhouette tailored for progressive streetwear styling.
-              </p>
-            )}
-            {activeTab === "fabric" && (
-              <p>
-                100% High-Grade Raw Linen Blend. Machine wash cold with like colors on delicate cycle. Do not bleach. Air dry in shade to preserve natural texture. Warm iron on reverse side if needed.
-              </p>
-            )}
-            {activeTab === "shipping" && (
-              <p>
-                Dispatched from the central Snitch atelier within 24 hours. Complimentary express courier delivery with live GPS telemetry. 7-day hassle-free returns on unworn items with tags intact.
-              </p>
-            )}
-            {activeTab === "reviews" && (
-              <p>
-                Rated ★ 4.6/5 by 128 verified collectors. Praised for ultra-breathable tactile fabric feel, true-to-size boxy drape, and exceptional longevity through continuous wear.
-              </p>
-            )}
           </div>
         </div>
       </main>
@@ -678,97 +612,6 @@ export default function ProductDetail() {
             alt={product.title}
             className="max-h-[85vh] max-w-[85vw] object-contain shadow-2xl"
           />
-        </div>
-      )}
-
-      {/* ── Wishlist Archive Drawer ─────────────────────────────────── */}
-      {isWishlistDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs animate-in fade-in">
-          <div
-            className="fixed inset-0"
-            onClick={() => setIsWishlistDrawerOpen(false)}
-          />
-          <aside className="relative w-full max-w-sm bg-[#e7e7e0] border-l border-zinc-300 h-full p-5 sm:p-6 flex flex-col shadow-2xl z-10 animate-in slide-in-from-right duration-200">
-            <div className="flex items-center justify-between border-b border-zinc-300 pb-4">
-              <div>
-                <span className="font-michroma text-sm font-bold uppercase tracking-wider text-zinc-950">
-                  WISHLIST ARCHIVE
-                </span>
-                <p className="font-mono text-[10px] text-zinc-500 uppercase mt-0.5">
-                  {isWishlisted ? "1 APPAREL CURATED" : "EMPTY ARCHIVE"}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsWishlistDrawerOpen(false)}
-                className="p-1.5 hover:bg-zinc-300/60 rounded-full transition-colors cursor-pointer text-zinc-700"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="flex-1 py-4 overflow-y-auto">
-              {isWishlisted ? (
-                <div className="border border-zinc-300 bg-white/70 p-3 flex gap-3 items-center shadow-2xs">
-                  <img
-                    src={activeImg}
-                    alt={product.title}
-                    className="w-14 aspect-[3/4] object-cover bg-zinc-200 border border-zinc-200"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-mono text-xs font-bold uppercase truncate text-zinc-950">
-                      {product.title}
-                    </h4>
-                    <p className="font-space text-xs font-bold text-zinc-900 mt-1">
-                      {currencySymbol}{formattedPrice}
-                    </p>
-                    <span className="font-mono text-[9px] text-zinc-500 uppercase">
-                      SIZE: {selectedSize}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsWishlisted(false)}
-                    className="p-1.5 hover:text-red-500 text-zinc-400 transition-colors cursor-pointer"
-                    title="Remove from wishlist"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ) : (
-                <div className="h-56 flex flex-col items-center justify-center text-center font-mono text-xs text-zinc-500 space-y-2.5">
-                  <Heart className="w-8 h-8 text-zinc-400 stroke-1" />
-                  <span className="font-bold text-zinc-700">NO PIECES CURATED YET</span>
-                  <span className="text-[10px] text-zinc-500 max-w-xs">
-                    USE THE HEART ICON ON ANY APPAREL TO SAVE IT TO YOUR PERSONAL ARCHIVE.
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div className="border-t border-zinc-300 pt-4 space-y-2">
-              {isWishlisted && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsWishlistDrawerOpen(false);
-                    handleAddToBag();
-                  }}
-                  className="w-full h-10 bg-zinc-950 hover:bg-zinc-800 text-white font-space text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>TRANSFER TO BAG</span>
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => setIsWishlistDrawerOpen(false)}
-                className="w-full h-9 border border-zinc-300 bg-white/70 hover:bg-white text-zinc-800 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-              >
-                RETURN TO APPAREL
-              </button>
-            </div>
-          </aside>
         </div>
       )}
     </div>
