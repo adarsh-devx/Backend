@@ -39,8 +39,7 @@ export default function CreateVariantDrawer({
   const [showCustomColorInput, setShowCustomColorInput] = useState(false);
   const [selectedFit, setSelectedFit] = useState("Oversized");
 
-  // Fabric and custom attributes
-  const [fabric, setFabric] = useState("380 GSM FLEECE");
+  // Custom attributes
   const [showCustomAttrForm, setShowCustomAttrForm] = useState(false);
   const [customAttrs, setCustomAttrs] = useState([]);
   const [newKey, setNewKey] = useState("");
@@ -125,9 +124,6 @@ export default function CreateVariantDrawer({
         fit: selectedFit,
       };
 
-      if (fabric) {
-        attributes.fabric = fabric;
-      }
 
       customAttrs.forEach(({ key, value }) => {
         attributes[key] = value;
@@ -429,29 +425,6 @@ export default function CreateVariantDrawer({
               </div>
             </div>
 
-            {/* Fabric */}
-            <div className="space-y-1">
-              <label className="text-[11px] font-semibold text-zinc-700 block">
-                Fabric
-              </label>
-
-              <div className="flex items-center justify-between bg-[#faf9f5] border border-zinc-300 rounded-md px-3 py-1.5 text-xs font-bold text-zinc-900">
-                <div className="flex items-center gap-1.5">
-                  <span>{fabric || "380 GSM FLEECE"}</span>
-                  <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
-                </div>
-                {fabric && (
-                  <button
-                    type="button"
-                    onClick={() => setFabric("")}
-                    className="text-zinc-400 hover:text-zinc-900 cursor-pointer"
-                    title="Remove fabric"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            </div>
 
             {/* + Add Custom Attribute Button */}
             <div>
