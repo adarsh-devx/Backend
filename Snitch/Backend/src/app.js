@@ -3,6 +3,7 @@ import morgan from "morgan";
 import "dotenv/config";
 import authRouter from "./routes/auth.routes.js";
 import productRouter from "./routes/product.routes.js";
+import cartRouter from "./routes/cart.routes.js";
 import cors from "cors";
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
@@ -54,5 +55,7 @@ passport.use(
 app.use("/api/auth", authRouter);
 
 app.use("/api/products", productRouter);
+
+app.use("/api/cart", cartRouter);
 
 export default app;
