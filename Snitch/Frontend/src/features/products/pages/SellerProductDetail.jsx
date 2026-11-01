@@ -8,10 +8,7 @@ import gsap from "gsap";
 import {
   ArrowLeft,
   Plus,
-  Search,
   PackageOpen,
-  Boxes,
-  TrendingUp,
   RefreshCw,
   ChevronLeft,
   ChevronRight,
@@ -19,8 +16,19 @@ import {
 } from "lucide-react";
 
 // Components
-import VariantCard from "../components/VariantCard";
 import CreateVariantDrawer from "../components/CreateVariantDrawer";
+
+// Safe helper to extract attributes object from variant
+const getVariantAttrs = (v) => {
+  if (!v || !v.attributes) return {};
+  if (v.attributes instanceof Map) {
+    return Object.fromEntries(v.attributes);
+  }
+  if (typeof v.attributes === "object" && !Array.isArray(v.attributes)) {
+    return { ...v.attributes };
+  }
+  return {};
+};
 
 export default function SellerProductDetail() {
   const { productId } = useParams();
@@ -35,15 +43,9 @@ export default function SellerProductDetail() {
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
-  const [focusedVariant, setFocusedVariant] = useState(null);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  // Filter & Search states
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSizeFilter, setSelectedSizeFilter] = useState("ALL");
-  const [stockStatusFilter, setStockStatusFilter] = useState("ALL"); // ALL, IN_STOCK, LOW_STOCK, DEPLETED
-  const [sortBy, setSortBy] = useState("default");
+  const [selectedAttrs, setSelectedAttrs] = useState({});
 
   // GSAP animation refs
   const heroImgRef = useRef(null);
@@ -55,9 +57,6 @@ export default function SellerProductDetail() {
     try {
       const prod = await handleGetSellerProductById(productId);
       setProduct(prod);
-      if (prod?.variants && prod.variants.length > 0) {
-        setFocusedVariant(prod.variants[0]);
-      }
     } catch (err) {
       console.error("Error fetching seller product details:", err);
       if (err?.response?.status === 403) {
@@ -81,17 +80,151 @@ export default function SellerProductDetail() {
     }
   }, [productId]);
 
-  // Gallery display images
-  // When a variant is focused and has images, show those; otherwise show master product images
+  const hasVariants = Boolean(product?.variants && product.variants.length > 0);
+
+  // Dynamically group attributes across all variants from database
+  const attributeGroups = useMemo(() => {
+    if (!product?.variants || product.variants.length === 0) return [];
+
+    const keyMap = new Map();
+    const valuesMap = new Map();
+
+    product.variants.forEach((v) => {
+      const attrs = getVariantAttrs(v);
+      Object.entries(attrs).forEach(([k, val]) => {
+        if (!val) return;
+        const normKey = String(k).trim().toLowerCase();
+        if (!keyMap.has(normKey)) {
+          const pretty = String(k).charAt(0).toUpperCase() + String(k).slice(1);
+          keyMap.set(normKey, pretty);
+          valuesMap.set(normKey, new Set());
+        }
+        valuesMap.get(normKey).add(String(val).trim());
+      });
+    });
+
+    const priority = ["color", "size", "fit", "fabric"];
+    const sortedKeys = Array.from(keyMap.keys()).sort((a, b) => {
+      const idxA = priority.indexOf(a);
+      const idxB = priority.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+    return sortedKeys.map((normKey) => ({
+      key: normKey,
+      displayName: keyMap.get(normKey),
+      values: Array.from(valuesMap.get(normKey)),
+    }));
+  }, [product]);
+
+  // Initialize selectedAttrs when product loads
+  useEffect(() => {
+    if (product?.variants && product.variants.length > 0) {
+      const firstInStock =
+        product.variants.find((v) => (v.stock || 0) > 0) || product.variants[0];
+      const vAttrs = getVariantAttrs(firstInStock);
+      const initObj = {};
+      Object.entries(vAttrs).forEach(([k, val]) => {
+        initObj[String(k).trim().toLowerCase()] = String(val).trim();
+      });
+      setSelectedAttrs(initObj);
+    } else {
+      setSelectedAttrs({});
+    }
+  }, [product]);
+
+  // Resolve currently active variant based on selected attributes
+  const activeVariant = useMemo(() => {
+    if (!product?.variants || product.variants.length === 0) return null;
+
+    // 1. Exact match
+    const exact = product.variants.find((v) => {
+      const vAttrs = getVariantAttrs(v);
+      const normVAttrs = {};
+      Object.entries(vAttrs).forEach(([k, val]) => {
+        normVAttrs[String(k).trim().toLowerCase()] = String(val).trim().toLowerCase();
+      });
+
+      return Object.entries(selectedAttrs).every(([key, val]) => {
+        if (!normVAttrs[key]) return true;
+        return normVAttrs[key] === String(val).toLowerCase();
+      });
+    });
+
+    if (exact) return exact;
+
+    // 2. Score-based fallback
+    let best = product.variants[0];
+    let highestScore = -1;
+    product.variants.forEach((v) => {
+      const vAttrs = getVariantAttrs(v);
+      const normVAttrs = {};
+      Object.entries(vAttrs).forEach(([k, val]) => {
+        normVAttrs[String(k).trim().toLowerCase()] = String(val).trim().toLowerCase();
+      });
+      let score = 0;
+      Object.entries(selectedAttrs).forEach(([key, val]) => {
+        if (normVAttrs[key] && normVAttrs[key] === String(val).toLowerCase()) {
+          score++;
+        }
+      });
+      if (score > highestScore) {
+        highestScore = score;
+        best = v;
+      }
+    });
+
+    return best;
+  }, [product, selectedAttrs]);
+
+  // Handler for user selecting an attribute value
+  const handleSelectAttribute = (normKey, value) => {
+    const match = product.variants.find((v) => {
+      const vAttrs = getVariantAttrs(v);
+      const normVAttrs = {};
+      Object.entries(vAttrs).forEach(([k, vVal]) => {
+        normVAttrs[String(k).trim().toLowerCase()] = String(vVal).trim().toLowerCase();
+      });
+      if (normVAttrs[normKey] !== String(value).toLowerCase()) return false;
+      return true;
+    });
+
+    if (match) {
+      const vAttrs = getVariantAttrs(match);
+      const resolved = {};
+      Object.entries(vAttrs).forEach(([k, vVal]) => {
+        resolved[String(k).trim().toLowerCase()] = String(vVal).trim();
+      });
+      resolved[normKey] = value;
+      setSelectedAttrs((prev) => ({ ...prev, ...resolved }));
+    } else {
+      setSelectedAttrs((prev) => ({ ...prev, [normKey]: value }));
+    }
+  };
+
+  // Gallery display images (Variant images if present, otherwise product images)
   const displayImages = useMemo(() => {
-    if (focusedVariant?.images && focusedVariant.images.length > 0) {
-      return focusedVariant.images.map((img) => img.url);
+    if (activeVariant?.images && activeVariant.images.length > 0) {
+      const vImgs = activeVariant.images
+        .map((img) => (typeof img === "string" ? img : img?.url))
+        .filter(Boolean);
+      if (vImgs.length > 0) return vImgs;
     }
     if (product?.images && product.images.length > 0) {
-      return product.images.map((img) => img.url);
+      const pImgs = product.images
+        .map((img) => (typeof img === "string" ? img : img?.url))
+        .filter(Boolean);
+      if (pImgs.length > 0) return pImgs;
     }
     return ["/assets/hero_black.jpg"];
-  }, [focusedVariant, product]);
+  }, [activeVariant, product]);
+
+  useEffect(() => {
+    setActiveImageIdx(0);
+  }, [activeVariant?._id]);
 
   const currentDisplayImg =
     displayImages[activeImageIdx] ||
@@ -107,117 +240,34 @@ export default function SellerProductDetail() {
         { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" },
       );
     }
-  }, [currentDisplayImg, focusedVariant?._id]);
+  }, [currentDisplayImg, activeVariant?._id]);
 
-  // Live Inventory Metrics
-  const inventoryMetrics = useMemo(() => {
-    const variants = product?.variants || [];
-    const totalVariants = variants.length;
-    const totalUnits = variants.reduce(
-      (sum, v) => sum + (Number(v.stock) || 0),
-      0,
-    );
-    const depletedCount = variants.filter(
-      (v) => (Number(v.stock) || 0) === 0,
-    ).length;
-    const lowStockCount = variants.filter(
-      (v) => (Number(v.stock) || 0) > 0 && (Number(v.stock) || 0) <= 5,
-    ).length;
-
-    const valuation = variants.reduce((sum, v) => {
-      const price = Number(v?.price?.amount ?? product?.price?.amount ?? 0);
-      const units = Number(v.stock) || 0;
-      return sum + price * units;
-    }, 0);
-
-    return {
-      totalVariants,
-      totalUnits,
-      depletedCount,
-      lowStockCount,
-      valuation,
-    };
-  }, [product]);
-
-  // Filtered & Sorted variants
-  const filteredVariants = useMemo(() => {
-    let list = [...(product?.variants || [])];
-
-    // Search query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter((v) => {
-        const rawAttrs = v.attributes;
-        const attrs =
-          rawAttrs instanceof Map
-            ? Object.fromEntries(rawAttrs)
-            : typeof rawAttrs === "object" && rawAttrs !== null
-              ? rawAttrs
-              : {};
-        return Object.values(attrs).some((val) =>
-          String(val).toLowerCase().includes(q),
-        );
-      });
+  // Price & currency fallback
+  const priceAmount = useMemo(() => {
+    if (
+      activeVariant?.price?.amount !== undefined &&
+      activeVariant?.price?.amount !== null &&
+      Number(activeVariant.price.amount) > 0
+    ) {
+      return Number(activeVariant.price.amount);
     }
+    return Number(product?.price?.amount || 0);
+  }, [product, activeVariant]);
 
-    // Size filter
-    if (selectedSizeFilter !== "ALL") {
-      list = list.filter((v) => {
-        const rawAttrs = v.attributes;
-        const attrs =
-          rawAttrs instanceof Map
-            ? Object.fromEntries(rawAttrs)
-            : typeof rawAttrs === "object" && rawAttrs !== null
-              ? rawAttrs
-              : {};
-        const sz = attrs.size || attrs.Size || attrs.SIZE;
-        return sz?.toUpperCase() === selectedSizeFilter;
-      });
-    }
+  const currency = useMemo(() => {
+    return activeVariant?.price?.currency || product?.price?.currency || "INR";
+  }, [product, activeVariant]);
 
-    // Stock status filter
-    if (stockStatusFilter === "IN_STOCK") {
-      list = list.filter((v) => (Number(v.stock) || 0) > 5);
-    } else if (stockStatusFilter === "LOW_STOCK") {
-      list = list.filter(
-        (v) => (Number(v.stock) || 0) > 0 && (Number(v.stock) || 0) <= 5,
-      );
-    } else if (stockStatusFilter === "DEPLETED") {
-      list = list.filter((v) => (Number(v.stock) || 0) === 0);
-    }
+  const currencySymbol = currency === "USD" ? "$" : "INR ";
+  const formattedPrice = priceAmount.toLocaleString();
 
-    // Sorting
-    switch (sortBy) {
-      case "stock-desc":
-        list.sort((a, b) => (Number(b.stock) || 0) - (Number(a.stock) || 0));
-        break;
-      case "stock-asc":
-        list.sort((a, b) => (Number(a.stock) || 0) - (Number(b.stock) || 0));
-        break;
-      case "price-desc":
-        list.sort(
-          (a, b) =>
-            Number(b?.price?.amount ?? product?.price?.amount ?? 0) -
-            Number(a?.price?.amount ?? product?.price?.amount ?? 0),
-        );
-        break;
-      case "price-asc":
-        list.sort(
-          (a, b) =>
-            Number(a?.price?.amount ?? product?.price?.amount ?? 0) -
-            Number(b?.price?.amount ?? product?.price?.amount ?? 0),
-        );
-        break;
-      default:
-        break;
-    }
+  // Stock
+  const currentStock = useMemo(() => {
+    if (!hasVariants) return 0;
+    return activeVariant?.stock !== undefined ? Number(activeVariant.stock) : 0;
+  }, [hasVariants, activeVariant]);
 
-    return list;
-  }, [product, searchQuery, selectedSizeFilter, stockStatusFilter, sortBy]);
-
-  // Handler: Real-time stock change
   const handleStockUpdate = async (variantId, newStock) => {
-    // Optimistic UI update
     setProduct((prev) => {
       if (!prev) return prev;
       return {
@@ -247,9 +297,6 @@ export default function SellerProductDetail() {
         const updated = prev.variants.filter((v) => v._id !== variantId);
         return { ...prev, variants: updated };
       });
-      if (focusedVariant?._id === variantId) {
-        setFocusedVariant(null);
-      }
     } catch (err) {
       console.error("Variant delete error:", err);
       fetchProduct();
@@ -261,32 +308,17 @@ export default function SellerProductDetail() {
     const res = await handleAddVariant(product._id, formData);
     if (res?.product) {
       setProduct(res.product);
-      if (res?.variant) {
-        setFocusedVariant(res.variant);
-      }
     } else {
       await fetchProduct();
     }
   };
 
-  const currencySymbol = product?.price?.currency === "USD" ? "$" : "₹";
-  const masterPriceFormatted = `${currencySymbol}${Number(product?.price?.amount || 0).toLocaleString()}`;
-
-  // Unique sizes present across all variants for filter pills
-  const availableSizes = useMemo(() => {
-    const sizes = new Set();
-    product?.variants?.forEach((v) => {
-      const rawAttrs = v.attributes;
-      const attrs =
-        rawAttrs instanceof Map
-          ? Object.fromEntries(rawAttrs)
-          : typeof rawAttrs === "object" && rawAttrs !== null
-            ? rawAttrs
-            : {};
-      const sz = attrs.size || attrs.Size || attrs.SIZE;
-      if (sz) sizes.add(sz.toUpperCase());
-    });
-    return Array.from(sizes);
+  // Total stock across all variants
+  const totalStockUnits = useMemo(() => {
+    return (product?.variants || []).reduce(
+      (sum, v) => sum + (Number(v.stock) || 0),
+      0,
+    );
   }, [product]);
 
   return (
@@ -322,7 +354,7 @@ export default function SellerProductDetail() {
               TOTAL STOCK:
             </span>
             <span className="font-space font-bold text-zinc-950">
-              {inventoryMetrics.totalUnits} UNITS
+              {totalStockUnits} UNITS
             </span>
           </div>
 
@@ -377,287 +409,199 @@ export default function SellerProductDetail() {
           </Link>
         </div>
       ) : (
-        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          {/* ══════════════════════════════════════════════════════════════
-              LEFT COLUMN: Lookbook Stage & Unboxed Ledger (5 cols)
-             ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
-            {/* Gallery Unit: Vertical Thumbnails + Hero Runway Stage */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 items-start w-full">
-              {/* Thumbnails Ribbon */}
-              {displayImages.length > 1 && (
-                <div className="w-full sm:w-16 shrink-0 flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-y-auto max-h-[480px] scrollbar-none pb-1 sm:pb-0">
-                  {displayImages.map((imgUrl, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setActiveImageIdx(idx)}
-                      className={cn(
-                        "w-14 sm:w-16 sm:w-full aspect-[3/4] bg-[#eae9e2] border overflow-hidden transition-all shrink-0 cursor-pointer p-0.5",
-                        activeImageIdx === idx
-                          ? "border-zinc-950 ring-1 ring-zinc-950 shadow-xs"
-                          : "border-zinc-300 opacity-70 hover:opacity-100",
-                      )}
-                    >
-                      <img
-                        src={imgUrl}
-                        alt={`Angle ${idx + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
+        <main className="flex-1 w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 sm:pb-16">
+          <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center justify-center -translate-y-4 sm:-translate-y-7">
+            {/* ══════════════════════════════════════════════════════════════
+                LEFT COLUMN: Lookbook Stage (Centered)
+               ══════════════════════════════════════════════════════════════ */}
+            <div className="lg:col-span-6 flex justify-center lg:justify-end w-full">
+              <div className="w-full max-w-[450px]">
+                {/* Gallery Unit: Vertical Thumbnails + Hero Runway Stage */}
+                <div className="flex flex-col-reverse sm:flex-row gap-3 items-start w-full">
+                  {/* Thumbnails Ribbon */}
+                  {displayImages.length > 1 && (
+                    <div className="w-full sm:w-16 shrink-0 flex flex-row sm:flex-col gap-2 overflow-x-auto sm:overflow-y-auto max-h-[480px] scrollbar-none pb-1 sm:pb-0">
+                      {displayImages.map((imgUrl, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setActiveImageIdx(idx)}
+                          className={cn(
+                            "w-14 sm:w-16 sm:w-full aspect-[3/4] bg-[#eae9e2] border overflow-hidden transition-all shrink-0 cursor-pointer p-0.5",
+                            activeImageIdx === idx
+                              ? "border-zinc-950 ring-1 ring-zinc-950 shadow-xs"
+                              : "border-zinc-300 opacity-70 hover:opacity-100",
+                          )}
+                        >
+                          <img
+                            src={imgUrl}
+                            alt={`Angle ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
-              {/* Main Hero Visual Stage */}
-              <div className="flex-1 w-full aspect-[3/4] max-h-[500px] bg-[#eae9e2] border border-zinc-300 overflow-hidden relative shadow-xs flex items-center justify-center select-none group">
-                <img
-                  ref={heroImgRef}
-                  src={currentDisplayImg}
-                  alt={product.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-
-                {/* Angle Controls */}
-                {displayImages.length > 1 && (
-                  <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setActiveImageIdx((prev) =>
-                          prev > 0 ? prev - 1 : displayImages.length - 1,
-                        )
-                      }
-                      className="w-7 h-7 bg-white/90 hover:bg-white text-zinc-900 border border-zinc-300 flex items-center justify-center shadow-xs transition-all cursor-pointer"
-                      title="Previous"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setActiveImageIdx((prev) =>
-                          prev < displayImages.length - 1 ? prev + 1 : 0,
-                        )
-                      }
-                      className="w-7 h-7 bg-white/90 hover:bg-white text-zinc-900 border border-zinc-300 flex items-center justify-center shadow-xs transition-all cursor-pointer"
-                      title="Next"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Seamless Unboxed Inventory Ledger Bar (Only show when variants exist) */}
-            {product?.variants && product.variants.length > 0 && (
-              <div className="border border-zinc-300 bg-white p-4 shadow-xs">
-                <div className="grid grid-cols-3 divide-x divide-zinc-200">
-                  <div className="pr-3">
-                    <span className="block text-[10px] font-mono uppercase tracking-wider text-zinc-500">
-                      TOTAL UNITS
-                    </span>
-                    <span className="block font-space text-xl font-bold text-zinc-950 mt-0.5">
-                      {inventoryMetrics.totalUnits}
-                    </span>
-                  </div>
-
-                  <div className="px-3">
-                    <span className="block text-[10px] font-mono uppercase tracking-wider text-zinc-500">
-                      ACTIVE SKUS
-                    </span>
-                    <span className="block font-space text-xl font-bold text-zinc-950 mt-0.5">
-                      {inventoryMetrics.totalVariants}
-                    </span>
-                  </div>
-
-                  <div className="pl-3">
-                    <span className="block text-[10px] font-mono uppercase tracking-wider text-zinc-500">
-                      VALUATION
-                    </span>
-                    <span className="block font-space text-xl font-bold text-zinc-950 mt-0.5">
-                      {currencySymbol}
-                      {inventoryMetrics.valuation.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ══════════════════════════════════════════════════════════════
-              RIGHT COLUMN: Product Details & Variant Studio (7 cols)
-             ══════════════════════════════════════════════════════════════ */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Header: Editorial Breadcrumb, Title, Price, Description */}
-            <div className="space-y-3 border-b border-zinc-300/80 pb-6">
-              <div className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-                <span>ATELIER ARCHIVE</span>
-                <span>/</span>
-                <span>FW26</span>
-                <span>/</span>
-                <span className="text-zinc-900 font-bold">
-                  SKU-{product._id.slice(-6).toUpperCase()}
-                </span>
-              </div>
-
-              <h1 className="font-syne text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-zinc-950 leading-tight">
-                {product.title}
-              </h1>
-
-              {/* Price Row */}
-              <div className="flex items-baseline gap-3 pt-0.5">
-                <span className="font-space text-2xl sm:text-3xl font-bold text-zinc-950 tracking-tight">
-                  {masterPriceFormatted}
-                </span>
-                <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
-                  BASE RUNWAY PRICE
-                </span>
-              </div>
-
-              {product.description && (
-                <p className="text-zinc-600 font-inter text-xs sm:text-sm leading-relaxed max-w-2xl pt-1">
-                  {product.description}
-                </p>
-              )}
-            </div>
-
-            {/* Filter & Search Bar (Only shown when product has variants) */}
-            {product?.variants && product.variants.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                  {/* Search */}
-                  <div className="relative flex-1">
-                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-                    <input
-                      type="text"
-                      placeholder="Filter variants by size, color, fit..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-white border border-zinc-300 pl-9 pr-3 py-2 text-xs font-inter text-zinc-900 outline-none focus:border-zinc-950 transition-colors shadow-2xs"
+                  {/* Main Hero Visual Stage */}
+                  <div className="flex-1 w-full aspect-[3/4] max-h-[500px] bg-[#eae9e2] border border-zinc-300 overflow-hidden relative shadow-xs flex items-center justify-center select-none group">
+                    <img
+                      ref={heroImgRef}
+                      src={currentDisplayImg}
+                      alt={product.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                  </div>
 
-                  {/* Stock status filter pills */}
-                  <div className="flex items-center gap-1">
-                    {[
-                      { label: "All", val: "ALL" },
-                      { label: "In Stock", val: "IN_STOCK" },
-                      { label: "Low", val: "LOW_STOCK" },
-                      { label: "Depleted", val: "DEPLETED" },
-                    ].map((filter) => (
-                      <button
-                        key={filter.val}
-                        type="button"
-                        onClick={() => setStockStatusFilter(filter.val)}
-                        className={cn(
-                          "px-2.5 py-1.5 text-[11px] font-space font-bold uppercase transition-all cursor-pointer border",
-                          stockStatusFilter === filter.val
-                            ? "bg-zinc-950 text-white border-zinc-950 shadow-2xs"
-                            : "bg-white text-zinc-700 border-zinc-300 hover:border-zinc-700",
-                        )}
-                      >
-                        {filter.label}
-                      </button>
-                    ))}
+                    {/* Angle Controls */}
+                    {displayImages.length > 1 && (
+                      <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setActiveImageIdx((prev) =>
+                              prev > 0 ? prev - 1 : displayImages.length - 1,
+                            )
+                          }
+                          className="w-7 h-7 bg-white/90 hover:bg-white text-zinc-900 border border-zinc-300 flex items-center justify-center shadow-xs transition-all cursor-pointer"
+                          title="Previous"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setActiveImageIdx((prev) =>
+                              prev < displayImages.length - 1 ? prev + 1 : 0,
+                            )
+                          }
+                          className="w-7 h-7 bg-white/90 hover:bg-white text-zinc-900 border border-zinc-300 flex items-center justify-center shadow-xs transition-all cursor-pointer"
+                          title="Next"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Sizing Filter Ribbon */}
-                {availableSizes.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                    <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mr-1">
-                      SIZES:
-                    </span>
+            {/* ══════════════════════════════════════════════════════════════
+                RIGHT COLUMN: Product Details & Variant Studio (Centered)
+               ══════════════════════════════════════════════════════════════ */}
+            <div className="lg:col-span-6 flex justify-center lg:justify-start w-full">
+              <div className="w-full max-w-[390px] space-y-4">
+                {/* Header: Title & Price */}
+                <div className="space-y-1.5">
+                  <h1 className="font-syne text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-zinc-950 leading-tight">
+                    {product.title}
+                  </h1>
+
+                  {/* Price */}
+                  <div className="font-space text-base sm:text-lg font-bold text-zinc-900 tracking-tight">
+                    {currencySymbol}
+                    {formattedPrice}
+                  </div>
+
+                  {/* Light Gray Border Line under Price */}
+                  <div className="w-full border-b border-zinc-300 pt-2.5" />
+                </div>
+
+                {/* ── Dynamic Multi-Attribute Variant Selection (Image 1, 2, 3 Layout) ── */}
+                {hasVariants ? (
+                  <div className="space-y-3.5">
+                    {/* Dynamically Render Each Attribute Group (e.g. COLOR, SIZE, FIT) */}
+                    {attributeGroups.map((group) => {
+                      const currentVal = selectedAttrs[group.key] || "";
+
+                      return (
+                        <div key={group.key} className="space-y-1.5">
+                          <label className="block text-[11px] font-mono tracking-widest text-zinc-500 uppercase font-semibold">
+                            {group.displayName}
+                          </label>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {group.values.map((val) => {
+                              const isSelected =
+                                currentVal.toLowerCase() === val.toLowerCase();
+
+                              return (
+                                <button
+                                  key={val}
+                                  type="button"
+                                  onClick={() =>
+                                    handleSelectAttribute(group.key, val)
+                                  }
+                                  className={cn(
+                                    "px-3.5 py-1.5 border text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer",
+                                    isSelected
+                                      ? "bg-black text-white border-black shadow-xs"
+                                      : "bg-white text-zinc-800 border-zinc-200 hover:border-zinc-400",
+                                  )}
+                                >
+                                  {val}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Live Stock Status (Green Text - Exactly as in Image 1, 2, 3) */}
+                    <div className="pt-0.5">
+                      {currentStock <= 0 ? (
+                        <span className="font-mono text-xs font-bold uppercase tracking-wider text-rose-600">
+                          OUT OF STOCK
+                        </span>
+                      ) : (
+                        <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-600">
+                          {currentStock} IN STOCK
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Action Buttons: ADD TO CART & BUY NOW (Controlled Width & Bold Typography) */}
+                    <div className="space-y-2 pt-2.5 max-w-[270px]">
+                      <button
+                        type="button"
+                        disabled={currentStock <= 0}
+                        className={cn(
+                          "w-full h-11 text-xs font-mono font-extrabold uppercase tracking-widest transition-all cursor-pointer shadow-xs active:scale-[0.99]",
+                          currentStock <= 0
+                            ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+                            : "bg-black text-white hover:bg-zinc-800",
+                        )}
+                      >
+                        {currentStock <= 0 ? "OUT OF STOCK" : "ADD TO CART"}
+                      </button>
+
+                      {currentStock > 0 && (
+                        <button
+                          type="button"
+                          className="w-full h-11 bg-white hover:bg-zinc-50 text-black border border-zinc-300 text-xs font-mono font-extrabold uppercase tracking-widest transition-all cursor-pointer shadow-2xs active:scale-[0.99]"
+                        >
+                          BUY NOW
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-12 space-y-4">
+                    <p className="text-xs font-inter text-zinc-600">
+                      This garment has no variant sizes or colorways yet.
+                    </p>
                     <button
                       type="button"
-                      onClick={() => setSelectedSizeFilter("ALL")}
-                      className={cn(
-                        "px-2.5 py-1 text-xs font-space font-bold border transition-colors cursor-pointer",
-                        selectedSizeFilter === "ALL"
-                          ? "bg-zinc-950 text-white border-zinc-950"
-                          : "bg-white text-zinc-700 border-zinc-300 hover:border-zinc-700",
-                      )}
+                      onClick={() => setIsDrawerOpen(true)}
+                      className="inline-flex items-center gap-2 bg-black hover:bg-zinc-800 text-white px-5 py-2.5 font-space text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
                     >
-                      ALL
+                      <Plus className="w-4 h-4" />
+                      <span>CRAFT FIRST VARIANT</span>
                     </button>
-                    {availableSizes.map((sz) => (
-                      <button
-                        key={sz}
-                        type="button"
-                        onClick={() => setSelectedSizeFilter(sz)}
-                        className={cn(
-                          "px-2.5 py-1 text-xs font-space font-bold border transition-colors cursor-pointer",
-                          selectedSizeFilter === sz
-                            ? "bg-zinc-950 text-white border-zinc-950"
-                            : "bg-white text-zinc-700 border-zinc-300 hover:border-zinc-700",
-                        )}
-                      >
-                        {sz}
-                      </button>
-                    ))}
                   </div>
                 )}
               </div>
-            )}
-
-            {/* Variant Matrix List */}
-            {filteredVariants.length === 0 ? (
-              <div className="py-16 text-center space-y-4">
-                <PackageOpen className="w-12 h-12 stroke-[1.2] text-zinc-400 mx-auto" />
-                <div className="space-y-1">
-                  <h3 className="font-space text-sm font-bold uppercase text-zinc-950 tracking-wider">
-                    NO VARIANTS AVAILABLE
-                  </h3>
-                  <p className="text-xs font-inter text-zinc-600 max-w-sm mx-auto">
-                    {product?.variants?.length === 0
-                      ? "This garment has no variant sizes or colorways yet. Create your first variant to initiate runway inventory."
-                      : "No variants match your current filter criteria."}
-                  </p>
-                </div>
-
-                {product?.variants?.length === 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsDrawerOpen(true)}
-                    className="inline-flex items-center gap-2 bg-zinc-950 hover:bg-zinc-800 text-white px-5 py-2.5 font-space text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shadow-xs"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>CRAFT FIRST VARIANT</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchQuery("");
-                      setSelectedSizeFilter("ALL");
-                      setStockStatusFilter("ALL");
-                    }}
-                    className="inline-block text-xs font-mono font-bold uppercase tracking-wider text-zinc-950 underline underline-offset-4 hover:text-zinc-600 cursor-pointer pt-1"
-                  >
-                    RESET FILTERS
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {filteredVariants.map((variant) => (
-                  <VariantCard
-                    key={variant._id}
-                    variant={variant}
-                    masterProduct={product}
-                    isSelected={focusedVariant?._id === variant._id}
-                    onSelect={(v) => {
-                      setFocusedVariant(v);
-                      setActiveImageIdx(0);
-                    }}
-                    onStockChange={handleStockUpdate}
-                    onDeleteVariant={handleDeleteVariantAction}
-                  />
-                ))}
-              </div>
-            )}
+            </div>
           </div>
         </main>
       )}
