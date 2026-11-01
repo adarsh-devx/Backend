@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import { useProduct } from "../hook/use.product";
+import { useCart } from "@/features/cart/hook/useCart.js";
 import { cn } from "@/lib/utils";
 import UiverseSearchInput from "@/components/ui/UiverseSearchInput";
 import {
@@ -26,13 +27,14 @@ export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { handleGetProductById } = useProduct();
+  const { handleAddToCart, cartItems } = useCart();
 
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [selectedSize, setSelectedSize] = useState("M");
-  const [isAddedToBag, setIsAddedToBag] = useState(false);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [openAccordions, setOpenAccordions] = useState({
     returnPolicy: true,
@@ -119,10 +121,25 @@ export default function ProductDetail() {
     return ["S", "M", "L", "XL"];
   }, [product]);
 
-  const handleAddToBag = () => {
-    setIsAddedToBag(true);
-    setTimeout(() => setIsAddedToBag(false), 2500);
-  };
+  const activeVariant = useMemo(() => {
+    if (!product?.variants || product.variants.length === 0) return null;
+
+    const match = product.variants.find((v) => {
+      const rawAttrs = v.attributes;
+      const attrs =
+        rawAttrs instanceof Map
+          ? Object.fromEntries(rawAttrs)
+          : typeof rawAttrs === "object" && rawAttrs !== null
+            ? rawAttrs
+            : {};
+      const sz = attrs.size || attrs.Size || attrs.SIZE;
+      return (
+        sz && String(sz).toUpperCase() === String(selectedSize).toUpperCase()
+      );
+    });
+
+    return match || product.variants[0] || null;
+  }, [product, selectedSize]);
 
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndX, setTouchEndX] = useState(null);
@@ -291,9 +308,11 @@ export default function ProductDetail() {
               title="Shopping Bag"
             >
               <ShoppingBag className="w-4 h-4" />
-              <span className="absolute -top-0.5 -right-0.5 bg-zinc-950 text-white text-[9px] font-mono font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                1
-              </span>
+              {cartItems.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-zinc-950 text-white text-[9px] font-mono font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                  {cartItems.length}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -480,15 +499,27 @@ export default function ProductDetail() {
                 {/* Add to cart */}
                 <button
                   type="button"
-                  onClick={handleAddToBag}
+                  onClick={async () => {
+                    try {
+                      await handleAddToCart({
+                        productId: product._id,
+                        variantId: activeVariant?._id,
+                        quantity,
+                      });
+                      setIsAddedToCart(true);
+                      setTimeout(() => setIsAddedToCart(false), 2500);
+                    } catch (err) {
+                      console.error("Failed to add to cart:", err);
+                    }
+                  }}
                   className={cn(
                     "flex-1 h-11 px-4 font-space text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99]",
-                    isAddedToBag
+                    isAddedToCart
                       ? "bg-emerald-600 text-white"
                       : "bg-zinc-950 text-white hover:bg-zinc-800",
                   )}
                 >
-                  {isAddedToBag ? (
+                  {isAddedToCart ? (
                     <>
                       <Check className="w-4 h-4" />
                       <span>Added to cart</span>
@@ -505,7 +536,19 @@ export default function ProductDetail() {
               {/* Buy it now (Full-width button) */}
               <button
                 type="button"
-                onClick={handleAddToBag}
+                onClick={async () => {
+                  try {
+                    await handleAddToCart({
+                      productId: product._id,
+                      variantId: activeVariant?._id,
+                      quantity,
+                    });
+                    setIsAddedToCart(true);
+                    setTimeout(() => setIsAddedToCart(false), 2500);
+                  } catch (err) {
+                    console.error("Failed to buy now:", err);
+                  }
+                }}
                 className="w-full h-11 bg-zinc-950 hover:bg-zinc-800 text-white font-space text-xs font-bold uppercase tracking-wider flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-[0.99]"
               >
                 <span>Buy it now</span>
