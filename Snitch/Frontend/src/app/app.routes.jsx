@@ -3,6 +3,8 @@ import { createBrowserRouter } from "react-router";
 import Protected from "../features/auth/components/Protected.jsx";
 import Home from "../features/products/pages/Home.jsx";
 import SellerProductDetail from "@/features/products/pages/SellerProductDetail.jsx";
+import Cart from "../features/cart/pages/Cart.jsx";
+import AppLayout from "./AppLayout.jsx";
 
 const Register = lazy(() => import("../features/auth/pages/Register.jsx"));
 const Login = lazy(() => import("../features/auth/pages/Login.jsx"));
@@ -22,41 +24,52 @@ const withSuspense = (Component) => (
 
 export const routes = createBrowserRouter([
   {
-    path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/products/:id",
-    element: withSuspense(ProductDetail),
-  },
-  {
-    path: "/register",
-    element: withSuspense(Register),
-  },
-  {
-    path: "/login",
-    element: withSuspense(Login),
-  },
-  {
-    path: "/seller",
+    element: <AppLayout />,
     children: [
       {
-        path: "create-product",
-        element: (
-          <Protected role="seller">{withSuspense(CreateProduct)}</Protected>
-        ),
+        path: "/",
+        element: <Home />,
       },
       {
-        path: "dashboard",
-        element: <Protected role="seller">{withSuspense(Dashboard)}</Protected>,
+        path: "/products/:id",
+        element: withSuspense(ProductDetail),
       },
       {
-        path: "product/:productId",
-        element: (
-          <Protected role="seller">
-            <SellerProductDetail />
-          </Protected>
-        ),
+        path: "/cart",
+        element: <Protected>{withSuspense(Cart)}</Protected>,
+      },
+      {
+        path: "/register",
+        element: withSuspense(Register),
+      },
+      {
+        path: "/login",
+        element: withSuspense(Login),
+      },
+      {
+        path: "/seller",
+        children: [
+          {
+            path: "create-product",
+            element: (
+              <Protected role="seller">{withSuspense(CreateProduct)}</Protected>
+            ),
+          },
+          {
+            path: "dashboard",
+            element: (
+              <Protected role="seller">{withSuspense(Dashboard)}</Protected>
+            ),
+          },
+          {
+            path: "product/:productId",
+            element: (
+              <Protected role="seller">
+                <SellerProductDetail />
+              </Protected>
+            ),
+          },
+        ],
       },
     ],
   },

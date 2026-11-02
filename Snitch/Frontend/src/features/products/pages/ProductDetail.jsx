@@ -1,33 +1,25 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import { useProduct } from "../hook/use.product";
 import { useCart } from "@/features/cart/hook/useCart.js";
 import { cn } from "@/lib/utils";
-import UiverseSearchInput from "@/components/ui/UiverseSearchInput";
+import AddToCartButton from "@/features/cart/components/AddToCartButton";
 import {
   ArrowLeft,
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
   ChevronUp,
-  Search,
-  Expand,
   X,
   Minus,
   Plus,
-  ShoppingBag,
-  Check,
   Ruler,
 } from "lucide-react";
-
-const SIZES = ["S", "M", "L", "XL", "XXL"];
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { handleGetProductById } = useProduct();
-  const { handleAddToCart, cartItems } = useCart();
+  const { handleAddToCart } = useCart();
+  const heroImageRef = useRef(null);
 
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,10 +46,7 @@ export default function ProductDetail() {
     setQuantity((prev) => prev + 1);
   };
 
-  const [activeTab, setActiveTab] = useState("details");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -241,82 +230,16 @@ export default function ProductDetail() {
 
   return (
     <div className="min-h-screen w-full bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter select-none">
-      {/* ── Editorial Header ─────────────────────────────────────────── */}
-      <header className="w-full px-4 sm:px-6 lg:px-8 py-3 border-b border-zinc-300/80 bg-[#e7e7e0]/95 backdrop-blur-xs sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider uppercase text-zinc-700 hover:text-zinc-950 transition-colors shrink-0"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">RUNWAY ARCHIVE</span>
-          </Link>
-
-          {/* Center Brand or Uiverse Inline Search */}
-          {isSearchOpen ? (
-            <div className="flex-1 max-w-md mx-2 sm:mx-4 flex items-center gap-2 animate-in fade-in">
-              <UiverseSearchInput
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onSubmit={(e) => {
-                  if (e) e.preventDefault();
-                  if (searchQuery.trim()) {
-                    navigate(
-                      `/?search=${encodeURIComponent(searchQuery.trim())}`,
-                    );
-                  }
-                }}
-                placeholder="search..."
-                autoFocus
-                containerClassName="flex-1"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSearchOpen(false);
-                  setSearchQuery("");
-                }}
-                className="p-1 hover:text-zinc-950 text-zinc-600 transition-colors cursor-pointer shrink-0"
-                title="Close Search"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <Link
-              to="/"
-              className="font-michroma text-base sm:text-lg font-bold tracking-[0.25em] uppercase text-zinc-950 hover:opacity-80 transition-opacity"
-            >
-              SNITCH
-            </Link>
-          )}
-
-          <div className="flex items-center gap-2.5 sm:gap-3 text-xs font-mono shrink-0">
-            {!isSearchOpen && (
-              <button
-                type="button"
-                onClick={() => setIsSearchOpen(true)}
-                className="p-1.5 hover:text-zinc-950 text-zinc-700 transition-colors cursor-pointer"
-                title="Search Collection"
-              >
-                <Search className="w-4 h-4" />
-              </button>
-            )}
-
-            <div
-              className="relative p-1.5 text-zinc-700 hover:text-zinc-950 cursor-pointer transition-colors"
-              title="Shopping Bag"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              {cartItems.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-zinc-950 text-white text-[9px] font-mono font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                  {cartItems.length}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* ── Sub-navigation / Breadcrumb ─────────────────────────── */}
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-1">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 text-xs font-mono font-bold tracking-wider uppercase text-zinc-500 hover:text-zinc-950 transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>RUNWAY ARCHIVE</span>
+        </Link>
+      </div>
 
       {/* ── Main Detail Canvas: Refined Reference Layout (Aligned with Navbar) ── */}
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 flex flex-col justify-center">
@@ -356,6 +279,8 @@ export default function ProductDetail() {
               className="flex-1 max-w-[460px] w-full aspect-[3/4] max-h-[500px] border border-zinc-300 bg-transparent relative select-none group flex items-center justify-center overflow-hidden"
             >
               <img
+                ref={heroImageRef}
+                id="product-hero-img"
                 src={activeImg}
                 alt={product.title}
                 className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
@@ -496,41 +421,15 @@ export default function ProductDetail() {
                   </button>
                 </div>
 
-                {/* Add to cart */}
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      await handleAddToCart({
-                        productId: product._id,
-                        variantId: activeVariant?._id,
-                        quantity,
-                      });
-                      setIsAddedToCart(true);
-                      setTimeout(() => setIsAddedToCart(false), 2500);
-                    } catch (err) {
-                      console.error("Failed to add to cart:", err);
-                    }
-                  }}
-                  className={cn(
-                    "flex-1 h-11 px-4 font-space text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99]",
-                    isAddedToCart
-                      ? "bg-emerald-600 text-white"
-                      : "bg-zinc-950 text-white hover:bg-zinc-800",
-                  )}
-                >
-                  {isAddedToCart ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>Added to cart</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-4 h-4" />
-                      <span>Add to cart</span>
-                    </>
-                  )}
-                </button>
+                {/* Add to cart with Framer Motion flying thumbnail & animated checkmark */}
+                <AddToCartButton
+                  product={product}
+                  variant={activeVariant}
+                  quantity={quantity}
+                  imageUrl={activeImg}
+                  targetCartSelector="#nav-cart-btn"
+                  className="flex-1 h-11 px-4"
+                />
               </div>
 
               {/* Buy it now (Full-width button) */}

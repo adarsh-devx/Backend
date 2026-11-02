@@ -13,6 +13,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldAlert,
+  Eye,
+  ExternalLink,
 } from "lucide-react";
 
 // Components
@@ -560,29 +562,26 @@ export default function SellerProductDetail() {
                       )}
                     </div>
 
-                    {/* Action Buttons: ADD TO CART & BUY NOW (Controlled Width & Bold Typography) */}
+                    {/* Seller Studio Actions (Replaced buyer buttons with seller controls) */}
                     <div className="space-y-2 pt-2.5 max-w-[270px]">
                       <button
                         type="button"
-                        disabled={currentStock <= 0}
-                        className={cn(
-                          "w-full h-11 text-xs font-mono font-extrabold uppercase tracking-widest transition-all cursor-pointer shadow-xs active:scale-[0.99]",
-                          currentStock <= 0
-                            ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
-                            : "bg-black text-white hover:bg-zinc-800",
-                        )}
+                        onClick={() => setIsDrawerOpen(true)}
+                        className="w-full h-11 bg-black text-white hover:bg-zinc-800 text-xs font-mono font-extrabold uppercase tracking-widest transition-all cursor-pointer shadow-xs active:scale-[0.99] flex items-center justify-center gap-2"
                       >
-                        {currentStock <= 0 ? "OUT OF STOCK" : "ADD TO CART"}
+                        <Plus className="w-4 h-4" />
+                        <span>CRAFT VARIANT</span>
                       </button>
 
-                      {currentStock > 0 && (
-                        <button
-                          type="button"
-                          className="w-full h-11 bg-white hover:bg-zinc-50 text-black border border-zinc-300 text-xs font-mono font-extrabold uppercase tracking-widest transition-all cursor-pointer shadow-2xs active:scale-[0.99]"
-                        >
-                          BUY NOW
-                        </button>
-                      )}
+                      <Link
+                        to={`/products/${product._id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-full h-11 bg-white hover:bg-zinc-50 text-black border border-zinc-300 text-xs font-mono font-extrabold uppercase tracking-widest transition-all cursor-pointer shadow-2xs active:scale-[0.99] flex items-center justify-center gap-2"
+                      >
+                        <Eye className="w-4 h-4 text-zinc-600" />
+                        <span>PREVIEW AS BUYER</span>
+                      </Link>
                     </div>
                   </div>
                 ) : (

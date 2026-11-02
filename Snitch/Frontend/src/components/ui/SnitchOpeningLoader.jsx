@@ -25,9 +25,11 @@ export default function SnitchOpeningLoader({ onComplete }) {
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
 
-    // In development, allow user to always see the animation on reload
-    // Only skip if explicitly requested via ?no_loader=true
-    const skipLoader = window.location.search.includes("no_loader=true");
+    // Show animation only once per browser session (first visit or hard reload)
+    // Skip on SPA navigations (back, search, route change)
+    const alreadyShown = sessionStorage.getItem("snitch_loader_shown");
+    const skipLoader =
+      alreadyShown || window.location.search.includes("no_loader=true");
     if (skipLoader) {
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
@@ -35,6 +37,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
       if (onComplete) onComplete();
       return;
     }
+    sessionStorage.setItem("snitch_loader_shown", "true");
 
     const canvas = canvasRef.current;
     const container = containerRef.current;

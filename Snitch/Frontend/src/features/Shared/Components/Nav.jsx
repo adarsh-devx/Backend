@@ -1,33 +1,39 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router";
-import { Heart, User, ShoppingBag, Menu, X } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { ShoppingCart, Menu, X, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import DrawUnderlineLink from "@/components/ui/DrawUnderlineLink";
+import { useCart } from "@/features/cart/hook/useCart";
+import AccountPopover from "@/features/auth/components/AccountPopover";
 
-export default function MainNavbar({
-  wishlistCount = 0,
-  cartCount = 0,
-  onOpenWishlist,
-  onOpenCart,
-}) {
+export default function Nav({ className = "" }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { openCart, cartItems = [] } = useCart();
   const [activeItem, setActiveItem] = useState("MEN");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const lastScrollY = useRef(0);
 
+  // Total cart items count
+  const cartCount =
+    cartItems?.reduce((acc, item) => acc + (item.quantity || 1), 0) || 0;
+
+  // Dedicated pages that have their own minimal/focused layout
+  const hideOnPaths = ["/login", "/register", "/cart"];
+  const isSellerRoute = location.pathname.startsWith("/seller");
+
+  // Scroll behavior: hide on scroll down, reveal on scroll up
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       if (currentScrollY > 120) {
         if (currentScrollY > lastScrollY.current + 8) {
-          // Scrolling Down -> Hide navbar to maximize runway screen space
           setIsNavVisible(false);
         } else if (currentScrollY < lastScrollY.current - 6) {
-          // Scrolling Up -> Smoothly reveal navbar
           setIsNavVisible(true);
         }
       } else {
-        // At the top of page -> always visible
         setIsNavVisible(true);
       }
       lastScrollY.current = currentScrollY;
@@ -36,6 +42,10 @@ export default function MainNavbar({
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  if (hideOnPaths.includes(location.pathname) || isSellerRoute) {
+    return null;
+  }
 
   const navLinks = [
     { label: "MEN", href: "#catalog" },
@@ -48,6 +58,10 @@ export default function MainNavbar({
 
   const handleNavClick = (link) => {
     setActiveItem(link.label);
+    if (location.pathname !== "/") {
+      navigate(`/${link.href}`);
+      return;
+    }
     const targetId = link.href.replace("#", "");
     const el = document.getElementById(targetId);
     if (el) {
@@ -63,10 +77,11 @@ export default function MainNavbar({
           isNavVisible
             ? "translate-y-0 shadow-xs"
             : "-translate-y-full shadow-none",
+          className,
         )}
       >
         <div className="max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12 py-3 sm:py-3.5 flex items-center justify-between gap-4 lg:gap-6">
-          {/* Left: SNITCH Brand Wordmark */}
+          {/* Left: Brand Wordmark */}
           <Link
             to="/"
             className="font-michroma text-xl sm:text-2xl font-bold tracking-[0.25em] uppercase text-zinc-950 hover:opacity-80 transition-opacity shrink-0"
@@ -74,7 +89,7 @@ export default function MainNavbar({
             SNITCH
           </Link>
 
-          {/* Center-Left: Navigation Links with Hand-Drawn Atelier Underline */}
+          {/* Center: Navigation Links with Hand-Drawn Atelier Underline */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8 font-mono text-xs uppercase tracking-wider text-zinc-700">
             {navLinks.map((link) => (
               <DrawUnderlineLink
@@ -87,38 +102,35 @@ export default function MainNavbar({
             ))}
           </nav>
 
-          {/* Right: Search Input + Heart + User + Bag + Hamburger */}
+          {/* Right: Cart + User Profile + Mobile Hamburger */}
           <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-            {/* Wishlist Heart Icon */}
+            {/* Search shortcut */}
             <button
               type="button"
-              onClick={onOpenWishlist}
-              className="relative p-1 hover:text-zinc-950 text-zinc-700 transition-colors cursor-pointer"
-              title="Curated Wishlist"
+              onClick={() => {
+                if (location.pathname !== "/") {
+                  navigate("/#catalog");
+                } else {
+                  const el = document.getElementById("catalog");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="p-1 hover:text-zinc-950 text-zinc-700 transition-colors cursor-pointer"
+              title="Search Catalog"
             >
-              <Heart
-                className={cn(
-                  "w-4 h-4 transition-colors",
-                  wishlistCount > 0
-                    ? "fill-red-500 text-red-500"
-                    : "text-zinc-700 hover:text-zinc-950",
-                )}
-              />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-mono font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
+              <Search className="w-4 h-4" />
             </button>
 
-            {/* Shopping Bag Icon with live count badge */}
+            {/* Cart Icon — opens Slide-over Cart Drawer, targets flying thumbnail animation */}
             <button
+              id="nav-cart-btn"
               type="button"
-              onClick={onOpenCart}
+              onClick={openCart}
               className="relative p-1 hover:text-zinc-950 text-zinc-700 transition-colors cursor-pointer"
-              title="Shopping Bag"
+              title="Cart"
+              aria-label={`Shopping cart, ${cartCount} items`}
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShoppingCart className="w-4 h-4" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-zinc-950 text-white text-[9px] font-mono font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                   {cartCount}
@@ -126,14 +138,8 @@ export default function MainNavbar({
               )}
             </button>
 
-            {/* User / Account Icon (At the last) */}
-            <Link
-              to="/login"
-              className="p-1 hover:text-zinc-950 text-zinc-700 transition-colors"
-              title="Account"
-            >
-              <User className="w-4 h-4" />
-            </Link>
+            {/* User Profile / Account Popover (In-place Edit with Profile & Address Accordions) */}
+            <AccountPopover />
 
             {/* Mobile Hamburger Menu Toggle */}
             <button

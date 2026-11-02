@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useProduct } from "../hook/use.product";
+import { useCart } from "@/features/cart/hook/useCart";
 import { X, ShoppingBag, Heart } from "lucide-react";
 
 // 15 Sections strictly ordered matching reference
-import MainNavbar from "../components/home/MainNavbar";
 import HeroSection from "../components/home/HeroSection";
 import BrandTrustStrip from "../components/home/BrandTrustStrip";
 import ShopByCategory from "../components/home/ShopByCategory";
@@ -23,22 +23,13 @@ import SnitchOpeningLoader from "@/components/ui/SnitchOpeningLoader";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { openCart } = useCart();
   const { handleGetAllProducts } = useProduct();
   const products = useSelector((state) => state.product.products) || [];
 
   const [wishlistedIds, setWishlistedIds] = useState([]);
   const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
-  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
-  const [cartItems] = useState([
-    {
-      id: "6adc7fa06ef2657b685ff2b8",
-      title: "BRANDED BLACK JACKET",
-      price: 1111,
-      image: "/refrenceCatalogItems/windbreaker_4x3.webp",
-      quantity: 1,
-      size: "M",
-    },
-  ]);
+  const cartItems = useSelector((state) => state.cart.items);
 
   useEffect(() => {
     handleGetAllProducts().catch((err) => {
@@ -75,14 +66,6 @@ export default function Home() {
     <div className="min-h-screen w-full bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter">
       {/* ── EXACT MEERMOHSIN WEBGL PERLIN SHADER PRELOADER ── */}
       <SnitchOpeningLoader />
-
-      {/* ── SECTION 02 — MAIN NAVIGATION ───────────────────────────────── */}
-      <MainNavbar
-        wishlistCount={wishlistedIds.length}
-        cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
-        onOpenWishlist={() => setIsWishlistDrawerOpen(true)}
-        onOpenCart={() => setIsCartDrawerOpen(true)}
-      />
 
       {/* ── SECTION 03 — HERO / RUNWAY ARCHIVE ─────────────────────────── */}
       <HeroSection onExplore={handleExplore} onWatchFilm={handleWatchFilm} />
@@ -217,80 +200,6 @@ export default function Home() {
       )}
 
       {/* ── Shopping Bag Slide-Over Drawer ───────────────────────────── */}
-      {isCartDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs animate-in fade-in select-none">
-          <div
-            className="fixed inset-0"
-            onClick={() => setIsCartDrawerOpen(false)}
-          />
-          <aside className="relative w-full max-w-sm bg-[#e7e7e0] border-l border-zinc-300 h-full p-6 flex flex-col shadow-2xl z-10 animate-in slide-in-from-right duration-200">
-            <div className="flex items-center justify-between border-b border-zinc-300 pb-4">
-              <div>
-                <span className="font-michroma text-sm font-bold uppercase tracking-wider text-zinc-950">
-                  SHOPPING BAG
-                </span>
-                <p className="font-mono text-[10px] text-zinc-500 uppercase mt-0.5">
-                  1 PIECE RESERVED
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsCartDrawerOpen(false)}
-                className="p-1.5 hover:bg-zinc-300/60 rounded-full transition-colors cursor-pointer text-zinc-700"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="flex-1 py-4 overflow-y-auto space-y-3">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="border border-zinc-300 bg-white/70 p-3 flex gap-3 items-center shadow-2xs"
-                >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-14 aspect-[3/4] object-contain bg-zinc-200 border border-zinc-200"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-mono text-xs font-bold uppercase truncate text-zinc-950">
-                      {item.title}
-                    </h4>
-                    <p className="font-space text-xs font-bold text-zinc-900 mt-1">
-                      ₹{item.price.toLocaleString()}
-                    </p>
-                    <span className="font-mono text-[9px] text-zinc-500 uppercase">
-                      SIZE: {item.size} // QTY: {item.quantity}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="border-t border-zinc-300 pt-4 space-y-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsCartDrawerOpen(false);
-                  navigate(`/products/${cartItems[0]?.id}`);
-                }}
-                className="w-full h-11 bg-zinc-950 hover:bg-zinc-800 text-white font-space text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>CHECKOUT // ₹1,111</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsCartDrawerOpen(false)}
-                className="w-full h-9 border border-zinc-300 bg-white/70 hover:bg-white text-zinc-800 font-mono text-[11px] font-bold uppercase tracking-wider transition-colors cursor-pointer"
-              >
-                CONTINUE BROWSING
-              </button>
-            </div>
-          </aside>
-        </div>
-      )}
     </div>
   );
 }
