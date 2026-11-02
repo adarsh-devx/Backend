@@ -1,7 +1,16 @@
 import express from "express";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
-import { validateAddToCart } from "../validator/cart.validator.js";
-import { addToCart, getCart } from "../controllers/cart.controller.js";
+import {
+  validateAddToCart,
+  validateUpdateCartItemQuantity,
+  validateRemoveCartItem,
+} from "../validator/cart.validator.js";
+import {
+  addToCart,
+  getCart,
+  updateCartItemQuantity,
+  removeCartItem,
+} from "../controllers/cart.controller.js";
 
 const router = express.Router();
 
@@ -12,13 +21,38 @@ const router = express.Router();
 // @argument variantId - ID of the variant to add (optional)
 // @argument quantity - Quantity of the product to add (optional, default: 1 )
 
-router.post("/add/:productId/:variantId", authenticateUser, validateAddToCart, addToCart);
+router.post(
+  "/add/:productId/:variantId",
+  authenticateUser,
+  validateAddToCart,
+  addToCart,
+);
 router.post("/add/:productId", authenticateUser, validateAddToCart, addToCart);
 
 // @route GET /api/cart
 // @desc Get user's cart
 // @access Private
+router.get("/", authenticateUser, getCart);
 
-router.get("/", authenticateUser , getCart);
+// @route PATCH /api/cart/item/:itemId
+// @desc Update item quantity in cart
+// @access Private
+// @argument quantity - New quantity of the item
+router.patch(
+  "/item/:itemId",
+  authenticateUser,
+  validateUpdateCartItemQuantity,
+  updateCartItemQuantity,
+);
+
+// @route DELETE /api/cart/item/:itemId
+// @desc Remove item from cart
+// @access Private
+router.delete(
+  "/item/:itemId",
+  authenticateUser,
+  validateRemoveCartItem,
+  removeCartItem,
+);
 
 export default router;

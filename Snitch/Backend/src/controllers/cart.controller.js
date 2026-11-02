@@ -154,3 +154,86 @@ export const getCart = async (req, res) => {
     });
   }
 };
+
+export const updateCartItemQuantity = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { quantity } = req.body;
+
+    let cart = await cartModel.findOne({ user: req.user._id });
+    if (!cart) {
+      return res
+        .status(404)
+        .json({ message: "Cart not found", success: false });
+    }
+
+    const item = cart.items.id(itemId);
+    if (!item) {
+      return res
+        .status(404)
+        .json({ message: "Item not found in cart", success: false });
+    }
+
+    if (quantity < 1) {
+      return res.status(400).json({
+        message: "Quantity must be at least 1",
+        success: false,
+      });
+    }
+
+    const stock = await stockOfVariant(item.product, item.variant);
+
+    if (quantity > stock) {
+      return res.status(400).json({
+        message: `Only ${stock} items left in stock`,
+        success: false,
+      });
+    }
+
+    item.quantity = quantity;
+
+    await cart.save();
+    await cart.populate("items.product");
+
+    return res.status(200).json({
+      message: "Cart updated successfully",
+      success: true,
+      cart,
+    });
+  } catch (error) {
+    console.error("updateCartItemQuantity error:", error);
+    return res.status(500).json({
+      message: error.message || "Internal server error",
+      success: false,
+    });
+  }
+};
+
+export const removeCartItem = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+
+    let cart = await cartModel.findOne({ user: req.user._id });
+    if (!cart) {
+      return res
+        .status(404)
+        .json({ message: "Cart not found", success: false });
+    }
+
+    cart.items.pull(itemId);
+    await cart.save();
+    await cart.populate("items.product");
+
+    return res.status(200).json({
+      message: "Item removed from cart",
+      success: true,
+      cart,
+    });
+  } catch (error) {
+    console.error("removeCartItem error:", error);
+    return res.status(500).json({
+      message: error.message || "Internal server error",
+      success: false,
+    });
+  }
+};
