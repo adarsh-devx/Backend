@@ -16,7 +16,17 @@ export const addItem = async ({ productId, variantId, quantity = 1 }) => {
   return response.data;
 };
 
-export const fetchCart = async () => {
-  const response = await cartAPIInstance.get("/");
+export const getCart = async () => {
+  const response = await cartAPIInstance.get("/", { withCredentials: true });
+  return response.data;
+};
+
+export const updateQuantity = async ({ itemId, quantity }) => {
+  const response = await cartAPIInstance.patch(`/item/${itemId}`, { quantity });
+  return response.data;
+};
+
+export const removeItem = async (itemId) => {
+  const response = await cartAPIInstance.delete(`/item/${itemId}`);
   return response.data;
 };
