@@ -25,19 +25,14 @@ export default function SnitchOpeningLoader({ onComplete }) {
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
 
-    // Show animation only once per browser session (first visit or hard reload)
-    // Skip on SPA navigations (back, search, route change)
-    const alreadyShown = sessionStorage.getItem("snitch_loader_shown");
-    const skipLoader =
-      alreadyShown || window.location.search.includes("no_loader=true");
-    if (skipLoader) {
+    // Allow manual bypass via URL param if ever needed: ?no_loader=true
+    if (window.location.search.includes("no_loader=true")) {
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
       setIsRendered(false);
       if (onComplete) onComplete();
       return;
     }
-    sessionStorage.setItem("snitch_loader_shown", "true");
 
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -315,7 +310,6 @@ export default function SnitchOpeningLoader({ onComplete }) {
         duration: 3.0,
         ease: "power2.inOut",
         onComplete() {
-          sessionStorage.setItem("snitch_loader_played", "true");
           cancelAnimationFrame(animId);
           window.removeEventListener("resize", resize);
           document.body.style.overflow = prevBodyOverflow;
@@ -326,34 +320,36 @@ export default function SnitchOpeningLoader({ onComplete }) {
       });
     }
 
-    // Number counting (000 to 100 over 3.2s)
-    gsap.to(counterObj, {
-      value: 100,
-      duration: 3.2,
-      ease: "power2.inOut",
-      onUpdate() {
-        if (countEl) {
-          countEl.textContent = Math.floor(counterObj.value)
-            .toString()
-            .padStart(3, "0");
-        }
-      },
-      onComplete() {
-        // Fade out counter numbers smoothly over 1.45s as in meermohsin.me
-        gsap.to(countEl, {
-          opacity: 0,
-          duration: 1.45,
-          ease: "power3.out",
-        });
+    const ctx = gsap.context(() => {
+      // Number counting (000 to 100 over 3.2s)
+      gsap.to(counterObj, {
+        value: 100,
+        duration: 3.2,
+        ease: "power2.inOut",
+        onUpdate() {
+          if (countEl) {
+            countEl.textContent = Math.floor(counterObj.value)
+              .toString()
+              .padStart(3, "0");
+          }
+        },
+        onComplete() {
+          // Fade out counter numbers smoothly over 1.45s as in meermohsin.me
+          gsap.to(countEl, {
+            opacity: 0,
+            duration: 1.45,
+            ease: "power3.out",
+          });
 
-        // Dissolve completes and container fades out
-        gsap.to(container, {
-          opacity: 0,
-          duration: 0.5,
-          delay: 2.5,
-          ease: "power3.out",
-        });
-      },
+          // Dissolve completes and container fades out
+          gsap.to(container, {
+            opacity: 0,
+            duration: 0.5,
+            delay: 2.5,
+            ease: "power3.out",
+          });
+        },
+      });
     });
 
     // Exactly like meermohsin.me: dissolve triggers at 2.8s as counter reaches 100
@@ -362,6 +358,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
     }, 2800);
 
     return () => {
+      ctx.revert();
       clearTimeout(dissolveTimer);
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
