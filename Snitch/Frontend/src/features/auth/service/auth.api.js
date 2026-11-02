@@ -78,3 +78,23 @@ export async function getMe() {
     throw new Error(message);
   }
 }
+
+export async function logout() {
+  try {
+    const response = await authApiInstance.post("/logout");
+    return response.data;
+  } catch (error) {
+    console.error("Logout API error:", error);
+    return { success: true };
+  }
+}
+
+export async function updateProfileApi(profileData) {
+  const response = await authApiInstance.put("/profile", profileData);
+  return response.data;
+}
+
+export async function updateAddressesApi(addresses) {
+  const response = await authApiInstance.put("/addresses", { addresses });
+  return response.data;
+}

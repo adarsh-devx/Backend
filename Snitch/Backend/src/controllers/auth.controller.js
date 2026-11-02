@@ -142,6 +142,74 @@ export const getMe = async (req, res) => {
       contact: user.contact,
       fullName: user.fullName,
       role: user.role,
+      addresses: user.addresses || [],
     },
   });
+};
+
+export const logoutUser = async (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { fullName, contact, password } = req.body;
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (fullName) user.fullName = fullName;
+    if (contact !== undefined) user.contact = contact;
+    if (password) user.password = password; // will be hashed automatically by pre-save hook
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        _id: user._id,
+        email: user.email,
+        contact: user.contact,
+        fullName: user.fullName,
+        role: user.role,
+        addresses: user.addresses || [],
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message || "Failed to update profile" });
+  }
+};
+
+export const updateAddresses = async (req, res) => {
+  try {
+    const { addresses } = req.body;
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.addresses = addresses || [];
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Addresses updated successfully",
+      user: {
+        _id: user._id,
+        email: user.email,
+        contact: user.contact,
+        fullName: user.fullName,
+        role: user.role,
+        addresses: user.addresses || [],
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message || "Failed to update addresses" });
+  }
 };

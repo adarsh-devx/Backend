@@ -1,6 +1,13 @@
 import { setError, setUser, setLoading } from "../state/auth.slice.js";
-import { register, login, getMe } from "../service/auth.api.js";
-import { useDispatch } from "react-redux";
+import {
+  register,
+  login,
+  getMe,
+  logout,
+  updateProfileApi,
+  updateAddressesApi,
+} from "../service/auth.api.js";
+import { useDispatch, useSelector } from "react-redux";
 
 /**
  * Custom React Hook: useAuth
@@ -9,6 +16,8 @@ import { useDispatch } from "react-redux";
  */
 export const useAuth = () => {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth?.user || null);
+  const isLoading = useSelector((state) => state.auth?.loading || false);
 
   /**
    * Handles user registration:
@@ -69,5 +78,40 @@ export const useAuth = () => {
     }
   }
 
-  return { handleRegister, handleLogin, handleGetMe };
+  async function handleLogout() {
+    try {
+      await logout();
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      dispatch(setUser(null));
+    }
+  }
+
+  async function handleUpdateProfile(profileData) {
+    const data = await updateProfileApi(profileData);
+    if (data.user) {
+      dispatch(setUser(data.user));
+    }
+    return data;
+  }
+
+  async function handleUpdateAddresses(addresses) {
+    const data = await updateAddressesApi(addresses);
+    if (data.user) {
+      dispatch(setUser(data.user));
+    }
+    return data;
+  }
+
+  return {
+    user,
+    isLoading,
+    handleRegister,
+    handleLogin,
+    handleGetMe,
+    handleLogout,
+    handleUpdateProfile,
+    handleUpdateAddresses,
+  };
 };

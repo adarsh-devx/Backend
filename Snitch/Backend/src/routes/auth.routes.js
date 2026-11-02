@@ -8,6 +8,9 @@ import {
   loginUser,
   googleCallback,
   getMe,
+  logoutUser,
+  updateProfile,
+  updateAddresses,
 } from "../controllers/auth.controller.js";
 import passport from "passport";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
@@ -42,5 +45,17 @@ router.get(
 // @desc    Get current logged in user
 // @access  Private
 router.get("/me", authenticateUser, getMe);
+
+// @route   POST /api/auth/logout
+// @desc    Logout user and clear JWT cookie
+router.post("/logout", logoutUser);
+
+// @route   PUT /api/auth/profile
+// @desc    Update user profile details (fullName, contact, password)
+router.put("/profile", authenticateUser, updateProfile);
+
+// @route   PUT /api/auth/addresses
+// @desc    Update user saved delivery addresses
+router.put("/addresses", authenticateUser, updateAddresses);
 
 export default router;
