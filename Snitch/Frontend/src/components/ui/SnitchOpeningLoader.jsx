@@ -28,16 +28,8 @@ export default function SnitchOpeningLoader({ onComplete }) {
   const [isRendered, setIsRendered] = useState(true);
 
   useEffect(() => {
-    // Lock scroll on body and documentElement to eliminate any right-side scrollbar gray/white border
-    const prevBodyOverflow = document.body.style.overflow;
-    const prevHtmlOverflow = document.documentElement.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-
     // Allow manual bypass via URL param if ever needed: ?no_loader=true
     if (window.location.search.includes("no_loader=true")) {
-      document.body.style.overflow = prevBodyOverflow;
-      document.documentElement.style.overflow = prevHtmlOverflow;
       hasPlayedInWindowSession = true;
       setIsRendered(false);
       if (onComplete) onComplete();
@@ -63,8 +55,6 @@ export default function SnitchOpeningLoader({ onComplete }) {
       });
 
     if (!gl) {
-      document.body.style.overflow = prevBodyOverflow;
-      document.documentElement.style.overflow = prevHtmlOverflow;
       setIsRendered(false);
       return;
     }
@@ -312,6 +302,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
       // Allow background transparency on container as dissolve starts
       if (container) {
         container.style.backgroundColor = "transparent";
+        container.style.pointerEvents = "none";
       }
 
       // Animate WebGL Perlin Noise Dissolve upward (3 seconds with power2.inOut)
@@ -323,8 +314,6 @@ export default function SnitchOpeningLoader({ onComplete }) {
           hasPlayedInWindowSession = true;
           cancelAnimationFrame(animId);
           window.removeEventListener("resize", resize);
-          document.body.style.overflow = prevBodyOverflow;
-          document.documentElement.style.overflow = prevHtmlOverflow;
           setIsRendered(false);
           if (onComplete) onComplete();
         },
@@ -373,8 +362,6 @@ export default function SnitchOpeningLoader({ onComplete }) {
       clearTimeout(dissolveTimer);
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
-      document.body.style.overflow = prevBodyOverflow;
-      document.documentElement.style.overflow = prevHtmlOverflow;
     };
   }, [onComplete]);
 
