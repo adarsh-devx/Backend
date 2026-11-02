@@ -11,7 +11,16 @@ import gsap from "gsap";
  * 5. Snitch Atelier palette: Obsidian Noir (#0a0a0c) & Bone Ivory (#F3F1E9)
  * 6. Zero clutter (no soundwaves, no extra text)
  */
+// In-memory session flag: survives SPA route transitions and Back button clicks,
+// but automatically resets on full Page Refresh (F5 / reload), new tab, or new browser.
+let hasPlayedInWindowSession = false;
+
 export default function SnitchOpeningLoader({ onComplete }) {
+  // If already played in this window session (e.g. user clicked browser Back button), skip immediately
+  if (hasPlayedInWindowSession) {
+    return null;
+  }
+
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const countRef = useRef(null);
@@ -29,6 +38,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
     if (window.location.search.includes("no_loader=true")) {
       document.body.style.overflow = prevBodyOverflow;
       document.documentElement.style.overflow = prevHtmlOverflow;
+      hasPlayedInWindowSession = true;
       setIsRendered(false);
       if (onComplete) onComplete();
       return;
@@ -310,6 +320,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
         duration: 3.0,
         ease: "power2.inOut",
         onComplete() {
+          hasPlayedInWindowSession = true;
           cancelAnimationFrame(animId);
           window.removeEventListener("resize", resize);
           document.body.style.overflow = prevBodyOverflow;
