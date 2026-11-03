@@ -139,12 +139,71 @@ export const getCart = async (req, res) => {
 
     if (!cart) {
       cart = await cartModel.create({ user: req.user._id, items: [] });
+      return res.status(200).json({
+        message: "Cart fetched successfully",
+        success: true,
+        cart,
+        priceAlerts: [],
+      });
+    }
+
+    const priceAlerts = [];
+    let hasAnyPriceChanged = false;
+
+    for (const item of cart.items) {
+      const product = item.product;
+      if (!product) continue;
+
+      const variant = item.variant
+        ? product.variants?.find((v) => v._id.toString() === item.variant.toString())
+        : null;
+
+      const currentPriceObj =
+        variant?.price?.amount && Number(variant.price.amount) > 0
+          ? variant.price
+          : product.price;
+
+      if (!currentPriceObj || typeof currentPriceObj.amount !== "number") continue;
+
+      const oldAmount = Number(item.price?.amount || 0);
+      const currentAmount = Number(currentPriceObj.amount);
+
+      if (oldAmount > 0 && oldAmount !== currentAmount) {
+        hasAnyPriceChanged = true;
+        const diff = currentAmount - oldAmount;
+
+        priceAlerts.push({
+          type: diff > 0 ? "PRICE_INCREASED" : "PRICE_DECREASED",
+          productId: product._id,
+          variantId: item.variant || null,
+          productTitle: product.title,
+          currency: currentPriceObj.currency || "INR",
+          oldPrice: oldAmount,
+          newPrice: currentAmount,
+          difference: Math.abs(diff),
+          message:
+            diff > 0
+              ? `The price of "${product.title}" increased from ₹${oldAmount} to ₹${currentAmount}.`
+              : `The price of "${product.title}" dropped from ₹${oldAmount} to ₹${currentAmount}.`,
+        });
+
+        // Update cart item price to the new live price
+        item.price.amount = currentAmount;
+        if (currentPriceObj.currency) {
+          item.price.currency = currentPriceObj.currency;
+        }
+      }
+    }
+
+    if (hasAnyPriceChanged) {
+      await cart.save();
     }
 
     return res.status(200).json({
       message: "Cart fetched successfully",
       success: true,
       cart,
+      priceAlerts,
     });
   } catch (error) {
     console.error("getCart error:", error);
