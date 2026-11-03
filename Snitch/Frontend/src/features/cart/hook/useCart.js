@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addItem as addItemToCart,
   setItems,
+  setPriceAlerts,
+  dismissAlert,
   updateItemQuantity as updateQuantityAction,
   removeItem as removeItemAction,
   openCart as openCartAction,
@@ -18,6 +20,7 @@ import {
 export const useCart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart?.items || []);
+  const priceAlerts = useSelector((state) => state.cart?.priceAlerts || []);
   const isCartOpen = useSelector((state) => state.cart?.isOpen || false);
 
   const openCart = () => dispatch(openCartAction());
@@ -38,6 +41,9 @@ export const useCart = () => {
     const data = await getCart();
     if (data.cart?.items) {
       dispatch(setItems(data.cart.items));
+    }
+    if (data.priceAlerts && Array.isArray(data.priceAlerts)) {
+      dispatch(setPriceAlerts(data.priceAlerts));
     }
     return data;
   }
@@ -76,8 +82,13 @@ export const useCart = () => {
     }
   }
 
+  function handleDismissAlert(index) {
+    dispatch(dismissAlert(index));
+  }
+
   return {
     cartItems,
+    priceAlerts,
     isCartOpen,
     openCart,
     closeCart,
@@ -86,5 +97,6 @@ export const useCart = () => {
     handleGetCart,
     handleUpdateQuantity,
     handleRemoveItem,
+    handleDismissAlert,
   };
 };

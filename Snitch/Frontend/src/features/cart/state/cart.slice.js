@@ -4,11 +4,23 @@ export const cartSlice = createSlice({
   name: "cart",
   initialState: {
     items: [],
+    priceAlerts: [],
     isOpen: false,
   },
   reducers: {
     setItems: (state, action) => {
       state.items = action.payload;
+    },
+    setPriceAlerts: (state, action) => {
+      state.priceAlerts = action.payload || [];
+    },
+    dismissAlert: (state, action) => {
+      state.priceAlerts = state.priceAlerts.filter(
+        (_, idx) => idx !== action.payload
+      );
+    },
+    clearAlerts: (state) => {
+      state.priceAlerts = [];
     },
     addItem: (state, action) => {
       state.items.push(action.payload);
@@ -42,6 +54,9 @@ export const cartSlice = createSlice({
 
 export const {
   setItems,
+  setPriceAlerts,
+  dismissAlert,
+  clearAlerts,
   addItem,
   updateItemQuantity,
   removeItem,
@@ -50,4 +65,3 @@ export const {
   toggleCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;
-
