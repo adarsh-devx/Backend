@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "../hook/useCart";
+import PriceAlertBanner from "./PriceAlertBanner";
 
 const AnimatedTrash = ({ size = 16, strokeWidth = 1.8, className = "" }) => (
   <svg
@@ -34,6 +35,8 @@ export default function CartDrawer() {
     handleGetCart,
     handleUpdateQuantity,
     handleRemoveItem,
+    priceAlerts,
+    handleDismissAlert,
   } = useCart();
 
   const [discountOpen, setDiscountOpen] = useState(false);
@@ -152,14 +155,17 @@ export default function CartDrawer() {
         </div>
 
         {/* ── Cart Items List (Scrollable Area) ── */}
-        <div className="flex-1 overflow-y-auto px-6 py-2 divide-y divide-zinc-100">
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <PriceAlertBanner alerts={priceAlerts} onDismiss={handleDismissAlert} />
+
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-20 gap-3 text-zinc-400">
               <span className="text-4xl">🛒</span>
               <p className="text-sm font-space">Your cart is empty</p>
             </div>
           ) : (
-            cartItems.map((item, index) => {
+            <div className="divide-y divide-zinc-100">
+              {cartItems.map((item, index) => {
               const price = Number(
                 item.price?.amount ?? item.product?.price?.amount ?? 0,
               );
@@ -284,9 +290,10 @@ export default function CartDrawer() {
                   </div>
                 </div>
               );
-            })
-          )}
-        </div>
+            })}
+          </div>
+        )}
+      </div>
 
         {/* ── Bottom Section (Checkout & Total) ── */}
         <div className="border-t border-zinc-200 px-6 pt-4 pb-6 bg-white shrink-0">

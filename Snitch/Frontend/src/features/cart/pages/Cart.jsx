@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { Minus, Plus, X, ChevronRight } from "lucide-react";
 import { useCart } from "../hook/useCart";
+import PriceAlertBanner from "../components/PriceAlertBanner";
 
 const AnimatedTrash = ({ size = 16, strokeWidth = 1.8, className = "" }) => (
   <svg
@@ -30,7 +31,13 @@ const AnimatedTrash = ({ size = 16, strokeWidth = 1.8, className = "" }) => (
 const Cart = () => {
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart?.items || []);
-  const { handleGetCart, handleUpdateQuantity, handleRemoveItem } = useCart();
+  const {
+    handleGetCart,
+    handleUpdateQuantity,
+    handleRemoveItem,
+    priceAlerts,
+    handleDismissAlert,
+  } = useCart();
   const [discountOpen, setDiscountOpen] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
@@ -95,14 +102,17 @@ const Cart = () => {
       </div>
 
       {/* ── Items ── */}
-      <div className="flex-1 px-5 py-4 divide-y divide-zinc-100">
+      <div className="flex-1 px-5 py-4">
+        <PriceAlertBanner alerts={priceAlerts} onDismiss={handleDismissAlert} />
+
         {cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3 text-zinc-400">
             <span className="text-4xl">🛒</span>
             <p className="text-sm font-space">Your cart is empty</p>
           </div>
         ) : (
-          cartItems.map((item, index) => {
+          <div className="divide-y divide-zinc-100">
+            {cartItems.map((item, index) => {
             const price = Number(
               item.price?.amount ?? item.product?.price?.amount ?? 0
             );
@@ -206,9 +216,10 @@ const Cart = () => {
                 </div>
               </div>
             );
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
+    </div>
 
       {/* ── Bottom section ── */}
       <div className="border-t border-zinc-200 px-5 pt-4 pb-6">
