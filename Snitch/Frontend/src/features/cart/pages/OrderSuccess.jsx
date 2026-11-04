@@ -16,9 +16,7 @@ export default function OrderSuccess() {
   const [copied, setCopied] = useState(false);
 
   const activeOrderId =
-    orderData?.Razorpay?.orderId ||
-    orderIdFromQuery ||
-    "NV-" + Math.random().toString(36).substring(2, 9).toUpperCase();
+    orderData?.Razorpay?.orderId || orderIdFromQuery || "NV-ORDER-CONFIRMED";
 
   useEffect(() => {
     if (!orderData && orderIdFromQuery) {
