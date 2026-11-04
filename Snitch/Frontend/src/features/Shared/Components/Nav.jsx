@@ -20,7 +20,7 @@ export default function Nav({ className = "" }) {
     cartItems?.reduce((acc, item) => acc + (item.quantity || 1), 0) || 0;
 
   // Dedicated pages that have their own minimal/focused layout
-  const hideOnPaths = ["/login", "/register", "/cart"];
+  const hideOnPaths = ["/login", "/register", "/cart", "/order-success"];
   const isSellerRoute = location.pathname.startsWith("/seller");
 
   // Scroll behavior: hide on scroll down, reveal on scroll up
