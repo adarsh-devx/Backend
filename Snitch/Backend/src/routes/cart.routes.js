@@ -10,6 +10,9 @@ import {
   getCart,
   updateCartItemQuantity,
   removeCartItem,
+  createOrderController,
+  verifyOrderController
+  
 } from "../controllers/cart.controller.js";
 
 const router = express.Router();
@@ -54,5 +57,12 @@ router.delete(
   validateRemoveCartItem,
   removeCartItem,
 );
+
+
+// @route POST /api/cart/payment/create/order
+router.post("/payment/create/order" , authenticateUser, createOrderController)
+
+router.post("/payment/verify/order" , authenticateUser, verifyOrderController)
+
 
 export default router;
