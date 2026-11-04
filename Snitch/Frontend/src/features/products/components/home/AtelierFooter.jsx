@@ -44,7 +44,7 @@ export default function AtelierFooter() {
               to="/"
               className="font-michroma text-xl font-bold tracking-[0.25em] uppercase text-white hover:opacity-80 transition-opacity block"
             >
-              SNITCH
+              NOIRVAYN
             </Link>
           </div>
 
@@ -130,7 +130,7 @@ export default function AtelierFooter() {
         {/* Bottom Bar: Currency, Copyright, Legal */}
         <div className="border-t border-zinc-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest text-center sm:text-left">
           <div>INDIA (INR) | ENGLISH</div>
-          <div>&copy; 2026 SNITCH. ALL RIGHTS RESERVED.</div>
+          <div>&copy; 2026 NOIRVAYN. ALL RIGHTS RESERVED.</div>
           <div className="flex items-center gap-4">
             <a href="#terms" className="hover:text-white transition-colors">
               TERMS

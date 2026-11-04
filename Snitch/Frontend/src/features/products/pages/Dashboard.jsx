@@ -144,10 +144,10 @@ export default function Dashboard() {
     <div className="min-h-screen w-full bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter select-none">
       {/* ── 1. Top Minimal Navbar (Full Screen) ─────────────────────────── */}
       <header className="w-full px-6 sm:px-10 lg:px-16 pt-6 pb-4 flex items-center justify-between gap-6 z-20 border-b border-zinc-300/70 bg-[#e7e7e0]/95 backdrop-blur-xs sticky top-0">
-        {/* Brand Logo: SNITCH */}
+        {/* Brand Logo: NOIRVAYN */}
         <Link to="/" className="flex items-center gap-2.5 group">
           <span className="font-michroma text-xl sm:text-2xl font-bold tracking-[0.25em] uppercase text-zinc-950 group-hover:opacity-80 transition-opacity">
-            SNITCH
+            NOIRVAYN
           </span>
           <span className="text-zinc-500 font-mono text-xs hidden sm:inline">
             /
@@ -206,7 +206,7 @@ export default function Dashboard() {
             </h2>
             <p className="text-xs sm:text-sm font-inter text-zinc-600 leading-relaxed">
               Your atelier catalog has no active products. Create your first
-              apparel listing to launch your collection on the Snitch runway.
+              apparel listing to launch your collection on the Noirvayn runway.
             </p>
           </div>
           <Link
@@ -592,7 +592,7 @@ export default function Dashboard() {
         <div className="w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-5 flex items-center justify-between text-[11px] font-mono text-zinc-600">
           <div className="flex items-center gap-3">
             <span className="uppercase tracking-wider font-semibold text-zinc-900">
-              SNITCH ATELIER // SELLER WORKBENCH
+              NOIRVAYN ATELIER // SELLER WORKBENCH
             </span>
             <span className="text-zinc-500">|</span>
             <span className="hidden sm:inline">LIVE STOREFRONT ACTIVE</span>

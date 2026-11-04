@@ -281,7 +281,7 @@ export default function CreateProduct() {
                 to="/"
                 className="font-michroma text-base sm:text-lg font-bold tracking-[0.25em] uppercase text-zinc-950"
               >
-                SNITCH
+                NOIRVAYN
               </Link>
               <span className="text-zinc-500 font-mono text-xs">/</span>
               <span className="font-mono text-[10px] font-bold tracking-widest uppercase text-zinc-600">
@@ -738,7 +738,7 @@ export default function CreateProduct() {
               {/* Product Info */}
               <div className="p-3 space-y-1 bg-[#f4f4f0] border-t border-zinc-300/70">
                 <span className="text-[9px] font-mono font-bold tracking-widest text-zinc-500 uppercase block">
-                  SNITCH ATELIER
+                  NOIRVAYN ATELIER
                 </span>
                 <p className="font-space text-xs font-semibold text-zinc-950 uppercase truncate">
                   {formData.title.trim() || "Untitled Product"}

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 
 /**
  * AtelierCursor
- * Pure luxury custom cursor for Snitch Atelier:
+ * Pure luxury custom cursor for Noirvayn Atelier:
  * 1. Precision obsidian hairline pointer arrow
  * 2. Zero-latency mouse tracking with translate3d
  * 3. Fluid animation / smoke trail removed as requested

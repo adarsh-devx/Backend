@@ -367,7 +367,7 @@ export default function HeroSection({
             <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
               <div>
                 <span className="font-michroma text-xs font-bold uppercase tracking-wider text-zinc-200">
-                  SNITCH ATELIER // FW-26 RUNWAY LOOKBOOK FILM
+                  NOIRVAYN ATELIER // FW-26 RUNWAY LOOKBOOK FILM
                 </span>
                 <p className="font-mono text-[10px] text-zinc-400 uppercase mt-0.5">
                   Autumn Archive / Direction 01
@@ -397,7 +397,7 @@ export default function HeroSection({
                 </p>
                 <p className="font-inter text-xs text-zinc-400 max-w-md">
                   Captured during the FW/26 Paris runway showcase. Curated
-                  exclusively for Snitch collectors.
+                  exclusively for Noirvayn collectors.
                 </p>
               </div>
             </div>

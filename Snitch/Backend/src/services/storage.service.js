@@ -19,7 +19,7 @@ const client = new ImageKit({
 export async function uploadToImageKit(
   buffer,
   originalname,
-  folder = "/snitch/products",
+  folder = "/noirvayn/products",
 ) {
   try {
     const fileName = `${Date.now()}-${originalname.replace(/\s+/g, "-")}`;

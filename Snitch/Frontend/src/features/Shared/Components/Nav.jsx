@@ -86,7 +86,7 @@ export default function Nav({ className = "" }) {
             to="/"
             className="font-michroma text-xl sm:text-2xl font-bold tracking-[0.25em] uppercase text-zinc-950 hover:opacity-80 transition-opacity shrink-0"
           >
-            SNITCH
+            NOIRVAYN
           </Link>
 
           {/* Center: Navigation Links with Hand-Drawn Atelier Underline */}

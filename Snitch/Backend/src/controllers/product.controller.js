@@ -16,7 +16,7 @@ export async function createProduct(req, res) {
     let images = [];
     if (req.files && req.files.length > 0) {
       const uploadPromises = req.files.map((file) =>
-        uploadToImageKit(file.buffer, file.originalname, "/snitch/products"),
+        uploadToImageKit(file.buffer, file.originalname, "/noirvayn/products"),
       );
       const uploadedResults = await Promise.all(uploadPromises);
       images = uploadedResults.map((result) => ({ url: result.url }));
@@ -219,7 +219,7 @@ export async function addVariantToProduct(req, res) {
     let images = [];
     if (req.files && req.files.length > 0) {
       const uploadPromises = req.files.map((file) =>
-        uploadToImageKit(file.buffer, file.originalname, "/snitch/variants"),
+        uploadToImageKit(file.buffer, file.originalname, "/noirvayn/variants"),
       );
       const uploadedResults = await Promise.all(uploadPromises);
       images = uploadedResults.map((result) => ({ url: result.url }));

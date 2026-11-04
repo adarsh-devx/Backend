@@ -16,7 +16,7 @@ export default function JoinTheArchive() {
       return;
     }
     setStatus("success");
-    setMessage("You have been added to the Snitch Archive dispatch list.");
+    setMessage("You have been added to the Noirvayn Archive dispatch list.");
     setEmail("");
     setTimeout(() => {
       setStatus("idle");
@@ -93,7 +93,7 @@ export default function JoinTheArchive() {
           <div className="w-full max-w-[380px] aspect-[4/3] sm:aspect-[1/1] overflow-hidden bg-zinc-900 border border-zinc-800 shadow-xl group">
             <img
               src="/useImage/mockups/newsletter_archive_collector.png"
-              alt="SNITCH Archive Collector"
+              alt="NOIRVAYN Archive Collector"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               loading="lazy"
             />

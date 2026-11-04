@@ -341,7 +341,7 @@ export default function SellerProductDetail() {
           <span className="text-zinc-400 font-mono text-xs">/</span>
 
           <span className="font-michroma text-sm sm:text-base font-bold tracking-[0.2em] uppercase text-zinc-950">
-            SNITCH ATELIER
+            NOIRVAYN ATELIER
           </span>
 
           <span className="hidden md:inline font-mono text-[11px] uppercase tracking-wider text-zinc-500 border-l border-zinc-300 pl-3">

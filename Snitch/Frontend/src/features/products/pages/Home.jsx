@@ -19,7 +19,7 @@ import BeyondApparel from "../components/home/BeyondApparel";
 import JoinTheArchive from "../components/home/JoinTheArchive";
 import AtelierFooter from "../components/home/AtelierFooter";
 import InfiniteRibbonMarquee from "@/components/ui/infinite-ribbon";
-import SnitchOpeningLoader from "@/components/ui/SnitchOpeningLoader";
+import NoirvaynOpeningLoader from "@/components/ui/NoirvaynOpeningLoader";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -65,7 +65,7 @@ export default function Home() {
   return (
     <div className="min-h-screen w-full bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter">
       {/* ── EXACT MEERMOHSIN WEBGL PERLIN SHADER PRELOADER ── */}
-      <SnitchOpeningLoader />
+      <NoirvaynOpeningLoader />
 
       {/* ── SECTION 03 — HERO / RUNWAY ARCHIVE ─────────────────────────── */}
       <HeroSection onExplore={handleExplore} onWatchFilm={handleWatchFilm} />
@@ -75,7 +75,7 @@ export default function Home() {
 
       {/* ── CRISS-CROSS DUAL ATELIER RIBBON MARQUEE (JUST ABOVE SHOP BY CATEGORY) ── */}
       <InfiniteRibbonMarquee
-        text="SNITCH ATELIER // AUTUMN WINTER 2026 // TOKYO RUNWAY ARCHIVE // TECHNICAL SHELL INNOVATION // LIMITED RUN DROPS // STREETS TO ARCHIVE // PARIS EDITORIAL //"
+        text="NOIRVAYN ATELIER // AUTUMN WINTER 2026 // TOKYO RUNWAY ARCHIVE // TECHNICAL SHELL INNOVATION // LIMITED RUN DROPS // STREETS TO ARCHIVE // PARIS EDITORIAL //"
         duration={35}
         rotation={2.8}
       />

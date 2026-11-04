@@ -60,7 +60,7 @@ export default function FabricInnovation({ onLearnMore }) {
           <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] bg-zinc-900 border border-zinc-800 overflow-hidden shadow-xl group">
             <motion.img
               src="/useImage/mockups/fabric_water_resistant_droplets.jpg"
-              alt="SNITCH Hydrophobic Fabric Innovation"
+              alt="NOIRVAYN Hydrophobic Fabric Innovation"
               style={{ y: fabricParallax }}
               className="w-full h-[115%] -top-[7%] relative object-cover transition-transform duration-700 group-hover:scale-105 will-change-transform"
               loading="lazy"

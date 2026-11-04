@@ -158,13 +158,13 @@ const Register = () => {
         {/* Header */}
         <div className="text-center mb-3.5">
           <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-zinc-600 uppercase mb-0.5 block">
-            Snitch Atelier
+            Noirvayn Atelier
           </span>
           <h1 className="font-syne text-xl sm:text-[1.45rem] font-bold tracking-[-0.03em] text-zinc-950 leading-tight">
             Create Account
           </h1>
           <p className="text-zinc-600 text-xs mt-0.5 font-normal">
-            Join Snitch for seamless shopping & selling
+            Join Noirvayn for seamless shopping & selling
           </p>
         </div>
 
@@ -302,7 +302,7 @@ const Register = () => {
                   Register as a seller
                 </span>
                 <span className="text-zinc-600 text-[11px]">
-                  (start selling on Snitch)
+                  (start selling on Noirvayn)
                 </span>
               </span>
             </label>

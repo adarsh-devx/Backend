@@ -2,20 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
 /**
- * SnitchOpeningLoader
+ * NoirvaynOpeningLoader
  * EXACT WebGL Perlin Noise Upward Dissolve Animation extracted directly from meermohsin.me:
  * 1. Fixed full-screen preloader overlay (.site-pre-loader) with body scroll locked (zero right-side scrollbar/border)
  * 2. Exact giant cursive calligraphy counter in 'Ruthie' font (000 -> 100)
  * 3. Exact WebGL 3-octave Perlin noise upward dissolve shader with tight, compact distance between Black and White
- * 4. Crisp organic liquid burning edge moving from bottom to top, revealing the Snitch homepage underneath
- * 5. Snitch Atelier palette: Obsidian Noir (#0a0a0c) & Bone Ivory (#F3F1E9)
+ * 4. Crisp organic liquid burning edge moving from bottom to top, revealing the Noirvayn homepage underneath
+ * 5. Noirvayn Atelier palette: Obsidian Noir (#0a0a0c) & Bone Ivory (#F3F1E9)
  * 6. Zero clutter (no soundwaves, no extra text)
  */
 // In-memory session flag: survives SPA route transitions and Back button clicks,
 // but automatically resets on full Page Refresh (F5 / reload), new tab, or new browser.
 let hasPlayedInWindowSession = false;
 
-export default function SnitchOpeningLoader({ onComplete }) {
+export default function NoirvaynOpeningLoader({ onComplete }) {
   // If already played in this window session (e.g. user clicked browser Back button), skip immediately
   if (hasPlayedInWindowSession) {
     return null;
@@ -182,7 +182,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
         edge = pow(clamp(edge, 0.0, 1.0), 6.0);
         edge *= min(uTransition * 1.5, 1.0);
 
-        // Snitch Atelier Palette: Deep Obsidian Noir & Bone Ivory Luminescence
+        // Noirvayn Atelier Palette: Deep Obsidian Noir & Bone Ivory Luminescence
         vec3 deepMidnightColor = vec3(0.06, 0.06, 0.07);
         vec3 richGlowingColor = uBorderColor * 1.4;
 
@@ -283,7 +283,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
       gl.uniform1f(uTransitionLoc, uniforms.transition);
       gl.uniform2f(uResolutionLoc, uniforms.width, uniforms.height);
       gl.uniform1f(uTimeLoc, uniforms.time);
-      // Bone Ivory luminescence for Snitch edge glow
+      // Bone Ivory luminescence for Noirvayn edge glow
       gl.uniform3f(uBorderColorLoc, 0.95, 0.94, 0.91);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -433,7 +433,7 @@ export default function SnitchOpeningLoader({ onComplete }) {
           line-height: 1;
           font-family: 'Ruthie', cursive;
           font-size: clamp(9rem, 26vw, 24rem);
-          color: #F3F1E9; /* Snitch signature bone ivory */
+          color: #F3F1E9; /* Noirvayn signature bone ivory */
           text-shadow: 0 0 35px rgba(243, 241, 233, 0.15);
           pointer-events: none;
           will-change: opacity;

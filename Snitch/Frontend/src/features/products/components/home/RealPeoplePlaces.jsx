@@ -36,7 +36,7 @@ export default function RealPeoplePlaces({ onViewCommunity }) {
           </h2>
 
           <p className="font-inter text-xs sm:text-sm text-zinc-600 max-w-lg leading-relaxed">
-            SNITCH in the wild. From city streets to remote landscapes. Built
+            NOIRVAYN in the wild. From city streets to remote landscapes. Built
             for every story.
           </p>
         </motion.div>

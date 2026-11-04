@@ -142,7 +142,7 @@ const Login = () => {
         {/* Header - Option 2 Strong Modern Typography */}
         <div className="text-center mb-6">
           <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-zinc-600 uppercase mb-1 block">
-            Snitch Atelier
+            Noirvayn Atelier
           </span>
           <h1 className="font-syne text-2xl sm:text-[1.65rem] font-bold tracking-[-0.03em] text-zinc-950">
             Welcome Back
