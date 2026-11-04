@@ -445,3 +445,33 @@ export const verifyOrderController = async (req, res) => {
     });
   }
 };
+
+export const getOrderDetailsController = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const payment = await paymentModel.findOne({
+      "Razorpay.orderId": orderId,
+      user: req.user._id,
+    });
+
+    if (!payment) {
+      return res.status(404).json({
+        message: "Order not found",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Order fetched successfully",
+      success: true,
+      order: payment,
+    });
+  } catch (error) {
+    console.error("getOrderDetailsController error:", error);
+    return res.status(500).json({
+      message: error.message || "Internal server error while fetching order",
+      success: false,
+    });
+  }
+};

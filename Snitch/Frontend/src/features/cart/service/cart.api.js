@@ -31,7 +31,6 @@ export const removeItem = async (itemId) => {
   return response.data;
 };
 
-
 export const createCartOrder = async () => {
   const response = await cartAPIInstance.post(`/payment/create/order`);
   return response.data;
@@ -47,5 +46,10 @@ export const verifyCartOrder = async ({
     razorpay_payment_id,
     razorpay_signature,
   });
+  return response.data;
+};
+
+export const getOrderDetails = async (orderId) => {
+  const response = await cartAPIInstance.get(`/order/${orderId}`);
   return response.data;
 };

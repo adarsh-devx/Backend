@@ -5,6 +5,7 @@ import {
   removeItem,
   createCartOrder,
   verifyCartOrder,
+  getOrderDetails,
 } from "../service/cart.api.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -103,7 +104,12 @@ export const useCart = () => {
       razorpay_payment_id,
       razorpay_signature,
     });
-    return data.success;
+    return data;
+  }
+
+  async function handleGetOrderDetails(orderId) {
+    const data = await getOrderDetails(orderId);
+    return data?.order;
   }
 
   return {
@@ -120,5 +126,6 @@ export const useCart = () => {
     handleDismissAlert,
     handleCreateCartOrder,
     handleVerifyCartOrder,
+    handleGetOrderDetails,
   };
 };

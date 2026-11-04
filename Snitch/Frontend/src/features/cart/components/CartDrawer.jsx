@@ -132,11 +132,13 @@ export default function CartDrawer() {
         description: "Fashion House",
         order_id: order.id, // Generate order_id on server
         handler: async (response) => {
-          const isValid = await handleVerifyCartOrder(response);
+          const verifyResult = await handleVerifyCartOrder(response);
 
-          if (isValid) {
+          if (verifyResult?.success) {
             closeCart();
-            navigate(`/order-success?order_id=${response?.razorpay_order_id}`);
+            navigate(`/order-success?order_id=${response?.razorpay_order_id}`, {
+              state: { order: verifyResult.payment },
+            });
           }
         },
         prefill: {

@@ -97,10 +97,12 @@ const Cart = () => {
         description: "Fashion House",
         order_id: order.id,
         handler: async (response) => {
-          const isValid = await handleVerifyCartOrder(response);
+          const verifyResult = await handleVerifyCartOrder(response);
 
-          if (isValid) {
-            navigate(`/order-success?order_id=${response?.razorpay_order_id}`);
+          if (verifyResult?.success) {
+            navigate(`/order-success?order_id=${response?.razorpay_order_id}`, {
+              state: { order: verifyResult.payment },
+            });
           }
         },
         prefill: {
