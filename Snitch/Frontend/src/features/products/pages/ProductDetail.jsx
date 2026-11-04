@@ -17,6 +17,18 @@ import {
   Ruler,
 } from "lucide-react";
 
+// Safe helper to extract attributes object from variant Map or Object
+const getVariantAttrs = (v) => {
+  if (!v || !v.attributes) return {};
+  if (v.attributes instanceof Map) {
+    return Object.fromEntries(v.attributes);
+  }
+  if (typeof v.attributes === "object" && !Array.isArray(v.attributes)) {
+    return { ...v.attributes };
+  }
+  return {};
+};
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -28,7 +40,7 @@ export default function ProductDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
-  const [selectedSize, setSelectedSize] = useState("M");
+  const [selectedAttrs, setSelectedAttrs] = useState({});
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [openAccordions, setOpenAccordions] = useState({
@@ -82,56 +94,153 @@ export default function ProductDetail() {
     };
   }, [id]);
 
+  const hasVariants = Boolean(product?.variants && product.variants.length > 0);
+
+  // 100% Dynamic Attribute Groups extraction from database
+  const attributeGroups = useMemo(() => {
+    if (!product?.variants || product.variants.length === 0) return [];
+
+    const keyMap = new Map();
+    const valuesMap = new Map();
+
+    product.variants.forEach((v) => {
+      const attrs = getVariantAttrs(v);
+      Object.entries(attrs).forEach(([k, val]) => {
+        if (!val) return;
+        const normKey = String(k).trim().toLowerCase();
+        if (!keyMap.has(normKey)) {
+          const pretty = String(k).charAt(0).toUpperCase() + String(k).slice(1);
+          keyMap.set(normKey, pretty);
+          valuesMap.set(normKey, new Set());
+        }
+        valuesMap.get(normKey).add(String(val).trim());
+      });
+    });
+
+    const priority = ["color", "size", "fit", "fabric", "material"];
+    const sortedKeys = Array.from(keyMap.keys()).sort((a, b) => {
+      const idxA = priority.indexOf(a);
+      const idxB = priority.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+    return sortedKeys.map((normKey) => ({
+      key: normKey,
+      displayName: keyMap.get(normKey),
+      values: Array.from(valuesMap.get(normKey)),
+    }));
+  }, [product]);
+
+  // Initialize selected attributes with first available variant
+  useEffect(() => {
+    if (product?.variants && product.variants.length > 0) {
+      const firstInStock =
+        product.variants.find((v) => (v.stock || 0) > 0) || product.variants[0];
+      const vAttrs = getVariantAttrs(firstInStock);
+      const initObj = {};
+      Object.entries(vAttrs).forEach(([k, val]) => {
+        initObj[String(k).trim().toLowerCase()] = String(val).trim();
+      });
+      setSelectedAttrs(initObj);
+    } else {
+      setSelectedAttrs({});
+    }
+  }, [product]);
+
+  // Dynamically resolve matching active variant
+  const activeVariant = useMemo(() => {
+    if (!product?.variants || product.variants.length === 0) return null;
+
+    // 1. Exact match
+    const exact = product.variants.find((v) => {
+      const vAttrs = getVariantAttrs(v);
+      const normVAttrs = {};
+      Object.entries(vAttrs).forEach(([k, val]) => {
+        normVAttrs[String(k).trim().toLowerCase()] = String(val).trim().toLowerCase();
+      });
+
+      return Object.entries(selectedAttrs).every(([key, val]) => {
+        if (!normVAttrs[key]) return true;
+        return normVAttrs[key] === String(val).toLowerCase();
+      });
+    });
+
+    if (exact) return exact;
+
+    // 2. Score-based fallback
+    let best = product.variants[0];
+    let highestScore = -1;
+    product.variants.forEach((v) => {
+      const vAttrs = getVariantAttrs(v);
+      const normVAttrs = {};
+      Object.entries(vAttrs).forEach(([k, val]) => {
+        normVAttrs[String(k).trim().toLowerCase()] = String(val).trim().toLowerCase();
+      });
+      let score = 0;
+      Object.entries(selectedAttrs).forEach(([key, val]) => {
+        if (normVAttrs[key] && normVAttrs[key] === String(val).toLowerCase()) {
+          score++;
+        }
+      });
+      if (score > highestScore) {
+        highestScore = score;
+        best = v;
+      }
+    });
+
+    return best || product.variants[0] || null;
+  }, [product, selectedAttrs]);
+
+  const handleSelectAttribute = (groupKey, val) => {
+    setSelectedAttrs((prev) => ({
+      ...prev,
+      [groupKey]: val,
+    }));
+    setActiveImageIdx(0);
+  };
+
+  // Dynamic Image gallery switching (variant images if present, otherwise product images)
   const images = useMemo(() => {
+    if (activeVariant?.images && activeVariant.images.length > 0) {
+      return activeVariant.images.map((img) => img.url);
+    }
     if (product?.images && product.images.length > 0) {
       return product.images.map((img) => img.url);
     }
     return ["/assets/hero_black.jpg"];
-  }, [product]);
+  }, [product, activeVariant]);
 
   const activeImg = images[activeImageIdx] || images[0];
-  const currencySymbol = product?.price?.currency === "USD" ? "$" : "₹";
-  const formattedPrice = Number(product?.price?.amount || 0).toLocaleString();
+
+  // Dynamic Price calculation
+  const currentPriceAmount = useMemo(() => {
+    if (
+      activeVariant?.price?.amount !== undefined &&
+      activeVariant?.price?.amount !== null &&
+      Number(activeVariant.price.amount) > 0
+    ) {
+      return Number(activeVariant.price.amount);
+    }
+    return Number(product?.price?.amount || 0);
+  }, [product, activeVariant]);
+
+  const currencySymbol =
+    (activeVariant?.price?.currency || product?.price?.currency) === "USD"
+      ? "$"
+      : "₹";
+  const formattedPrice = currentPriceAmount.toLocaleString();
   const prodId = product?._id ? product._id.slice(-6).toUpperCase() : "PROD-01";
 
-  const availableSizes = useMemo(() => {
-    if (product?.variants && product.variants.length > 0) {
-      const set = new Set();
-      product.variants.forEach((v) => {
-        const rawAttrs = v.attributes;
-        const attrs =
-          rawAttrs instanceof Map
-            ? Object.fromEntries(rawAttrs)
-            : typeof rawAttrs === "object" && rawAttrs !== null
-              ? rawAttrs
-              : {};
-        const sz = attrs.size || attrs.Size || attrs.SIZE;
-        if (sz) set.add(sz.toUpperCase());
-      });
-      if (set.size > 0) return Array.from(set);
-    }
-    return ["S", "M", "L", "XL"];
-  }, [product]);
+  // Dynamic Stock calculation
+  const currentStock = useMemo(() => {
+    if (!hasVariants) return 999;
+    return activeVariant?.stock !== undefined ? Number(activeVariant.stock) : 0;
+  }, [hasVariants, activeVariant]);
 
-  const activeVariant = useMemo(() => {
-    if (!product?.variants || product.variants.length === 0) return null;
-
-    const match = product.variants.find((v) => {
-      const rawAttrs = v.attributes;
-      const attrs =
-        rawAttrs instanceof Map
-          ? Object.fromEntries(rawAttrs)
-          : typeof rawAttrs === "object" && rawAttrs !== null
-            ? rawAttrs
-            : {};
-      const sz = attrs.size || attrs.Size || attrs.SIZE;
-      return (
-        sz && String(sz).toUpperCase() === String(selectedSize).toUpperCase()
-      );
-    });
-
-    return match || product.variants[0] || null;
-  }, [product, selectedSize]);
+  const isOutOfStock = hasVariants && currentStock <= 0;
 
   const [touchStartX, setTouchStartX] = useState(null);
   const [touchEndX, setTouchEndX] = useState(null);
@@ -171,7 +280,7 @@ export default function ProductDetail() {
               to="/"
               className="font-michroma text-base font-bold tracking-widest uppercase"
             >
-              SNITCH
+              NOIRVAYN
             </Link>
           </div>
         </header>
@@ -206,7 +315,7 @@ export default function ProductDetail() {
               to="/"
               className="font-michroma text-base font-bold tracking-widest uppercase"
             >
-              SNITCH
+              NOIRVAYN
             </Link>
           </div>
         </header>
@@ -274,7 +383,7 @@ export default function ProductDetail() {
               </div>
             )}
 
-            {/* Main Hero Visual Stage (Seamless - Aligned Left Flush with RUNWAY ARCHIVE) */}
+            {/* Main Hero Visual Stage */}
             <div
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
@@ -343,14 +452,14 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* ── Right Column: Unboxed Seamless Product Details (Exact Reference Spacing & Placing) ── */}
+          {/* ── Right Column: Unboxed Seamless Product Details ── */}
           <div className="md:col-span-5 order-3 w-full max-w-[400px]">
             {/* Product Title */}
             <h1 className="font-syne text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 uppercase leading-tight">
               {product.title}
             </h1>
 
-            {/* Price */}
+            {/* Dynamic Price */}
             <div className="font-space text-sm sm:text-base font-semibold text-zinc-700 tracking-tight mt-1.5 sm:mt-2">
               {currencySymbol}
               {formattedPrice}
@@ -359,30 +468,74 @@ export default function ProductDetail() {
             {/* Divider Line under Price */}
             <div className="w-full border-b border-zinc-300 mt-4 sm:mt-5" />
 
-            {/* Size Selector */}
-            <div className="mt-6 sm:mt-7">
-              <label className="block text-xs font-space font-semibold uppercase tracking-wider text-zinc-800 mb-2">
-                Size
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {availableSizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => setSelectedSize(size)}
-                    className={cn(
-                      "h-11 border font-space font-bold text-xs uppercase transition-all flex items-center justify-center cursor-pointer",
-                      selectedSize === size
-                        ? "bg-zinc-950 text-white border-zinc-950 shadow-2xs"
-                        : "bg-white text-zinc-800 border-zinc-200 hover:border-zinc-800",
-                    )}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
+            {/* ── 100% Dynamic Multi-Attribute Variant Selector ── */}
+            {hasVariants && attributeGroups.length > 0 && (
+              <div className="mt-5 space-y-4">
+                {attributeGroups.map((group) => {
+                  const currentVal = selectedAttrs[group.key] || "";
 
-              {/* Find Your Size */}
+                  return (
+                    <div key={group.key} className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-space font-semibold uppercase tracking-wider text-zinc-800">
+                          {group.displayName}
+                        </label>
+                        {currentVal && (
+                          <span className="text-[11px] font-mono text-zinc-500 font-medium">
+                            {currentVal}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        {group.values.map((val) => {
+                          const isSelected =
+                            currentVal.toLowerCase() === val.toLowerCase();
+
+                          return (
+                            <button
+                              key={val}
+                              type="button"
+                              onClick={() =>
+                                handleSelectAttribute(group.key, val)
+                              }
+                              className={cn(
+                                "h-10 px-4 border font-space font-bold text-xs uppercase transition-all flex items-center justify-center cursor-pointer",
+                                isSelected
+                                  ? "bg-zinc-950 text-white border-zinc-950 shadow-2xs"
+                                  : "bg-white text-zinc-800 border-zinc-200 hover:border-zinc-800",
+                              )}
+                            >
+                              {val}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Dynamic Live Stock Status */}
+                <div className="pt-0.5">
+                  {isOutOfStock ? (
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-red-600">
+                      OUT OF STOCK
+                    </span>
+                  ) : currentStock <= 5 ? (
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-amber-600">
+                      ONLY {currentStock} LEFT IN STOCK
+                    </span>
+                  ) : (
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-600">
+                      {currentStock} IN STOCK
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Find Your Size (helper link if size exists) */}
+            {attributeGroups.some((g) => g.key === "size") && (
               <div className="mt-3">
                 <button
                   type="button"
@@ -395,7 +548,7 @@ export default function ProductDetail() {
                   <span className="w-20 h-[2px] bg-zinc-900 group-hover:bg-black transition-colors" />
                 </button>
               </div>
-            </div>
+            )}
 
             {/* Stepper + Add to Cart Row & Buy It Now */}
             <div className="mt-6 sm:mt-7 space-y-2.5">
@@ -405,7 +558,7 @@ export default function ProductDetail() {
                   <button
                     type="button"
                     onClick={handleDecrementQty}
-                    disabled={quantity <= 1}
+                    disabled={quantity <= 1 || isOutOfStock}
                     className="w-5 h-5 flex items-center justify-center text-zinc-500 hover:text-black disabled:opacity-30 cursor-pointer"
                     aria-label="Decrease quantity"
                   >
@@ -417,7 +570,8 @@ export default function ProductDetail() {
                   <button
                     type="button"
                     onClick={handleIncrementQty}
-                    className="w-5 h-5 flex items-center justify-center text-zinc-500 hover:text-black cursor-pointer"
+                    disabled={isOutOfStock}
+                    className="w-5 h-5 flex items-center justify-center text-zinc-500 hover:text-black disabled:opacity-30 cursor-pointer"
                     aria-label="Increase quantity"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -425,20 +579,32 @@ export default function ProductDetail() {
                 </div>
 
                 {/* Add to cart with Framer Motion flying thumbnail & animated checkmark */}
-                <AddToCartButton
-                  product={product}
-                  variant={activeVariant}
-                  quantity={quantity}
-                  imageUrl={activeImg}
-                  targetCartSelector="#nav-cart-btn"
-                  className="flex-1 h-11 px-4"
-                />
+                {isOutOfStock ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="flex-1 h-11 px-4 bg-zinc-200 text-zinc-400 font-space text-xs font-bold uppercase tracking-wider flex items-center justify-center cursor-not-allowed border border-zinc-300"
+                  >
+                    Out of stock
+                  </button>
+                ) : (
+                  <AddToCartButton
+                    product={product}
+                    variant={activeVariant}
+                    quantity={quantity}
+                    imageUrl={activeImg}
+                    targetCartSelector="#nav-cart-btn"
+                    className="flex-1 h-11 px-4"
+                  />
+                )}
               </div>
 
               {/* Buy it now (Full-width button) */}
               <button
                 type="button"
+                disabled={isOutOfStock}
                 onClick={async () => {
+                  if (isOutOfStock) return;
                   try {
                     await handleAddToCart({
                       productId: product._id,
@@ -451,9 +617,14 @@ export default function ProductDetail() {
                     console.error("Failed to buy now:", err);
                   }
                 }}
-                className="w-full h-11 bg-zinc-950 hover:bg-zinc-800 text-white font-space text-xs font-bold uppercase tracking-wider flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-[0.99]"
+                className={cn(
+                  "w-full h-11 font-space text-xs font-bold uppercase tracking-wider flex items-center justify-center transition-all shadow-xs cursor-pointer active:scale-[0.99]",
+                  isOutOfStock
+                    ? "bg-zinc-300 text-zinc-500 cursor-not-allowed"
+                    : "bg-zinc-950 hover:bg-zinc-800 text-white",
+                )}
               >
-                <span>Buy it now</span>
+                <span>{isOutOfStock ? "Out of stock" : "Buy it now"}</span>
               </button>
             </div>
 
@@ -534,8 +705,8 @@ export default function ProductDetail() {
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <footer className="w-full border-t border-zinc-300 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-widest bg-[#e7e7e0]">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 flex items-center justify-between">
-          <span>SNITCH ATELIER // SPECIFICATION ARCHIVE</span>
-          <span>&copy; 2026 SNITCH // ALL RIGHTS RESERVED</span>
+          <span>NOIRVAYN ATELIER // SPECIFICATION ARCHIVE</span>
+          <span>&copy; 2026 NOIRVAYN // ALL RIGHTS RESERVED</span>
         </div>
       </footer>
 
