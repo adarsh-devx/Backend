@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { Minus, Plus, X, ChevronRight } from "lucide-react";
+import { useRazorpay } from "react-razorpay";
 import { useCart } from "../hook/useCart";
 import PriceAlertBanner from "../components/PriceAlertBanner";
 
@@ -31,12 +32,16 @@ const AnimatedTrash = ({ size = 16, strokeWidth = 1.8, className = "" }) => (
 const Cart = () => {
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart?.items || []);
+  const user = useSelector((state) => state.auth?.user);
+  const { Razorpay } = useRazorpay();
   const {
     handleGetCart,
     handleUpdateQuantity,
     handleRemoveItem,
     priceAlerts,
     handleDismissAlert,
+    handleCreateCartOrder,
+    handleVerifyCartOrder,
   } = useCart();
   const [discountOpen, setDiscountOpen] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
@@ -76,6 +81,42 @@ const Cart = () => {
       await handleRemoveItem(itemId);
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const order = await handleCreateCartOrder();
+      if (!order) return;
+
+      const options = {
+        key: "rzp_test_Tw4xY3JTscmoUh",
+        amount: order.amount,
+        currency: order.currency,
+        name: "Noirvayn",
+        description: "Fashion House",
+        order_id: order.id,
+        handler: async (response) => {
+          const isValid = await handleVerifyCartOrder(response);
+
+          if (isValid) {
+            navigate(`/order-success?order_id=${response?.razorpay_order_id}`);
+          }
+        },
+        prefill: {
+          name: user?.name || user?.username || "Noirvayn Collector",
+          email: user?.email || "",
+          contact: user?.contact || user?.phone || "",
+        },
+        theme: {
+          color: "#000000",
+        },
+      };
+
+      const razorpayInstance = new Razorpay(options);
+      razorpayInstance.open();
+    } catch (err) {
+      console.error("Cart checkout error:", err);
     }
   };
 
@@ -264,7 +305,7 @@ const Cart = () => {
         </p>
 
         {/* Checkout button */}
-        <button className="w-full bg-black text-white py-4 rounded-sm text-sm font-semibold tracking-wide font-space hover:bg-zinc-800 active:scale-[0.98] transition-all">
+        <button onClick={() => handleCheckout()}  className="w-full bg-black text-white py-4 rounded-sm text-sm font-semibold tracking-wide font-space hover:bg-zinc-800 active:scale-[0.98] transition-all">
           Check out
         </button>
       </div>

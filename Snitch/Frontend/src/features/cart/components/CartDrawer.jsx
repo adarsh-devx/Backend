@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "../hook/useCart";
 import PriceAlertBanner from "./PriceAlertBanner";
+import { useRazorpay } from "react-razorpay";
 
 const AnimatedTrash = ({ size = 16, strokeWidth = 1.8, className = "" }) => (
   <svg
@@ -28,6 +30,7 @@ const AnimatedTrash = ({ size = 16, strokeWidth = 1.8, className = "" }) => (
 );
 
 export default function CartDrawer() {
+  const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart?.items || []);
   const {
     isCartOpen,
@@ -37,11 +40,16 @@ export default function CartDrawer() {
     handleRemoveItem,
     priceAlerts,
     handleDismissAlert,
+    handleCreateCartOrder,
+    handleVerifyCartOrder,
   } = useCart();
 
   const [discountOpen, setDiscountOpen] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
+
+  const { error, isLoading, Razorpay } = useRazorpay();
+  const user = useSelector((state) => state.auth?.user);
 
   useEffect(() => {
     if (isCartOpen) {
@@ -111,6 +119,43 @@ export default function CartDrawer() {
     }
   };
 
+  const handleCheckout = async () => {
+    try {
+      const order = await handleCreateCartOrder();
+      if (!order) return;
+
+      const options = {
+        key: "rzp_test_Tw4xY3JTscmoUh",
+        amount: order.amount, // Amount in paise
+        currency: order.currency,
+        name: "Noirvayn",
+        description: "Fashion House",
+        order_id: order.id, // Generate order_id on server
+        handler: async (response) => {
+          const isValid = await handleVerifyCartOrder(response);
+
+          if (isValid) {
+            closeCart();
+            navigate(`/order-success?order_id=${response?.razorpay_order_id}`);
+          }
+        },
+        prefill: {
+          name: user?.name || user?.username || "Noirvayn Collector",
+          email: user?.email || "",
+          contact: user?.contact || user?.phone || "",
+        },
+        theme: {
+          color: "#000000",
+        },
+      };
+
+      const razorpayInstance = new Razorpay(options);
+      razorpayInstance.open();
+    } catch (err) {
+      console.error("Cart checkout error:", err);
+    }
+  };
+
   return (
     <div
       className={`fixed inset-0 z-[100] transition-visibility duration-300 ${
@@ -156,7 +201,10 @@ export default function CartDrawer() {
 
         {/* ── Cart Items List (Scrollable Area) ── */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <PriceAlertBanner alerts={priceAlerts} onDismiss={handleDismissAlert} />
+          <PriceAlertBanner
+            alerts={priceAlerts}
+            onDismiss={handleDismissAlert}
+          />
 
           {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-20 gap-3 text-zinc-400">
@@ -166,134 +214,136 @@ export default function CartDrawer() {
           ) : (
             <div className="divide-y divide-zinc-100">
               {cartItems.map((item, index) => {
-              const price = Number(
-                item.price?.amount ?? item.product?.price?.amount ?? 0,
-              );
-              const itemCurrency =
-                item.price?.currency || item.product?.price?.currency || "INR";
-              const itemSymbol = itemCurrency === "USD" ? "$" : "₹";
+                const price = Number(
+                  item.price?.amount ?? item.product?.price?.amount ?? 0,
+                );
+                const itemCurrency =
+                  item.price?.currency ||
+                  item.product?.price?.currency ||
+                  "INR";
+                const itemSymbol = itemCurrency === "USD" ? "$" : "₹";
 
-              // Extract variant
-              const variant = item.product?.variants?.find(
-                (v) =>
-                  String(v._id) === String(item.variant?._id || item.variant),
-              );
+                // Extract variant
+                const variant = item.product?.variants?.find(
+                  (v) =>
+                    String(v._id) === String(item.variant?._id || item.variant),
+                );
 
-              // Extract image safely
-              const rawImg =
-                variant?.images?.[0] ||
-                item.product?.variants?.[0]?.images?.[0] ||
-                item.product?.images?.[0] ||
-                null;
-              const image =
-                typeof rawImg === "string" ? rawImg : rawImg?.url || null;
+                // Extract image safely
+                const rawImg =
+                  variant?.images?.[0] ||
+                  item.product?.variants?.[0]?.images?.[0] ||
+                  item.product?.images?.[0] ||
+                  null;
+                const image =
+                  typeof rawImg === "string" ? rawImg : rawImg?.url || null;
 
-              const productName =
-                item.product?.title || item.product?.name || "Product";
+                const productName =
+                  item.product?.title || item.product?.name || "Product";
 
-              // Extract size
-              const rawAttrs = variant?.attributes;
-              const attrs =
-                rawAttrs instanceof Map
-                  ? Object.fromEntries(rawAttrs)
-                  : typeof rawAttrs === "object" && rawAttrs !== null
-                    ? rawAttrs
-                    : {};
-              const size =
-                attrs.size ||
-                attrs.Size ||
-                attrs.SIZE ||
-                item.variant?.size ||
-                "Standard";
+                // Extract size
+                const rawAttrs = variant?.attributes;
+                const attrs =
+                  rawAttrs instanceof Map
+                    ? Object.fromEntries(rawAttrs)
+                    : typeof rawAttrs === "object" && rawAttrs !== null
+                      ? rawAttrs
+                      : {};
+                const size =
+                  attrs.size ||
+                  attrs.Size ||
+                  attrs.SIZE ||
+                  item.variant?.size ||
+                  "Standard";
 
-              const isBusy = updatingId === item._id;
+                const isBusy = updatingId === item._id;
 
-              return (
-                <div
-                  key={item._id ?? index}
-                  className={`py-4 flex gap-4 ${isBusy ? "opacity-60" : ""}`}
-                >
-                  {/* Product thumbnail */}
-                  <div className="w-18 h-18 rounded-md bg-zinc-100 shrink-0 overflow-hidden border border-zinc-200">
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={productName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-zinc-400 text-xs font-space">
-                        No img
-                      </div>
-                    )}
-                  </div>
+                return (
+                  <div
+                    key={item._id ?? index}
+                    className={`py-4 flex gap-4 ${isBusy ? "opacity-60" : ""}`}
+                  >
+                    {/* Product thumbnail */}
+                    <div className="w-18 h-18 rounded-md bg-zinc-100 shrink-0 overflow-hidden border border-zinc-200">
+                      {image ? (
+                        <img
+                          src={image}
+                          alt={productName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-zinc-400 text-xs font-space">
+                          No img
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-semibold text-black leading-tight font-space truncate">
-                          {productName}
+                    {/* Info */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-semibold text-black leading-tight font-space truncate">
+                            {productName}
+                          </p>
+                          <p className="text-sm font-bold text-black whitespace-nowrap font-space">
+                            {itemSymbol}
+                            {(price * item.quantity).toLocaleString()}
+                          </p>
+                        </div>
+                        <p className="text-xs text-zinc-500 mt-0.5 font-space">
+                          Size: {size}
                         </p>
-                        <p className="text-sm font-bold text-black whitespace-nowrap font-space">
+                        <p className="text-xs text-zinc-500 font-space">
                           {itemSymbol}
-                          {(price * item.quantity).toLocaleString()}
+                          {price.toLocaleString()} each
                         </p>
                       </div>
-                      <p className="text-xs text-zinc-500 mt-0.5 font-space">
-                        Size: {size}
-                      </p>
-                      <p className="text-xs text-zinc-500 font-space">
-                        {itemSymbol}
-                        {price.toLocaleString()} each
-                      </p>
-                    </div>
 
-                    {/* Stepper + Animated Trash Icon */}
-                    <div className="flex items-center gap-3 mt-2.5">
-                      <div className="flex items-center border border-zinc-300 rounded-md bg-white">
+                      {/* Stepper + Animated Trash Icon */}
+                      <div className="flex items-center gap-3 mt-2.5">
+                        <div className="flex items-center border border-zinc-300 rounded-md bg-white">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onQuantityChange(item._id, item.quantity - 1)
+                            }
+                            disabled={isBusy}
+                            className="w-7 h-7 flex items-center justify-center text-zinc-600 hover:bg-zinc-100 transition-colors rounded-l-md disabled:opacity-40 cursor-pointer"
+                          >
+                            <Minus size={12} strokeWidth={2} />
+                          </button>
+                          <span className="w-7 text-center text-xs font-medium text-black font-space select-none">
+                            {item.quantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onQuantityChange(item._id, item.quantity + 1)
+                            }
+                            disabled={isBusy}
+                            className="w-7 h-7 flex items-center justify-center text-zinc-600 hover:bg-zinc-100 transition-colors rounded-r-md disabled:opacity-40 cursor-pointer"
+                          >
+                            <Plus size={12} strokeWidth={2} />
+                          </button>
+                        </div>
+
                         <button
                           type="button"
-                          onClick={() =>
-                            onQuantityChange(item._id, item.quantity - 1)
-                          }
+                          onClick={() => onRemove(item._id)}
                           disabled={isBusy}
-                          className="w-7 h-7 flex items-center justify-center text-zinc-600 hover:bg-zinc-100 transition-colors rounded-l-md disabled:opacity-40 cursor-pointer"
+                          title="Remove item"
+                          className="group w-7 h-7 flex items-center justify-center text-zinc-500 hover:text-red-500 transition-colors disabled:opacity-40 cursor-pointer"
                         >
-                          <Minus size={12} strokeWidth={2} />
-                        </button>
-                        <span className="w-7 text-center text-xs font-medium text-black font-space select-none">
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onQuantityChange(item._id, item.quantity + 1)
-                          }
-                          disabled={isBusy}
-                          className="w-7 h-7 flex items-center justify-center text-zinc-600 hover:bg-zinc-100 transition-colors rounded-r-md disabled:opacity-40 cursor-pointer"
-                        >
-                          <Plus size={12} strokeWidth={2} />
+                          <AnimatedTrash size={16} strokeWidth={1.8} />
                         </button>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => onRemove(item._id)}
-                        disabled={isBusy}
-                        title="Remove item"
-                        className="group w-7 h-7 flex items-center justify-center text-zinc-500 hover:text-red-500 transition-colors disabled:opacity-40 cursor-pointer"
-                      >
-                        <AnimatedTrash size={16} strokeWidth={1.8} />
-                      </button>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* ── Bottom Section (Checkout & Total) ── */}
         <div className="border-t border-zinc-200 px-6 pt-4 pb-6 bg-white shrink-0">
@@ -346,6 +396,7 @@ export default function CartDrawer() {
 
           {/* Checkout button */}
           <button
+            onClick={() => handleCheckout()}
             type="button"
             className="w-full bg-black text-white py-3.5 rounded-none text-xs font-bold uppercase tracking-wider font-space hover:bg-zinc-800 active:scale-[0.99] transition-all cursor-pointer shadow-xs"
           >

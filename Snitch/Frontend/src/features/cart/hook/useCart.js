@@ -3,6 +3,8 @@ import {
   getCart,
   updateQuantity,
   removeItem,
+  createCartOrder,
+  verifyCartOrder,
 } from "../service/cart.api.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -86,6 +88,24 @@ export const useCart = () => {
     dispatch(dismissAlert(index));
   }
 
+  async function handleCreateCartOrder() {
+    const data = await createCartOrder();
+    return data.order;
+  }
+
+  async function handleVerifyCartOrder({
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+  }) {
+    const data = await verifyCartOrder({
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    });
+    return data.success;
+  }
+
   return {
     cartItems,
     priceAlerts,
@@ -98,5 +118,7 @@ export const useCart = () => {
     handleUpdateQuantity,
     handleRemoveItem,
     handleDismissAlert,
+    handleCreateCartOrder,
+    handleVerifyCartOrder,
   };
 };

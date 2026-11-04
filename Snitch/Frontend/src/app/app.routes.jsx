@@ -15,6 +15,9 @@ const Dashboard = lazy(() => import("@/features/products/pages/Dashboard.jsx"));
 const ProductDetail = lazy(
   () => import("../features/products/pages/ProductDetail.jsx"),
 );
+const OrderSuccess = lazy(
+  () => import("../features/cart/pages/OrderSuccess.jsx"),
+);
 
 const withSuspense = (Component) => (
   <Suspense fallback={<div className="min-h-screen bg-[#e7e7e0]" />}>
@@ -37,6 +40,10 @@ export const routes = createBrowserRouter([
       {
         path: "/cart",
         element: <Protected>{withSuspense(Cart)}</Protected>,
+      },
+      {
+        path: "/order-success",
+        element: withSuspense(OrderSuccess),
       },
       {
         path: "/register",
