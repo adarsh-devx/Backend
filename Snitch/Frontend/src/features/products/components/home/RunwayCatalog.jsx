@@ -139,7 +139,7 @@ export default function RunwayCatalog({
     >
       <div
         ref={viewportRef}
-        className="sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden py-5 sm:py-6 border-b border-zinc-300 bg-[#e7e7e0]"
+        className="sticky top-0 h-[100dvh] w-full flex flex-col justify-between overflow-hidden py-4 sm:py-6 border-b border-zinc-300 bg-[#e7e7e0]"
       >
         {/* Top Header & Controls Bar */}
         <div className="w-full max-w-[1520px] mx-auto px-4 sm:px-8 lg:px-12 shrink-0">
@@ -175,7 +175,7 @@ export default function RunwayCatalog({
                 <div
                   key={product.id || idx}
                   onClick={() => navigate(`/products/${product.id}`)}
-                  className="group w-[260px] sm:w-[280px] md:w-[300px] lg:w-[320px] shrink-0 bg-white border border-zinc-300/90 hover:border-zinc-950 transition-all duration-300 flex flex-col cursor-pointer shadow-2xs hover:shadow-md relative"
+                  className="group w-[220px] xs:w-[250px] sm:w-[280px] md:w-[300px] lg:w-[320px] shrink-0 bg-white border border-zinc-300/90 hover:border-zinc-950 transition-all duration-300 flex flex-col cursor-pointer shadow-2xs hover:shadow-md relative"
                 >
                   {/* Sequence Number Tag */}
                   <div className="absolute top-2.5 left-2.5 z-10 px-2 py-0.5 bg-zinc-950/80 text-white font-mono text-[9px] uppercase tracking-wider backdrop-blur-xs">

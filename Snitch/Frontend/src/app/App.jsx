@@ -5,7 +5,6 @@ import { routes } from "./app.routes.jsx";
 import { useAuth } from "@/features/auth/hook/use.auth";
 import { useEffect } from "react";
 import Lenis from "lenis";
-import AtelierCursor from "@/components/ui/AtelierCursor";
 import AtelierScrollIndicator from "@/components/ui/AtelierScrollIndicator";
 
 const App = () => {
@@ -32,7 +31,6 @@ const App = () => {
 
   return (
     <>
-      <AtelierCursor />
       <AtelierScrollIndicator />
       <RouterProvider router={routes} />
     </>

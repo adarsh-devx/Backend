@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router";
 
 /**
  * AtelierCursor
@@ -7,12 +8,26 @@ import React, { useEffect, useRef } from "react";
  * 2. Zero-latency mouse tracking with translate3d
  * 3. Fluid animation / smoke trail removed as requested
  * 4. Hidden on mobile/touch devices (width <= 800px)
+ * 5. Automatically disabled on auth pages (Login, Register) for clean UX & form accessibility
  */
 export default function AtelierCursor() {
+  const location = useLocation();
   const cursorRef = useRef(null);
 
+  const isAuthPage =
+    location.pathname === "/login" ||
+    location.pathname.startsWith("/login/") ||
+    location.pathname === "/register" ||
+    location.pathname.startsWith("/register/");
+
   useEffect(() => {
-    if (window.innerWidth <= 800) return;
+    if (isAuthPage) return;
+    if (
+      window.innerWidth <= 800 ||
+      window.matchMedia("(pointer: coarse)").matches
+    ) {
+      return;
+    }
 
     const cursorEl = cursorRef.current;
     if (!cursorEl) return;
@@ -50,12 +65,16 @@ export default function AtelierCursor() {
       document.removeEventListener("mouseleave", onMouseLeave);
       document.removeEventListener("mouseenter", onMouseEnter);
     };
-  }, []);
+  }, [isAuthPage]);
+
+  if (isAuthPage) {
+    return null;
+  }
 
   return (
     <>
       <style>{`
-        @media (min-width: 801px) {
+        @media (min-width: 801px) and (pointer: fine) {
           body, body * {
             cursor: none !important;
           }
@@ -70,7 +89,7 @@ export default function AtelierCursor() {
           will-change: transform, opacity;
           transition: opacity 0.2s ease-out;
         }
-        @media (max-width: 800px) {
+        @media (max-width: 800px), (pointer: coarse) {
           .custom-cursor { display: none !important; }
         }
       `}</style>

@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
-import { useProduct } from "../hook/use.product";
-import { useCart } from "@/features/cart/hook/useCart";
-import { X, ShoppingBag, Heart } from "lucide-react";
+import { useProduct } from "../hook/useProduct";
+import { X, Heart } from "lucide-react";
 
 // 15 Sections strictly ordered matching reference
 import HeroSection from "../components/home/HeroSection";
@@ -16,20 +14,18 @@ import FabricInnovation from "../components/home/FabricInnovation";
 import StreetsToArchive from "../components/home/StreetsToArchive";
 import RealPeoplePlaces from "../components/home/RealPeoplePlaces";
 import BeyondApparel from "../components/home/BeyondApparel";
+import AtelierAbout from "../components/home/AtelierAbout";
 import JoinTheArchive from "../components/home/JoinTheArchive";
 import AtelierFooter from "../components/home/AtelierFooter";
 import InfiniteRibbonMarquee from "@/components/ui/infinite-ribbon";
 import NoirvaynOpeningLoader from "@/components/ui/NoirvaynOpeningLoader";
 
 export default function Home() {
-  const navigate = useNavigate();
-  const { openCart } = useCart();
   const { handleGetAllProducts } = useProduct();
   const products = useSelector((state) => state.product.products) || [];
 
   const [wishlistedIds, setWishlistedIds] = useState([]);
   const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false);
-  const cartItems = useSelector((state) => state.cart.items);
 
   useEffect(() => {
     handleGetAllProducts().catch((err) => {
@@ -108,7 +104,10 @@ export default function Home() {
       {/* ── SECTION 13 — BEYOND APPAREL ─────────────────────────────────── */}
       <BeyondApparel onJoinMovement={handleExplore} />
 
-      {/* ── SECTION 14 — NEWSLETTER / JOIN THE ARCHIVE ──────────────────── */}
+      {/* ── SECTION 14 — THE ATELIER MANIFESTO (ABOUT NOIRVAYN) ─────────── */}
+      <AtelierAbout />
+
+      {/* ── SECTION 15 — NEWSLETTER / JOIN THE ARCHIVE ──────────────────── */}
       <JoinTheArchive />
 
       {/* ── SECTION 15 — FOOTER ─────────────────────────────────────────── */}

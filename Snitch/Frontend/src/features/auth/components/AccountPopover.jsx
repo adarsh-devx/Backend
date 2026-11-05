@@ -40,8 +40,14 @@ export default function AccountPopover({ className = "" }) {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Sync state with user details whenever user changes or popover opens
-  useEffect(() => {
+  const handleClose = () => {
+    setIsOpen(false);
+    setViewMode("view");
+    setExpandedSection("profile");
+    setSaveSuccess(false);
+  };
+
+  const handleStartEdit = () => {
     if (user) {
       setFullName(user.fullName || "");
       setContact(user.contact || "");
@@ -52,16 +58,9 @@ export default function AccountPopover({ className = "" }) {
       setCity(primaryAddress.city || "");
       setState(primaryAddress.state || "");
     }
-  }, [user, isOpen]);
-
-  // When popover closes, reset back to "view" mode
-  useEffect(() => {
-    if (!isOpen) {
-      setViewMode("view");
-      setExpandedSection("profile");
-      setSaveSuccess(false);
-    }
-  }, [isOpen]);
+    setViewMode("edit");
+    setExpandedSection("profile");
+  };
 
   // Close on outside click (protected while in "edit" mode so user doesn't lose progress)
   useEffect(() => {
@@ -71,7 +70,7 @@ export default function AccountPopover({ className = "" }) {
           // If editing, don't accidentally close on outside click to prevent data loss
           return;
         }
-        setIsOpen(false);
+        handleClose();
       }
     }
     if (isOpen) {
@@ -179,7 +178,7 @@ export default function AccountPopover({ className = "" }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.96 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="absolute right-0 top-full mt-2 w-[340px] sm:w-[360px] max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-zinc-200 z-50 p-5 font-space select-none"
+            className="fixed sm:absolute right-3 sm:right-0 left-3 sm:left-auto top-[58px] sm:top-full mt-2 w-auto sm:w-[360px] max-h-[80vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-zinc-200 z-50 p-4 sm:p-5 font-space select-none"
           >
             {user ? (
               viewMode === "view" ? (
@@ -192,7 +191,7 @@ export default function AccountPopover({ className = "" }) {
                     </span>
                     <button
                       type="button"
-                      onClick={() => setIsOpen(false)}
+                      onClick={handleClose}
                       className="p-1 text-zinc-400 hover:text-zinc-950 transition-colors cursor-pointer rounded-full hover:bg-zinc-100"
                       aria-label="Close"
                     >
@@ -220,10 +219,7 @@ export default function AccountPopover({ className = "" }) {
 
                     <button
                       type="button"
-                      onClick={() => {
-                        setViewMode("edit");
-                        setExpandedSection("profile");
-                      }}
+                      onClick={handleStartEdit}
                       className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-950 font-medium px-2 py-1 rounded hover:bg-zinc-100 transition-colors cursor-pointer shrink-0"
                       title="Edit profile & address"
                     >

@@ -299,7 +299,7 @@ export default function HeroSection({
               <button
                 type="button"
                 onClick={handleShopMenClick}
-                className="w-[140px] sm:w-[160px] bg-zinc-950 hover:bg-zinc-800 text-white font-space text-xs font-bold uppercase py-3 flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs active:translate-y-0.5"
+                className="flex-1 min-w-[130px] sm:min-w-0 sm:w-[160px] bg-zinc-950 hover:bg-zinc-800 text-white font-space text-xs font-bold uppercase py-3 flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs active:translate-y-0.5"
               >
                 <span>SHOP MEN</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -307,7 +307,7 @@ export default function HeroSection({
               <button
                 type="button"
                 onClick={handleShopWomenClick}
-                className="w-[140px] sm:w-[160px] bg-white hover:bg-zinc-50 text-zinc-950 border border-zinc-950 font-space text-xs font-bold uppercase py-3 flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs active:translate-y-0.5"
+                className="flex-1 min-w-[130px] sm:min-w-0 sm:w-[160px] bg-white hover:bg-zinc-50 text-zinc-950 border border-zinc-950 font-space text-xs font-bold uppercase py-3 flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs active:translate-y-0.5"
               >
                 <span>SHOP WOMEN</span>
                 <ArrowRight className="w-3.5 h-3.5" />
