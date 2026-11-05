@@ -86,12 +86,27 @@ export async function getSellerProducts(req, res) {
 }
 
 /**
- * Controller: Get All Products
- * Returns all products with seller details population
+ * Controller: Get All Products (supports ?search= query parameter)
+ * Returns all products or filtered products matching the keyword
  */
 export async function getAllProducts(req, res) {
   try {
-    const products = await productModel.find();
+    const { search } = req.query;
+    let filter = {};
+
+    if (search && typeof search === "string" && search.trim()) {
+      // Escape regex special characters to prevent ReDoS / injection
+      const sanitized = search.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const searchRegex = new RegExp(sanitized, "i");
+      filter = {
+        $or: [
+          { title: searchRegex },
+          { description: searchRegex },
+        ],
+      };
+    }
+
+    const products = await productModel.find(filter);
 
     return res.status(200).json({
       message: "Products fetched successfully",

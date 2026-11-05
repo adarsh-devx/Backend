@@ -17,9 +17,10 @@ export async function getSellerProduct() {
   return response.data;
 }
 
-// get all products
-export async function getAllProducts() {
-  const response = await productApiInstance.get("/");
+// get all products (supports optional search query)
+export async function getAllProducts(searchQuery = "") {
+  const params = searchQuery ? { search: searchQuery } : {};
+  const response = await productApiInstance.get("/", { params });
   return response.data;
 }
 
