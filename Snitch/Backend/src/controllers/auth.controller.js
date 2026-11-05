@@ -1,6 +1,10 @@
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/config.js";
+import {
+  getAuthCookieOptions,
+  getClearCookieOptions,
+} from "../config/cookie.config.js";
 
 /**
  * Helper: Signs JWT token, stores it in an HTTP cookie, and sends JSON response
@@ -14,8 +18,8 @@ async function sendTokenResponse(user, res, message) {
     expiresIn: "10d",
   });
 
-  // Set JWT token in an HTTP-only cookie for secure browser storage
-  res.cookie("token", token);
+  // Set JWT token in a secure HTTP-only cookie
+  res.cookie("token", token, getAuthCookieOptions());
 
   // Return safe user details (excluding password hash)
   return res.status(200).json({
@@ -121,12 +125,12 @@ export const googleCallback = async (req, res) => {
       expiresIn: "10d",
     });
 
-    // Step 4: Set JWT token in cookie and redirect user to frontend homepage
-    res.cookie("token", token);
-    return res.redirect("http://localhost:5173/");
+    // Step 4: Set JWT token in secure cookie and redirect user to frontend homepage
+    res.cookie("token", token, getAuthCookieOptions());
+    return res.redirect(`${config.FRONTEND_URL}/`);
   } catch (error) {
     console.error("Google OAuth Error:", error);
-    return res.redirect("http://localhost:5173/login?error=OAuthFailed");
+    return res.redirect(`${config.FRONTEND_URL}/login?error=OAuthFailed`);
   }
 };
 
@@ -148,7 +152,7 @@ export const getMe = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", getClearCookieOptions());
   res.status(200).json({
     success: true,
     message: "Logged out successfully",

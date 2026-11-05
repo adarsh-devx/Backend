@@ -1,5 +1,6 @@
 import express from "express";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
+import { orderLimiter } from "../middlewares/rateLimiter.middleware.js";
 import {
   validateAddToCart,
   validateUpdateCartItemQuantity,
@@ -59,10 +60,20 @@ router.delete(
 );
 
 // @route POST /api/cart/payment/create/order
-router.post("/payment/create/order", authenticateUser, createOrderController);
+router.post(
+  "/payment/create/order",
+  orderLimiter,
+  authenticateUser,
+  createOrderController,
+);
 
 // @route POST /api/cart/payment/verify/order
-router.post("/payment/verify/order", authenticateUser, verifyOrderController);
+router.post(
+  "/payment/verify/order",
+  orderLimiter,
+  authenticateUser,
+  verifyOrderController,
+);
 
 // @route GET /api/cart/order/:orderId
 router.get("/order/:orderId", authenticateUser, getOrderDetailsController);

@@ -1,34 +1,54 @@
 import express from "express";
 import morgan from "morgan";
 import "dotenv/config";
-import authRouter from "./routes/auth.routes.js";
-import productRouter from "./routes/product.routes.js";
-import cartRouter from "./routes/cart.routes.js";
+import helmet from "helmet";
 import cors from "cors";
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
 import cookieParser from "cookie-parser";
 import { config } from "./config/config.js";
+import { apiLimiter } from "./middlewares/rateLimiter.middleware.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
+import authRouter from "./routes/auth.routes.js";
+import productRouter from "./routes/product.routes.js";
+import cartRouter from "./routes/cart.routes.js";
 
 const app = express();
 
-// ── Global Middlewares ────────────────────────────────────────────────────────
-// Parse URL-encoded bodies and JSON payloads
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+// ── Security Headers with Helmet ──────────────────────────────────────────────
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allows loading assets from external CDNs (ImageKit, Google)
+    contentSecurityPolicy: false, // Prevents breaking OAuth redirects while retaining clickjacking & MIME protection
+  }),
+);
 
-// Parse incoming HTTP cookies (used for reading JWT tokens)
+// ── Global Rate Limiting ──────────────────────────────────────────────────────
+app.use("/api", apiLimiter);
+
+// ── Body Parsing & Cookie Parser ──────────────────────────────────────────────
+// Limit JSON payload to 16KB to prevent memory exhaustion attacks (multer handles larger image buffers)
+app.use(express.json({ limit: "16kb" }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
-// HTTP request logger for development
-app.use(morgan("dev"));
+// ── Request Logging ───────────────────────────────────────────────────────────
+if (config.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 
-// Enable Cross-Origin Resource Sharing (CORS) for Vite frontend with cookies enabled
+// ── Dynamic Cross-Origin Resource Sharing (CORS) ──────────────────────────────
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // Allows sending cookies across origins
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, server-to-server) or from allowed origins
+      if (!origin || config.ALLOWED_ORIGINS.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("CORS policy violation: Origin not allowed"));
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true, // Enables cookie transmission across origins
   }),
 );
 
@@ -41,21 +61,25 @@ passport.use(
     {
       clientID: config.GOOGLE_CLIENT_ID,
       clientSecret: config.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback", // Handled via Vite proxy or direct redirect
+      callbackURL: "/api/auth/google/callback",
     },
     (accessToken, refreshToken, profile, done) => {
-      // Forward Google user profile to the callback route handler
       return done(null, profile);
     },
   ),
 );
 
+// ── Health Check Endpoint ─────────────────────────────────────────────────────
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
 // ── Routes Mounting ──────────────────────────────────────────────────────────
-// Mount authentication endpoints under /api/auth
 app.use("/api/auth", authRouter);
-
 app.use("/api/products", productRouter);
-
 app.use("/api/cart", cartRouter);
+
+// ── Centralized Error Handling ────────────────────────────────────────────────
+app.use(errorHandler);
 
 export default app;

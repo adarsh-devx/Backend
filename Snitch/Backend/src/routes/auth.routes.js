@@ -14,15 +14,17 @@ import {
 } from "../controllers/auth.controller.js";
 import passport from "passport";
 import { authenticateUser } from "../middlewares/auth.middleware.js";
+import { authLimiter } from "../middlewares/rateLimiter.middleware.js";
+import { config } from "../config/config.js";
 
 const router = Router();
 
 // ── Standard Email/Password Authentication ────────────────────────────────────
-// POST /api/auth/register - Validate inputs and create a new buyer or seller account
-router.post("/register", validateRegisterUser, registerUser);
+// POST /api/auth/register - Rate-limited, validated, creates new account
+router.post("/register", authLimiter, validateRegisterUser, registerUser);
 
-// POST /api/auth/login - Validate credentials and issue JWT cookie
-router.post("/login", validateLoginUser, loginUser);
+// POST /api/auth/login - Rate-limited against brute force, validates credentials
+router.post("/login", authLimiter, validateLoginUser, loginUser);
 
 // ── Google OAuth 2.0 Authentication ───────────────────────────────────────────
 // GET /api/auth/google - Initiates Google sign-in flow (requests profile & email scopes)
@@ -36,7 +38,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: "http://localhost:5173/login",
+    failureRedirect: `${config.FRONTEND_URL}/login`,
   }),
   googleCallback,
 );
