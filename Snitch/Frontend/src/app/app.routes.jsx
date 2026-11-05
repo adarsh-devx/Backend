@@ -18,6 +18,7 @@ const ProductDetail = lazy(
 const OrderSuccess = lazy(
   () => import("../features/cart/pages/OrderSuccess.jsx"),
 );
+const NotFound = lazy(() => import("./NotFound.jsx"));
 
 const withSuspense = (Component) => (
   <Suspense fallback={<div className="min-h-screen bg-[#e7e7e0]" />}>
@@ -77,6 +78,10 @@ export const routes = createBrowserRouter([
             ),
           },
         ],
+      },
+      {
+        path: "*",
+        element: withSuspense(NotFound),
       },
     ],
   },
