@@ -5,6 +5,7 @@ import { createOrder } from "../services/payment.service.js";
 import paymentModel from "../models/payment.model.js";
 import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils.js";
 import { config } from "../config/config.js";
+import { sendOrderConfirmationEmail } from "../services/email.service.js";
 
 async function getCartDetails(userId) {
   let cart = await cartModel
@@ -431,6 +432,14 @@ export const verifyOrderController = async (req, res) => {
 
     // Clear cart after successful payment
     await cartModel.findOneAndUpdate({ user: req.user._id }, { items: [] });
+
+    // Asynchronous luxury order confirmation email dispatch (non-blocking)
+    sendOrderConfirmationEmail({
+      user: req.user,
+      payment,
+    }).catch((err) => {
+      console.error("[VERIFY ORDER] Failed to dispatch confirmation email:", err);
+    });
 
     return res.status(200).json({
       message: "Payment verified successfully",
