@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { X, ArrowRight, Loader2, Search } from "lucide-react";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { getAllProducts } from "@/features/products/services/product.api";
 import UiverseSearchInput from "./UiverseSearchInput";
 
@@ -146,9 +147,31 @@ export default function SearchModal({ isOpen, onClose }) {
         {/* Results Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 divide-y divide-zinc-300/80">
           {isLoading && displayResults.length === 0 ? (
-            <div className="py-12 flex flex-col items-center justify-center text-zinc-600 font-mono text-xs gap-3">
-              <Loader2 className="w-5 h-5 animate-spin text-zinc-950" />
-              <span>SEARCHING NOIRVAYN ARCHIVE...</span>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between mb-3 px-1">
+                <Skeleton className="h-3 w-32 bg-zinc-300/80" />
+                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest animate-pulse">
+                  Searching Archive...
+                </span>
+              </div>
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-2.5 sm:p-3 border border-zinc-200/80 bg-white/40"
+                >
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                    <Skeleton className="w-12 h-14 sm:w-14 sm:h-16 shrink-0 bg-zinc-300/70" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-3.5 w-32 sm:w-48 bg-zinc-300/80" />
+                      <Skeleton className="h-2.5 w-20 sm:w-28 bg-zinc-300/60" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-4 w-14 bg-zinc-300/80" />
+                    <Skeleton className="w-4 h-4 bg-zinc-300/60" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : searchTerm.trim() && displayResults.length === 0 ? (
             <div className="py-12 text-center font-mono">

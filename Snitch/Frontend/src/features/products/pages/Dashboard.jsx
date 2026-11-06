@@ -20,6 +20,7 @@ import {
 import DecagonButton from "../components/DecagonButton";
 import ProductCard from "../components/ProductCard";
 import QuickLookModal from "../components/QuickLookModal";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -180,19 +181,19 @@ export default function Dashboard() {
       {isLoading ? (
         /* Loading Skeleton */
         <div className="w-full max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-16 flex-1 flex flex-col justify-center">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-pulse">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-4 space-y-6">
-              <div className="h-10 bg-zinc-300 w-3/4" />
-              <div className="h-4 bg-zinc-300 w-full" />
-              <div className="h-4 bg-zinc-300 w-2/3" />
-              <div className="w-24 h-24 bg-zinc-300" />
+              <Skeleton className="h-10 bg-zinc-300/80 w-3/4" />
+              <Skeleton className="h-4 bg-zinc-300/70 w-full" />
+              <Skeleton className="h-4 bg-zinc-300/70 w-2/3" />
+              <Skeleton className="w-24 h-24 bg-zinc-300/80 mt-4" />
             </div>
             <div className="lg:col-span-5 flex justify-center">
-              <div className="w-72 h-96 bg-zinc-300" />
+              <Skeleton className="w-72 h-96 bg-zinc-300/80" />
             </div>
-            <div className="lg:col-span-3 space-y-4">
-              <div className="w-32 h-40 bg-zinc-300" />
-              <div className="w-32 h-40 bg-zinc-300" />
+            <div className="lg:col-span-3 space-y-4 flex flex-col lg:items-end">
+              <Skeleton className="w-32 h-40 bg-zinc-300/80" />
+              <Skeleton className="w-32 h-40 bg-zinc-300/80" />
             </div>
           </div>
         </div>

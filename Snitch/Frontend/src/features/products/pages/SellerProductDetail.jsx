@@ -19,6 +19,7 @@ import {
 
 // Components
 import CreateVariantDrawer from "../components/CreateVariantDrawer";
+import { Skeleton } from "@/components/ui/Skeleton";
 
 // Safe helper to extract attributes object from variant
 const getVariantAttrs = (v) => {
@@ -373,12 +374,60 @@ export default function SellerProductDetail() {
 
       {/* ── 2. Main Studio Content ─────────────────────────────────────── */}
       {isLoading ? (
-        <div className="flex-1 flex items-center justify-center py-28">
-          <div className="flex flex-col items-center gap-3 font-mono text-xs text-zinc-600">
-            <RefreshCw className="w-6 h-6 animate-spin text-zinc-950" />
-            <span>LOADING ATELIER PRODUCT STUDIO...</span>
+        <main className="flex-1 w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-12 sm:pb-16">
+          <div className="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center justify-center -translate-y-4 sm:-translate-y-7">
+            {/* Left Column Gallery Skeleton */}
+            <div className="lg:col-span-6 flex justify-center lg:justify-end w-full">
+              <div className="w-full max-w-[450px]">
+                <div className="flex flex-col-reverse sm:flex-row gap-3 items-start w-full">
+                  <div className="w-full sm:w-16 shrink-0 flex flex-row sm:flex-col gap-2">
+                    {[1, 2, 3].map((i) => (
+                      <Skeleton
+                        key={i}
+                        className="w-14 sm:w-16 sm:w-full aspect-[3/4] bg-zinc-300/80 border border-zinc-300"
+                      />
+                    ))}
+                  </div>
+                  <Skeleton className="flex-1 w-full aspect-[3/4] max-h-[500px] bg-zinc-300/80 border border-zinc-300" />
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column Product Details Skeleton */}
+            <div className="lg:col-span-6 flex justify-center lg:justify-start w-full">
+              <div className="w-full max-w-[390px] space-y-5">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-28 bg-zinc-300/70" />
+                  <Skeleton className="h-8 w-4/5 bg-zinc-300/90" />
+                  <Skeleton className="h-6 w-24 bg-zinc-300/80" />
+                  <div className="w-full border-b border-zinc-300/60 pt-2" />
+                </div>
+
+                {/* Attribute Group Skeletons */}
+                <div className="space-y-3">
+                  <Skeleton className="h-3.5 w-20 bg-zinc-300/70" />
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <Skeleton key={i} className="h-9 w-12 bg-zinc-300/80" />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stock Card Skeleton */}
+                <div className="border border-zinc-300 bg-white/40 p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="h-4 w-24 bg-zinc-300/80" />
+                    <Skeleton className="h-7 w-24 bg-zinc-300/80" />
+                  </div>
+                  <Skeleton className="h-3 w-40 bg-zinc-300/60" />
+                </div>
+
+                {/* Action CTA Skeleton */}
+                <Skeleton className="h-11 w-full bg-zinc-300/90" />
+              </div>
+            </div>
           </div>
-        </div>
+        </main>
       ) : authError ? (
         <div className="flex-1 flex flex-col items-center justify-center p-12 text-center space-y-4">
           <ShieldAlert className="w-14 h-14 stroke-[1.2] text-rose-600 mx-auto" />

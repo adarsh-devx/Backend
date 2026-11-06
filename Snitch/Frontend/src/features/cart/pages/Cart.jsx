@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { Minus, Plus, X, ChevronRight } from "lucide-react";
 import { useRazorpay } from "react-razorpay";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useCart } from "../hook/useCart";
 import PriceAlertBanner from "../components/PriceAlertBanner";
 
@@ -46,9 +47,11 @@ const Cart = () => {
   const [discountOpen, setDiscountOpen] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
+  const [isCartLoading, setIsCartLoading] = useState(true);
 
   useEffect(() => {
-    handleGetCart();
+    setIsCartLoading(true);
+    handleGetCart().finally(() => setIsCartLoading(false));
   }, []);
 
   const currencySymbol =
@@ -148,7 +151,25 @@ const Cart = () => {
       <div className="flex-1 px-5 py-4">
         <PriceAlertBanner alerts={priceAlerts} onDismiss={handleDismissAlert} />
 
-        {cartItems.length === 0 ? (
+        {isCartLoading && cartItems.length === 0 ? (
+          <div className="space-y-4 py-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex gap-4 py-3.5 border-b border-zinc-100">
+                <Skeleton className="w-20 h-24 shrink-0 bg-zinc-200/90" />
+                <div className="flex-1 flex flex-col justify-between py-1">
+                  <div className="space-y-2">
+                    <Skeleton className="h-3.5 w-3/4 bg-zinc-200/80" />
+                    <Skeleton className="h-3 w-1/3 bg-zinc-200/70" />
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <Skeleton className="h-4 w-16 bg-zinc-200/90" />
+                    <Skeleton className="h-7 w-20 bg-zinc-200/80" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : cartItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3 text-zinc-400">
             <span className="text-4xl">🛒</span>
             <p className="text-sm font-space">Your cart is empty</p>

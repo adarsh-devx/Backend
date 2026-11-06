@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useLocation, Link } from "react-router";
 import { Check, Copy, CheckCheck, ArrowUpRight, Loader2, ShoppingBag } from "lucide-react";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { useCart } from "../hook/useCart";
 
 export default function OrderSuccess() {
@@ -129,9 +130,22 @@ export default function OrderSuccess() {
             </div>
 
             {loading ? (
-              <div className="py-6 flex items-center justify-center gap-2 text-zinc-500 text-xs font-mono">
-                <Loader2 size={14} className="animate-spin" />
-                <span>Fetching items...</span>
+              <div className="space-y-2.5 py-1">
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="py-2 flex items-center justify-between gap-3 text-xs"
+                  >
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <Skeleton className="w-10 h-10 bg-zinc-200 shrink-0" />
+                      <div className="min-w-0 flex-1 space-y-1.5">
+                        <Skeleton className="h-3 w-3/4 bg-zinc-200" />
+                        <Skeleton className="h-2.5 w-1/4 bg-zinc-200" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-3 w-12 bg-zinc-200 shrink-0" />
+                  </div>
+                ))}
               </div>
             ) : items.length > 0 ? (
               <div className="divide-y divide-zinc-100 max-h-40 overflow-y-auto pr-1">

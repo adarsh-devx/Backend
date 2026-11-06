@@ -4,6 +4,7 @@ import { useProduct } from "../hook/use.product";
 import { useCart } from "@/features/cart/hook/useCart.js";
 import { cn } from "@/lib/utils";
 import AddToCartButton from "@/features/cart/components/AddToCartButton";
+import { Skeleton } from "@/components/ui/Skeleton";
 import {
   ArrowLeft,
   ChevronDown,
@@ -273,35 +274,61 @@ export default function ProductDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter">
-        <header className="w-full px-6 py-3 border-b border-zinc-300 bg-[#e7e7e0]/90 sticky top-0 z-20">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <Link
-              to="/"
-              className="font-michroma text-base font-bold tracking-widest uppercase"
-            >
-              NOIRVAYN
-            </Link>
-          </div>
-        </header>
-
-        <div className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-start animate-pulse">
-          <div className="md:col-span-7 flex gap-3">
-            <div className="w-14 hidden md:flex flex-col gap-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-14 aspect-[3/4] bg-zinc-300" />
-              ))}
-            </div>
-            <div className="flex-1 aspect-[3/4] max-h-[480px] bg-zinc-300 w-full" />
-          </div>
-          <div className="md:col-span-5 space-y-4">
-            <div className="h-4 bg-zinc-300 w-1/4" />
-            <div className="h-8 bg-zinc-300 w-3/4" />
-            <div className="h-6 bg-zinc-300 w-1/3" />
-            <div className="h-20 bg-zinc-300 w-full" />
-            <div className="h-11 bg-zinc-300 w-full" />
+      <div className="min-h-screen w-full bg-[#e7e7e0] text-zinc-950 flex flex-col font-inter select-none">
+        {/* Breadcrumb Skeleton */}
+        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-1">
+          <div className="flex items-center gap-2">
+            <Skeleton className="w-3.5 h-3.5 bg-zinc-300/80" />
+            <Skeleton className="h-3 w-28 bg-zinc-300/80" />
           </div>
         </div>
+
+        {/* Main Canvas Skeleton */}
+        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 flex flex-col justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-10 items-start w-full">
+            {/* Left Column Gallery Skeleton */}
+            <div className="md:col-span-7 flex flex-col-reverse md:flex-row gap-3 items-start max-w-[540px] w-full">
+              <div className="w-full md:w-16 shrink-0 flex flex-row md:flex-col gap-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton
+                    key={i}
+                    className="w-14 sm:w-16 md:w-full aspect-[3/4] bg-zinc-300/80 border border-zinc-300"
+                  />
+                ))}
+              </div>
+              <Skeleton className="flex-1 max-w-[460px] w-full aspect-[3/4] max-h-[500px] bg-zinc-300/80 border border-zinc-300" />
+            </div>
+
+            {/* Right Column Product Info Skeleton */}
+            <div className="md:col-span-5 flex flex-col gap-5 w-full">
+              <div className="space-y-2">
+                <Skeleton className="h-3 w-24 bg-zinc-300/70" />
+                <Skeleton className="h-8 w-4/5 bg-zinc-300/90" />
+                <Skeleton className="h-6 w-28 bg-zinc-300/80" />
+              </div>
+
+              {/* Attributes / Options Skeleton */}
+              <div className="space-y-3">
+                <Skeleton className="h-3.5 w-16 bg-zinc-300/70" />
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-9 w-12 bg-zinc-300/80" />
+                  ))}
+                </div>
+              </div>
+
+              {/* Description Skeleton */}
+              <div className="space-y-2 pt-2 border-t border-zinc-300/60">
+                <Skeleton className="h-3.5 w-full bg-zinc-300/70" />
+                <Skeleton className="h-3.5 w-5/6 bg-zinc-300/70" />
+                <Skeleton className="h-3.5 w-2/3 bg-zinc-300/70" />
+              </div>
+
+              {/* Add to Cart CTA Skeleton */}
+              <Skeleton className="h-12 w-full bg-zinc-300/90 mt-2" />
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
