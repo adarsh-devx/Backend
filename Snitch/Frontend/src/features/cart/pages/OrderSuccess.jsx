@@ -168,6 +168,10 @@ export default function OrderSuccess() {
                             src={itemImg}
                             alt={item.title || "Product"}
                             className="w-10 h-10 object-cover bg-zinc-100 border border-zinc-200 shrink-0"
+                            onError={(e) => {
+                              e.currentTarget.onerror = null;
+                              e.currentTarget.src = "/assets/hero_black.jpg";
+                            }}
                           />
                         ) : (
                           <div className="w-10 h-10 bg-zinc-100 border border-zinc-200 flex items-center justify-center text-zinc-400 shrink-0 font-mono text-[10px]">

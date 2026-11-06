@@ -106,6 +106,16 @@ export default function RunwayCatalog({
             ? bp.colors
             : defaultColorPalettes[idx % defaultColorPalettes.length];
 
+        const rawImg = bp.images?.[0] || bp.image;
+        const resolvedImg =
+          typeof rawImg === "string"
+            ? rawImg
+            : rawImg?.url ||
+              (typeof bp.variants?.[0]?.images?.[0] === "string"
+                ? bp.variants[0].images[0]
+                : bp.variants?.[0]?.images?.[0]?.url) ||
+              "/refrenceCatalogItems/windbreaker_4x3.webp";
+
         return {
           id: bp._id,
           title: (bp.title || "RUNWAY PIECE").toUpperCase(),
@@ -113,10 +123,7 @@ export default function RunwayCatalog({
           price: Number(
             bp.price?.amount ?? (typeof bp.price === "number" ? bp.price : 999),
           ),
-          image:
-            bp.images?.[0]?.url ||
-            bp.image ||
-            "/refrenceCatalogItems/windbreaker_4x3.webp",
+          image: resolvedImg,
           colors,
           raw: bp,
         };
@@ -191,7 +198,11 @@ export default function RunwayCatalog({
                         "w-full h-full object-contain transition-transform duration-500 group-hover:scale-105",
                         getModelOffsetClass(product),
                       )}
-                      loading="lazy"
+                      loading="eager"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/refrenceCatalogItems/windbreaker_4x3.webp";
+                      }}
                     />
 
                     {/* Wishlist Heart Button */}

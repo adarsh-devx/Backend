@@ -69,7 +69,17 @@ export default function Dashboard() {
   // Image list of current active product
   const activeImages = useMemo(() => {
     if (activeProduct?.images && activeProduct.images.length > 0) {
-      return activeProduct.images.map((img) => img.url);
+      const pImgs = activeProduct.images
+        .map((img) => (typeof img === "string" ? img : img?.url))
+        .filter(Boolean);
+      if (pImgs.length > 0) return pImgs;
+    }
+    if (activeProduct?.variants && activeProduct.variants.length > 0) {
+      const vImgs = activeProduct.variants
+        .flatMap((v) => v.images || [])
+        .map((img) => (typeof img === "string" ? img : img?.url))
+        .filter(Boolean);
+      if (vImgs.length > 0) return vImgs;
     }
     return [];
   }, [activeProduct]);
@@ -261,6 +271,10 @@ export default function Dashboard() {
                   alt={activeProduct?.title || "Product image"}
                   className="w-full h-auto max-h-[580px] object-contain transition-transform duration-700 ease-out pointer-events-auto"
                   loading="eager"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = "/assets/hero_black.jpg";
+                  }}
                 />
               </div>
 

@@ -20,8 +20,12 @@ export default function ProductCard({
   const cardRef = useRef(null);
 
   const images = product?.images || [];
+  const getImgSrc = (img) => (typeof img === "string" ? img : img?.url);
   const primaryImg =
-    images[activeImgIdx]?.url || images[0]?.url || "/assets/hero_black.jpg";
+    getImgSrc(images[activeImgIdx]) ||
+    getImgSrc(images[0]) ||
+    getImgSrc(product?.variants?.[0]?.images?.[0]) ||
+    "/assets/hero_black.jpg";
 
   const currencySymbol = product?.price?.currency === "USD" ? "$" : "₹";
   const formattedPrice = Number(product?.price?.amount || 0).toLocaleString();
@@ -92,7 +96,10 @@ export default function ProductCard({
           src={primaryImg}
           alt={product?.title || "Product"}
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/assets/hero_black.jpg";
+          }}
         />
 
         {/* Top Minimal Technical Badges */}

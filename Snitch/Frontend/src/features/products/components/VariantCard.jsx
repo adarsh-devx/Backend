@@ -39,9 +39,10 @@ export default function VariantCard({
   );
 
   // Image fallback
+  const getImgSrc = (img) => (typeof img === "string" ? img : img?.url);
   const variantImage =
-    variant?.images?.[0]?.url ||
-    masterProduct?.images?.[0]?.url ||
+    getImgSrc(variant?.images?.[0]) ||
+    getImgSrc(masterProduct?.images?.[0]) ||
     "/assets/hero_black.jpg";
 
   // Price calculations
@@ -98,6 +99,10 @@ export default function VariantCard({
             src={variantImage}
             alt={size}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = "/assets/hero_black.jpg";
+            }}
           />
         </div>
 

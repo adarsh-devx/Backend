@@ -297,6 +297,10 @@ export default function CartDrawer() {
                           src={image}
                           alt={productName}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/assets/hero_black.jpg";
+                          }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-zinc-400 text-xs font-space">

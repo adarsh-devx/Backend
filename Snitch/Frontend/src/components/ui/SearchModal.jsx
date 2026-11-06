@@ -188,10 +188,12 @@ export default function SearchModal({ isOpen, onClose }) {
                 MATCHING PIECES ({displayResults.length})
               </p>
               {displayResults.map((product) => {
+                const rawImg =
+                  product.images?.[0] || product.variants?.[0]?.images?.[0];
                 const imgUrl =
-                  product.images?.[0]?.url ||
-                  product.variants?.[0]?.images?.[0]?.url ||
-                  "/placeholder.webp";
+                  typeof rawImg === "string"
+                    ? rawImg
+                    : rawImg?.url || "/placeholder.webp";
                 const price =
                   product.price?.amount ||
                   product.variants?.[0]?.price?.amount ||
@@ -209,6 +211,10 @@ export default function SearchModal({ isOpen, onClose }) {
                           src={imgUrl}
                           alt={product.title}
                           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/placeholder.webp";
+                          }}
                         />
                       </div>
                       <div className="min-w-0">

@@ -206,10 +206,16 @@ export default function ProductDetail() {
   // Dynamic Image gallery switching (variant images if present, otherwise product images)
   const images = useMemo(() => {
     if (activeVariant?.images && activeVariant.images.length > 0) {
-      return activeVariant.images.map((img) => img.url);
+      const vImgs = activeVariant.images
+        .map((img) => (typeof img === "string" ? img : img?.url))
+        .filter(Boolean);
+      if (vImgs.length > 0) return vImgs;
     }
     if (product?.images && product.images.length > 0) {
-      return product.images.map((img) => img.url);
+      const pImgs = product.images
+        .map((img) => (typeof img === "string" ? img : img?.url))
+        .filter(Boolean);
+      if (pImgs.length > 0) return pImgs;
     }
     return ["/assets/hero_black.jpg"];
   }, [product, activeVariant]);
@@ -404,6 +410,10 @@ export default function ProductDetail() {
                       src={imgUrl}
                       alt={`Angle ${idx + 1}`}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "/assets/hero_black.jpg";
+                      }}
                     />
                   </button>
                 ))}
@@ -423,6 +433,10 @@ export default function ProductDetail() {
                 src={activeImg}
                 alt={product.title}
                 className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/assets/hero_black.jpg";
+                }}
               />
 
               {/* Expand Fullscreen Button (Top-Right) */}

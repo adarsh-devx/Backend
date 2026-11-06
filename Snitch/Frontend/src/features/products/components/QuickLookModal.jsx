@@ -8,9 +8,12 @@ export default function QuickLookModal({ product, onClose, onSelectAsHero }) {
   if (!product) return null;
 
   const images = product?.images || [];
-
+  const getImgSrc = (img) => (typeof img === "string" ? img : img?.url);
   const activeImg =
-    images[selectedImgIdx]?.url || images[0]?.url || "/assets/hero_black.jpg";
+    getImgSrc(images[selectedImgIdx]) ||
+    getImgSrc(images[0]) ||
+    getImgSrc(product?.variants?.[0]?.images?.[0]) ||
+    "/assets/hero_black.jpg";
 
   const currencySymbol = product?.price?.currency === "USD" ? "$" : "₹";
   const formattedPrice = Number(product?.price?.amount || 0).toLocaleString();
@@ -41,6 +44,10 @@ export default function QuickLookModal({ product, onClose, onSelectAsHero }) {
               src={activeImg}
               alt={product?.title || "Product image"}
               className="w-full h-full object-cover animate-in fade-in duration-300"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/assets/hero_black.jpg";
+              }}
             />
             <span className="absolute top-3 left-3 bg-zinc-950 text-white font-mono text-[9px] font-bold tracking-widest px-2 py-0.5">
               PHOTO {selectedImgIdx + 1} // {images.length || 1}
