@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate, useLocation } from "react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { ShoppingBag, AlertCircle } from "lucide-react";
 import gsap from "gsap";
@@ -22,7 +24,10 @@ export default function AddToCartButton({
   className = "",
   onSuccess,
 }) {
-  const { handleAddToCart } = useCart();
+  const { handleAddToCart, handleSavePendingCartItem } = useCart();
+  const user = useSelector((state) => state.auth?.user);
+  const navigate = useNavigate();
+  const location = useLocation();
   const buttonRef = useRef(null);
   const [buttonState, setButtonState] = useState("idle"); // "idle" | "loading" | "success" | "error"
   const [errorMessage, setErrorMessage] = useState("");
@@ -199,6 +204,19 @@ export default function AddToCartButton({
       setButtonState("error");
       setErrorMessage("Select a product");
       timerRef.current = setTimeout(() => setButtonState("idle"), 1500);
+      return;
+    }
+
+    // If user is unauthenticated, save pending item and smoothly redirect to login
+    if (!user) {
+      const returnUrl = location.pathname + location.search;
+      handleSavePendingCartItem({
+        productId: product._id,
+        variantId: variant?._id,
+        quantity: Math.max(1, quantity),
+        returnUrl,
+      });
+      navigate(`/login?redirect=${encodeURIComponent(returnUrl)}`);
       return;
     }
 

@@ -1,6 +1,7 @@
-import { useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState, useCallback, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../hook/use.auth";
+import { useCart } from "@/features/cart/hook/useCart";
 import { cn } from "@/lib/utils";
 import {
   Mail,
@@ -18,7 +19,9 @@ import GoogleButton from "../components/GoogleButton";
 // ── Register Page ────────────────────────────────────────────────────────────
 const Register = () => {
   const { handleRegister } = useAuth();
+  const { handleSyncPendingCartItem } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -119,7 +122,17 @@ const Register = () => {
         password: formData.password,
         isSeller: Boolean(formData.isSeller),
       });
-      navigate("/");
+
+      // Automatically sync any pending cart item added by guest before signup
+      const pendingSync = await handleSyncPendingCartItem();
+
+      if (formData.isSeller) {
+        navigate("/seller/dashboard");
+      } else if (pendingSync?.returnUrl) {
+        navigate(pendingSync.returnUrl, { replace: true });
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setErrors({
         general: err?.message || "Registration failed. Please try again.",
@@ -179,7 +192,7 @@ const Register = () => {
         {/* Modern Tab Switcher */}
         <div className="flex bg-[#deddd6] border border-zinc-300/80 rounded-xl p-1 mb-3.5">
           <Link
-            to="/login"
+            to={location.search ? `/login${location.search}` : "/login"}
             className="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center text-zinc-600 hover:text-zinc-950 cursor-pointer"
           >
             Sign In

@@ -1,13 +1,16 @@
 import { useState, useCallback, useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import { useAuth } from "../hook/use.auth";
+import { useCart } from "@/features/cart/hook/useCart";
 import { cn } from "@/lib/utils";
 import { Mail, Lock, Eye, EyeOff, AlertTriangle, Loader2 } from "lucide-react";
 import GoogleButton from "../components/GoogleButton";
 
 const Login = () => {
   const { handleLogin } = useAuth();
+  const { handleSyncPendingCartItem } = useCart();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +22,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [fieldTouched, setFieldTouched] = useState({});
 
+  // Check if user was redirected here after attempting to add an item to cart — notification removed per UX feedback, but sync still runs on submit
   // Load saved email if rememberMe was previously set
   useEffect(() => {
     const savedEmail = localStorage.getItem("userEmail");
@@ -99,8 +103,13 @@ const Login = () => {
         localStorage.removeItem("rememberMe");
       }
 
+      // Automatically sync any pending cart item added by guest before login
+      const pendingSync = await handleSyncPendingCartItem();
+
       if (loggedUser?.role === "seller") {
         navigate("/seller/dashboard");
+      } else if (pendingSync?.returnUrl) {
+        navigate(pendingSync.returnUrl, { replace: true });
       } else {
         navigate("/");
       }
@@ -166,7 +175,7 @@ const Login = () => {
             Sign In
           </span>
           <Link
-            to="/register"
+            to={location.search ? `/register${location.search}` : "/register"}
             className="flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all text-center text-zinc-600 hover:text-zinc-950 cursor-pointer"
           >
             Sign Up

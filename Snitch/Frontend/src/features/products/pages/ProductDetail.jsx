@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import { useProduct } from "../hook/use.product";
 import { useCart } from "@/features/cart/hook/useCart.js";
+import { useAuth } from "@/features/auth/hook/use.auth";
 import { cn } from "@/lib/utils";
 import AddToCartButton from "@/features/cart/components/AddToCartButton";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -34,7 +35,8 @@ export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { handleGetProductById } = useProduct();
-  const { handleAddToCart } = useCart();
+  const { handleAddToCart, handleSavePendingCartItem } = useCart();
+  const { user } = useAuth();
   const heroImageRef = useRef(null);
 
   const [product, setProduct] = useState(null);
@@ -646,6 +648,20 @@ export default function ProductDetail() {
                 disabled={isOutOfStock}
                 onClick={async () => {
                   if (isOutOfStock) return;
+                  if (!user) {
+                    const currentUrl =
+                      window.location.pathname + window.location.search;
+                    handleSavePendingCartItem({
+                      productId: product._id,
+                      variantId: activeVariant?._id,
+                      quantity,
+                      returnUrl: currentUrl,
+                    });
+                    navigate(
+                      `/login?redirect=${encodeURIComponent(currentUrl)}`,
+                    );
+                    return;
+                  }
                   try {
                     await handleAddToCart({
                       productId: product._id,
